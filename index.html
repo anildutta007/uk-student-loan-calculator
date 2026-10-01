@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UK UniLoan Calculator & Parental Contribution Lab | England & Wales</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 antialiased flex flex-col justify-between">
+
+  <!-- Header -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-xl shadow-md">
+          🎓
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">UK UniLoan Calculator</h1>
+            <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">England & Wales</span>
+            <span class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-2 py-0.5 rounded-full">Plan 2 & Plan 5</span>
+          </div>
+          <p class="text-xs text-slate-500">Student Repayment Forecasts • Parental Fee Impact • 3%, 4%, 5% Market Growth Comparison</p>
+        </div>
+      </div>
+
+      <!-- Quick Salary Preset Badges -->
+      <div class="flex items-center gap-1.5 flex-wrap text-xs">
+        <span class="text-slate-400 font-medium mr-1 hidden lg:inline">Quick Presets:</span>
+        <button onclick="applyPreset('nurse')" class="px-2.5 py-1 bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 rounded-lg transition font-medium border border-slate-200">
+          🏥 NHS Nurse (£28k)
+        </button>
+        <button onclick="applyPreset('teacher')" class="px-2.5 py-1 bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 rounded-lg transition font-medium border border-slate-200">
+          🏫 Teacher (£30k)
+        </button>
+        <button onclick="applyPreset('median')" class="px-2.5 py-1 bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 rounded-lg transition font-medium border border-slate-200">
+          💼 Median Grad (£32k)
+        </button>
+        <button onclick="applyPreset('tech')" class="px-2.5 py-1 bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 rounded-lg transition font-medium border border-slate-200">
+          💻 Tech/Eng (£42k)
+        </button>
+        <button onclick="applyPreset('finance')" class="px-2.5 py-1 bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 rounded-lg transition font-medium border border-slate-200">
+          ⚖️ City / Law (£60k)
+        </button>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-slate-100">
+      <nav class="flex space-x-1 sm:space-x-8 -mb-px overflow-x-auto text-sm font-medium">
+        <button onclick="switchTab('parentLab')" id="tabBtn-parentLab" class="tab-btn active py-3 px-3 text-slate-600 border-b-2 border-transparent hover:text-blue-600 flex items-center gap-2 whitespace-nowrap">
+          <span>👨‍👩‍👦</span> Parental Contribution & Market Comparison (3%, 4%, 5%)
+        </button>
+        <button onclick="switchTab('studentCalc')" id="tabBtn-studentCalc" class="tab-btn py-3 px-3 text-slate-600 border-b-2 border-transparent hover:text-blue-600 flex items-center gap-2 whitespace-nowrap">
+          <span>🎓</span> Student Repayment Calculator
+        </button>
+        <button onclick="switchTab('scheduleTable')" id="tabBtn-scheduleTable" class="tab-btn py-3 px-3 text-slate-600 border-b-2 border-transparent hover:text-blue-600 flex items-center gap-2 whitespace-nowrap">
+          <span>📊</span> Lifetime Year-by-Year Schedule
+        </button>
+        <button onclick="switchTab('guideFaq')" id="tabBtn-guideFaq" class="tab-btn py-3 px-3 text-slate-600 border-b-2 border-transparent hover:text-blue-600 flex items-center gap-2 whitespace-nowrap">
+          <span>📘</span> UK Rules Guide & FAQs
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full flex-grow">
+
+    <!-- TOP CONTROL PANEL: Shared Student & Career Settings -->
+    <section class="bg-white rounded-2xl p-5 mb-6 border border-slate-200 shadow-sm">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between pb-4 mb-4 border-b border-slate-100 gap-3">
+        <div>
+          <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+            <span>⚙️</span> Student & Course Setup
+          </h2>
+          <p class="text-xs text-slate-500">Configure whether the student is currently studying or graduated, their loan plan, and career earnings.</p>
+        </div>
+        <div class="flex items-center gap-2 bg-slate-100 p-1 rounded-xl text-xs font-semibold">
+          <button id="modeBtnStudying" onclick="setStudentMode('studying')" class="px-3 py-1.5 rounded-lg bg-white shadow-sm text-blue-700 transition">
+            🎒 Currently Studying
+          </button>
+          <button id="modeBtnGraduated" onclick="setStudentMode('graduated')" class="px-3 py-1.5 rounded-lg text-slate-600 hover:text-blue-600 transition">
+            🎓 Finished / Graduated
+          </button>
+        </div>
+      </div>
+
+      <!-- Input Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+        
+        <!-- Loan Plan Selection -->
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1 text-xs">Student Loan Plan</label>
+          <select id="inputPlanType" onchange="runCalculation()" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-900 font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            <option value="plan_5" selected>Plan 5 (England - Aug 2023 onwards)</option>
+            <option value="plan_2">Plan 2 (England 2012-23 / Wales 2012+)</option>
+            <option value="plan_1">Plan 1 (England & Wales - Pre-2012)</option>
+          </select>
+          <p id="planInfoText" class="text-[11px] text-slate-500 mt-1">£25,000 threshold, 9% repayment, 40-year write-off, RPI interest.</p>
+        </div>
+
+        <!-- Studying Inputs: Tuition & Maintenance -->
+        <div id="studyingInputs" class="contents">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1 text-xs">Tuition Fee per Year (£)</label>
+            <input type="number" id="inputTuition" value="9250" step="250" oninput="runCalculation()" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-900 font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            <div class="flex gap-1 mt-1">
+              <button onclick="setTuition(9250)" class="text-[10px] bg-slate-100 hover:bg-slate-200 px-1.5 py-0.5 rounded text-slate-600">Standard £9,250</button>
+              <button onclick="setTuition(9535)" class="text-[10px] bg-slate-100 hover:bg-slate-200 px-1.5 py-0.5 rounded text-slate-600">2025/26 £9,535</button>
+              <button onclick="setTuition(9000)" class="text-[10px] bg-slate-100 hover:bg-slate-200 px-1.5 py-0.5 rounded text-slate-600">Wales £9,000</button>
+            </div>
+          </div>
+
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1 text-xs">Maintenance Loan per Year (£)</label>
+            <input type="number" id="inputMaintenance" value="10227" step="250" oninput="runCalculation()" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-900 font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            <div class="flex gap-1 mt-1 flex-wrap">
+              <button onclick="setMaintenance(8610)" class="text-[10px] bg-slate-100 hover:bg-slate-200 px-1.5 py-0.5 rounded text-slate-600">Home £8.6k</button>
+              <button onclick="setMaintenance(10227)" class="text-[10px] bg-slate-100 hover:bg-slate-200 px-1.5 py-0.5 rounded text-slate-600">Away £10.2k</button>
+              <button onclick="setMaintenance(13348)" class="text-[10px] bg-slate-100 hover:bg-slate-200 px-1.5 py-0.5 rounded text-slate-600">London £13.3k</button>
+            </div>
+          </div>
+
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1 text-xs">Course Duration (Years)</label>
+            <select id="inputCourseYears" onchange="runCalculation()" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-900 font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              <option value="3" selected>3 Years (Standard BA / BSc)</option>
+              <option value="4">4 Years (MSci / Placement / Year Abroad)</option>
+              <option value="5">5 Years (Medicine / Dentistry / Architecture)</option>
+            </select>
+            <p class="text-[11px] text-slate-500 mt-1">In-study interest automatically compounds.</p>
+          </div>
+        </div>
+
+        <!-- Graduated Inputs: Current Balance -->
+        <div id="graduatedInputs" class="hidden contents">
+          <div class="lg:col-span-3">
+            <label class="block font-semibold text-slate-700 mb-1 text-xs">Current / Remaining Loan Balance (£)</label>
+            <div class="relative">
+              <span class="absolute left-3 top-2.5 text-slate-400 font-semibold">£</span>
+              <input type="number" id="inputGradBalance" value="48000" step="1000" oninput="runCalculation()" class="w-full bg-slate-50 border border-slate-300 rounded-lg pl-7 pr-3 py-2 text-slate-900 font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            </div>
+            <p class="text-[11px] text-slate-500 mt-1">Check your Student Loans Company (SLC) online account for exact balance.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Salary & Growth Row -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm mt-4 pt-4 border-t border-slate-100">
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1 text-xs">Starting / Expected Annual Salary (£)</label>
+          <div class="relative">
+            <span class="absolute left-3 top-2.5 text-slate-400 font-semibold">£</span>
+            <input type="number" id="inputSalary" value="32000" step="500" oninput="runCalculation()" class="w-full bg-slate-50 border border-slate-300 rounded-lg pl-7 pr-3 py-2 text-slate-900 font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none">
+          </div>
+          <p class="text-[11px] text-slate-500 mt-1">Salary drawn now or upon graduation.</p>
+        </div>
+
+        <div>
+          <div class="flex justify-between items-center mb-1">
+            <label class="block font-semibold text-slate-700 text-xs">Expected Annual Salary Growth</label>
+            <span id="salaryGrowthVal" class="text-xs font-bold text-blue-600">3.5% / yr</span>
+          </div>
+          <input type="range" id="inputSalaryGrowth" min="1.0" max="8.0" step="0.5" value="3.5" oninput="document.getElementById('salaryGrowthVal').innerText = this.value + '% / yr'; runCalculation();" class="w-full h-2 bg-slate-200 rounded-lg cursor-pointer">
+          <div class="flex justify-between text-[10px] text-slate-400 mt-1">
+            <span>1% (Flat)</span>
+            <span>3.5% (Typical)</span>
+            <span>8% (Fast Track)</span>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex justify-between items-center mb-1">
+            <label class="block font-semibold text-slate-700 text-xs">Assumed RPI Inflation</label>
+            <span id="rpiVal" class="text-xs font-bold text-slate-600">3.2%</span>
+          </div>
+          <input type="range" id="inputRPI" min="1.5" max="6.0" step="0.1" value="3.2" oninput="document.getElementById('rpiVal').innerText = this.value + '%'; runCalculation();" class="w-full h-2 bg-slate-200 rounded-lg cursor-pointer">
+          <div class="flex justify-between text-[10px] text-slate-400 mt-1">
+            <span>2.0%</span>
+            <span>3.2% (Target)</span>
+            <span>6.0%</span>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1 text-xs">Postgraduate Loan</label>
+          <label class="flex items-center gap-2 cursor-pointer mt-2 text-xs">
+            <input type="checkbox" id="checkPostgrad" onchange="runCalculation()" class="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500">
+            <span class="text-slate-700 font-medium">Add Postgrad Loan (+6% > £21k)</span>
+          </label>
+          <p class="text-[11px] text-slate-400 mt-1">Master's / PhD concurrent repayment.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 1: PARENTAL CONTRIBUTION & MARKET COMPARISON (Primary Requirement) -->
+    <div id="tabContent-parentLab" class="tab-pane space-y-6">
+
+      <!-- Parent Setup & Comparison Inputs -->
+      <section class="bg-gradient-to-r from-blue-900 to-indigo-900 text-white rounded-2xl p-6 shadow-md">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-indigo-700/60">
+          <div>
+            <span class="bg-indigo-700/80 text-indigo-100 text-xs font-semibold px-2.5 py-1 rounded-full uppercase tracking-wider">Parental Strategy Lab</span>
+            <h2 class="text-2xl font-bold mt-2">Should Parents Pay University Fees or Invest in the Market?</h2>
+            <p class="text-indigo-200 text-sm mt-1 max-w-2xl">
+              Under UK student finance, paying tuition upfront may not reduce monthly student deductions at all if the debt would be written off anyway.
+              Compare your exact fee contribution against investing the same capital at <strong class="text-white">3%, 4%, and 5%</strong> compound growth.
+            </p>
+          </div>
+
+          <!-- Total Parental Capital Badge -->
+          <div class="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/15 text-right min-w-[200px]">
+            <span class="text-xs text-indigo-200 uppercase font-semibold">Total Parental Capital</span>
+            <div id="statTotalParentContribution" class="text-2xl font-black text-amber-300">£27,750</div>
+            <span id="statParentFlowDesc" class="text-[11px] text-indigo-200">£9,250 / yr × 3 years</span>
+          </div>
+        </div>
+
+        <!-- Contribution Config Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-5 text-sm">
+          <div>
+            <label class="block text-indigo-200 text-xs font-semibold mb-1">Contribution Method</label>
+            <select id="inputContribType" onchange="runCalculation()" class="w-full bg-indigo-950/70 border border-indigo-600 rounded-lg px-3 py-2 text-white font-medium focus:ring-2 focus:ring-amber-400 focus:outline-none">
+              <option value="annual_fee" selected>Pay Annual Tuition (£9,250/yr)</option>
+              <option value="custom_annual">Custom Annual Contribution</option>
+              <option value="lump_sum">One-off Lump Sum</option>
+            </select>
+          </div>
+
+          <div id="parentAnnualGroup">
+            <label class="block text-indigo-200 text-xs font-semibold mb-1">Annual Fee Support (£ / yr)</label>
+            <div class="relative">
+              <span class="absolute left-3 top-2.5 text-indigo-300 font-semibold">£</span>
+              <input type="number" id="inputParentAnnual" value="9250" step="250" oninput="runCalculation()" class="w-full bg-indigo-950/70 border border-indigo-600 rounded-lg pl-7 pr-3 py-2 text-white font-semibold focus:ring-2 focus:ring-amber-400 focus:outline-none">
+            </div>
+          </div>
+
+          <div id="parentLumpGroup" class="hidden">
+            <label class="block text-indigo-200 text-xs font-semibold mb-1">One-off Lump Sum (£)</label>
+            <div class="relative">
+              <span class="absolute left-3 top-2.5 text-indigo-300 font-semibold">£</span>
+              <input type="number" id="inputParentLump" value="25000" step="1000" oninput="runCalculation()" class="w-full bg-indigo-950/70 border border-indigo-600 rounded-lg pl-7 pr-3 py-2 text-white font-semibold focus:ring-2 focus:ring-amber-400 focus:outline-none">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-indigo-200 text-xs font-semibold mb-1">Custom Market Growth Rate (%)</label>
+            <div class="flex items-center gap-2">
+              <input type="number" id="inputCustomMarketRate" value="6.0" step="0.5" min="1" max="15" oninput="runCalculation()" class="w-24 bg-indigo-950/70 border border-indigo-600 rounded-lg px-3 py-2 text-white font-semibold focus:ring-2 focus:ring-amber-400 focus:outline-none text-center">
+              <span class="text-xs text-indigo-300">Alongside 3%, 4%, 5%</span>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-indigo-200 text-xs font-semibold mb-1">Comparison Investment Horizon</label>
+            <select id="inputHorizonYears" onchange="runCalculation()" class="w-full bg-indigo-950/70 border border-indigo-600 rounded-lg px-3 py-2 text-white font-medium focus:ring-2 focus:ring-amber-400 focus:outline-none">
+              <option value="write_off" selected>Full Loan Term (30 or 40 Yrs)</option>
+              <option value="20">20 Years (Early Career / House Buy)</option>
+              <option value="10">10 Years (Medium Term)</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <!-- STRATEGIC VERDICT BOX (Plain English Recommendation) -->
+      <section id="verdictBox" class="rounded-2xl p-6 border shadow-sm transition-all duration-300 bg-amber-50 border-amber-200">
+        <div class="flex items-start gap-4">
+          <div id="verdictIcon" class="text-3xl p-3 rounded-2xl bg-white shadow-sm border border-amber-200">⚠️</div>
+          <div class="space-y-2 flex-grow">
+            <div class="flex items-center gap-3 flex-wrap">
+              <h3 id="verdictTitle" class="text-lg font-bold text-slate-900">Evaluating Financial Outcome...</h3>
+              <span id="verdictBadge" class="text-xs font-bold px-2.5 py-1 rounded-full bg-amber-200 text-amber-900">Graduate Tax Risk</span>
+            </div>
+            <p id="verdictSummary" class="text-sm text-slate-700 leading-relaxed">Analyzing your career salary curve and contribution...</p>
+            <div class="bg-white/80 p-3.5 rounded-xl border border-amber-200 text-sm text-slate-800 font-medium">
+              <span class="text-blue-700 font-bold block mb-1">💡 Strategic Guidance for Parents:</span>
+              <span id="verdictRecommendation">Checking whether paying tuition or investing in an ISA is mathematically superior...</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3-WAY COMPARISON CARDS: No Help vs Fee Contribution vs Market Pot -->
+      <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+        <!-- Column A: Without Parental Help -->
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover-card flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-100">
+              <h3 class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
+                <span class="w-3 h-3 rounded-full bg-slate-400 inline-block"></span>
+                Scenario A: Full Student Loan
+              </h3>
+              <span class="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded">No Parental Money</span>
+            </div>
+
+            <div class="space-y-3 text-sm">
+              <div class="flex justify-between items-baseline">
+                <span class="text-slate-500 text-xs">Loan at Graduation:</span>
+                <span id="colA_startBalance" class="font-bold text-slate-800 text-base">£58,431</span>
+              </div>
+              <div class="flex justify-between items-baseline">
+                <span class="text-slate-500 text-xs">Total Repaid by Student:</span>
+                <span id="colA_totalRepaid" class="font-bold text-slate-900 text-lg">£38,200</span>
+              </div>
+              <div class="flex justify-between items-baseline">
+                <span class="text-slate-500 text-xs">Total Interest Incurred:</span>
+                <span id="colA_interest" class="font-semibold text-slate-700">£42,100</span>
+              </div>
+              <div class="flex justify-between items-baseline">
+                <span class="text-slate-500 text-xs">Payoff / Status:</span>
+                <span id="colA_payoffStatus" class="font-bold text-amber-600">Written Off (Yr 40)</span>
+              </div>
+              <div class="flex justify-between items-baseline">
+                <span class="text-slate-500 text-xs">Debt Written Off by Gov:</span>
+                <span id="colA_writtenOff" class="font-bold text-emerald-600">£62,331</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-slate-100 text-xs text-slate-400 text-center">
+            Student pays 9% above threshold via monthly salary deductions.
+          </div>
+        </div>
+
+        <!-- Column B: With Parental Contribution -->
+        <div class="bg-blue-50/50 rounded-2xl p-5 border-2 border-blue-400 shadow-sm hover-card flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between pb-3 mb-3 border-b border-blue-200">
+              <h3 class="font-bold text-blue-900 text-sm flex items-center gap-1.5">
+                <span class="w-3 h-3 rounded-full bg-blue-600 inline-block"></span>
+                Scenario B: With Parental Help
+              </h3>
+              <span class="text-[11px] font-semibold text-blue-700 bg-blue-100 px-2 py-0.5 rounded">Fee Reduced</span>
+            </div>
+
+            <div class="space-y-3 text-sm">
+              <div class="flex justify-between items-baseline">
+                <span class="text-slate-600 text-xs">Parent Capital Paid:</span>
+                <span id="colB_parentPaid" class="font-bold text-blue-700 text-base">£27,750</span>
+              </div>
+              <div class="flex justify-between items-baseline">
+                <span class="text-slate-600 text-xs">New Graduation Balance:</span>
+                <span id="colB_startBalance" class="font-bold text-slate-800">£30,681</span>
+              </div>
+              <div class="flex justify-between items-baseline">
+                <span class="text-slate-600 text-xs">Total Repaid by Student:</span>
+                <span id="colB_totalRepaid" class="font-bold text-slate-900 text-lg">£38,200</span>
+              </div>
+              <div class="flex justify-between items-baseline">
+                <span class="text-slate-600 text-xs">Payoff / Status:</span>
+                <span id="colB_payoffStatus" class="font-bold text-blue-800">Written Off (Yr 40)</span>
+              </div>
+              <div class="bg-white p-2.5 rounded-xl border border-blue-200 space-y-1 mt-2">
+                <div class="flex justify-between text-xs">
+                  <span class="text-slate-600">Student Repayments Saved:</span>
+                  <span id="colB_savings" class="font-bold text-slate-900">£0</span>
+                </div>
+                <div class="flex justify-between text-xs">
+                  <span class="text-slate-600">Years Cleared Earlier:</span>
+                  <span id="colB_yearsEarlier" class="font-bold text-slate-900">0 yrs</span>
+                </div>
+                <div class="flex justify-between text-xs">
+                  <span class="text-slate-600">Net Family Financial Gain:</span>
+                  <span id="colB_netGain" class="font-bold text-red-600">-£27,750</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-blue-100 text-xs text-blue-600 font-medium text-center">
+            Does the student actually pay less over 30/40 years?
+          </div>
+        </div>
+
+        <!-- Column C: Alternative Market Investment (3%, 4%, 5%) -->
+        <div class="bg-emerald-50/60 rounded-2xl p-5 border-2 border-emerald-400 shadow-sm hover-card flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between pb-3 mb-3 border-b border-emerald-200">
+              <h3 class="font-bold text-emerald-950 text-sm flex items-center gap-1.5">
+                <span class="w-3 h-3 rounded-full bg-emerald-600 inline-block"></span>
+                Scenario C: Market Investment Pot
+              </h3>
+              <span class="text-[11px] font-semibold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded">Compound Growth</span>
+            </div>
+
+            <p class="text-xs text-emerald-800 mb-3">If parents invest the same <strong id="colC_capitalInvested">£27,750</strong> in Stocks & Shares ISA / Index Fund:</p>
+
+            <div class="space-y-2 text-sm bg-white p-3 rounded-xl border border-emerald-200">
+              <div class="flex justify-between items-baseline py-1 border-b border-slate-100">
+                <span class="text-slate-600 text-xs font-medium">Growth @ <span class="text-emerald-700 font-bold">3% p.a.</span> (Cash/Gilts):</span>
+                <span id="colC_pot3" class="font-bold text-emerald-900">£67,400</span>
+              </div>
+              <div class="flex justify-between items-baseline py-1 border-b border-slate-100">
+                <span class="text-slate-600 text-xs font-medium">Growth @ <span class="text-emerald-700 font-bold">4% p.a.</span> (Balanced):</span>
+                <span id="colC_pot4" class="font-bold text-emerald-900">£89,200</span>
+              </div>
+              <div class="flex justify-between items-baseline py-1 border-b border-slate-100">
+                <span class="text-slate-600 text-xs font-medium">Growth @ <span class="text-emerald-700 font-bold">5% p.a.</span> (Growth Fund):</span>
+                <span id="colC_pot5" class="font-bold text-emerald-900 text-base">£118,500</span>
+              </div>
+              <div class="flex justify-between items-baseline py-1">
+                <span class="text-slate-600 text-xs font-medium">Growth @ <span id="colC_customRateLabel" class="text-indigo-700 font-bold">6% p.a.</span> (Custom):</span>
+                <span id="colC_potCustom" class="font-bold text-indigo-900">£157,800</span>
+              </div>
+            </div>
+
+            <!-- House Deposit Callout -->
+            <div class="mt-3 bg-emerald-100/70 p-2.5 rounded-lg text-emerald-900 text-xs">
+              🏡 <strong>Liquid Wealth:</strong> This cash stays in the family! It can fund a <em>First Home Deposit</em>, marriage, or rainy day fund.
+            </div>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-emerald-100 text-xs text-emerald-700 font-medium text-center">
+            Full compound growth calculated over your selected horizon.
+          </div>
+        </div>
+
+      </section>
+
+      <!-- COMPARISON CHART: Repayment Savings vs 3%, 4%, 5% Market Growth -->
+      <section class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-4 border-b border-slate-100 gap-2">
+          <div>
+            <h3 class="font-bold text-slate-900 text-base">Growth Trajectory: Parental Loan Savings vs Market Investment Pots</h3>
+            <p class="text-xs text-slate-500">Visualizing the cumulative student loan savings against compound investment pot values over 30 or 40 years.</p>
+          </div>
+          <div class="flex items-center gap-2 text-xs font-medium text-slate-600">
+            <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-blue-600"></span> Loan Savings</span>
+            <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-emerald-400"></span> 3% Pot</span>
+            <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-emerald-600"></span> 4% Pot</span>
+            <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-emerald-800"></span> 5% Pot</span>
+          </div>
+        </div>
+
+        <div class="h-80 sm:h-96 relative">
+          <canvas id="parentCompareChart"></canvas>
+        </div>
+      </section>
+
+      <!-- MILESTONE COMPARISON TABLE -->
+      <section class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm overflow-hidden">
+        <h3 class="font-bold text-slate-900 text-base mb-1">Timeline Milestone Breakdown: Paying Loan vs Investing at 3%, 4%, 5%</h3>
+        <p class="text-xs text-slate-500 mb-4">Compare value available to the student at each decade of their adult life.</p>
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-50 text-slate-600 border-b border-slate-200">
+                <th class="py-2.5 px-3 font-semibold">Milestone / Life Stage</th>
+                <th class="py-2.5 px-3 font-semibold text-blue-700">Cumulative Loan Savings (£)</th>
+                <th class="py-2.5 px-3 font-semibold text-emerald-700">Market Pot @ 3% (£)</th>
+                <th class="py-2.5 px-3 font-semibold text-emerald-700">Market Pot @ 4% (£)</th>
+                <th class="py-2.5 px-3 font-semibold text-emerald-800">Market Pot @ 5% (£)</th>
+                <th class="py-2.5 px-3 font-semibold text-indigo-700">Custom Market Pot (£)</th>
+              </tr>
+            </thead>
+            <tbody id="milestoneTableBody" class="divide-y divide-slate-100">
+              <!-- Populated dynamically via JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- TAB 2: STUDENT REPAYMENT CALCULATOR -->
+    <div id="tabContent-studentCalc" class="tab-pane hidden space-y-6">
+
+      <!-- PAYSLIP IMPACT CARD -->
+      <section class="bg-gradient-to-r from-slate-900 to-blue-950 text-white rounded-2xl p-6 shadow-md">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-slate-700">
+          <div>
+            <span class="bg-blue-600/80 text-blue-100 text-xs font-semibold px-2.5 py-1 rounded-full uppercase tracking-wider">PAYE Deduction Breakdown</span>
+            <h2 class="text-2xl font-bold mt-2">What Will Come Out of Your Monthly Payslip?</h2>
+            <p class="text-slate-300 text-xs mt-1">
+              Repayments are deducted automatically by HMRC from your monthly salary like a tax, not a regular debt.
+            </p>
+          </div>
+          <div class="text-right">
+            <span class="text-xs text-slate-400 uppercase font-semibold">Gross Salary</span>
+            <div id="payslipGrossDisplay" class="text-2xl font-black text-white">£32,000 / yr</div>
+            <span id="payslipGrossMonthlyDisplay" class="text-xs text-slate-400">£2,667 / month</span>
+          </div>
+        </div>
+
+        <!-- 4-Card Payslip Breakdown -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-5">
+          <div class="bg-white/10 rounded-xl p-3.5 border border-white/10">
+            <span class="text-slate-400 text-xs font-medium block">Income Tax (20%/40%)</span>
+            <span id="payslipTaxDisplay" class="text-lg font-bold text-white block mt-1">£324 / mo</span>
+            <span id="payslipTaxAnnualDisplay" class="text-[11px] text-slate-400">£3,886 / yr</span>
+          </div>
+
+          <div class="bg-white/10 rounded-xl p-3.5 border border-white/10">
+            <span class="text-slate-400 text-xs font-medium block">National Insurance (8%)</span>
+            <span id="payslipNIDisplay" class="text-lg font-bold text-white block mt-1">£130 / mo</span>
+            <span id="payslipNIAnnualDisplay" class="text-[11px] text-slate-400">£1,554 / yr</span>
+          </div>
+
+          <div class="bg-blue-600/30 rounded-xl p-3.5 border border-blue-400/30">
+            <span class="text-blue-300 text-xs font-semibold block">Student Loan (9% over thres.)</span>
+            <span id="payslipSLDisplay" class="text-xl font-black text-amber-300 block mt-1">£53 / mo</span>
+            <span id="payslipSLAnnualDisplay" class="text-[11px] text-amber-200">£630 / yr</span>
+          </div>
+
+          <div class="bg-emerald-600/30 rounded-xl p-3.5 border border-emerald-400/30">
+            <span class="text-emerald-300 text-xs font-semibold block">Net Take-Home Pay</span>
+            <span id="payslipNetDisplay" class="text-xl font-black text-emerald-300 block mt-1">£2,160 / mo</span>
+            <span id="payslipNetAnnualDisplay" class="text-[11px] text-emerald-200">£25,930 / yr</span>
+          </div>
+        </div>
+
+        <!-- Marginal Rate Banner -->
+        <div class="mt-4 pt-3 border-t border-slate-700/60 flex flex-col sm:flex-row sm:items-center justify-between text-xs text-slate-300 gap-2">
+          <div>
+            <span>Your Effective Marginal Deduction Rate: </span>
+            <strong id="payslipMarginalRate" class="text-amber-300 font-bold text-sm">37.0%</strong>
+            <span class="text-slate-400"> (20% Income Tax + 8% NI + 9% Student Loan on every £1 earned above threshold)</span>
+          </div>
+          <span class="bg-white/10 px-2 py-1 rounded text-slate-300 text-[11px]">Plan Threshold: <strong id="payslipThresholdVal">£25,000</strong></span>
+        </div>
+      </section>
+
+      <!-- LIFETIME OUTCOMES SUMMARY CARDS -->
+      <section class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover-card">
+          <span class="text-slate-500 text-xs font-medium block">Starting Debt at Graduation</span>
+          <span id="kpiStartBalance" class="text-2xl font-black text-slate-900 block mt-1">£58,431</span>
+          <span id="kpiInStudyInterest" class="text-[11px] text-slate-400 mt-1 block">Includes £4,200 study interest</span>
+        </div>
+
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover-card">
+          <span class="text-slate-500 text-xs font-medium block">Total Lifetime Repaid</span>
+          <span id="kpiTotalRepaid" class="text-2xl font-black text-blue-600 block mt-1">£41,200</span>
+          <span id="kpiRepaidRatio" class="text-[11px] text-slate-500 mt-1 block">71% of original debt</span>
+        </div>
+
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover-card">
+          <span class="text-slate-500 text-xs font-medium block">Total Interest Accrued</span>
+          <span id="kpiTotalInterest" class="text-2xl font-black text-slate-700 block mt-1">£44,500</span>
+          <span class="text-[11px] text-slate-400 mt-1 block">Statutory RPI compounding</span>
+        </div>
+
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover-card">
+          <span class="text-slate-500 text-xs font-medium block">Outcome at Year End</span>
+          <span id="kpiPayoffOutcome" class="text-2xl font-black text-emerald-600 block mt-1">Written Off</span>
+          <span id="kpiWrittenOffAmount" class="text-[11px] text-emerald-700 font-semibold mt-1 block">£61,731 cancelled by Gov</span>
+        </div>
+      </section>
+
+      <!-- LIFETIME LOAN TRAJECTORY CHART -->
+      <section class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-4 border-b border-slate-100 gap-2">
+          <div>
+            <h3 class="font-bold text-slate-900 text-base">30- / 40-Year Loan Projection & Write-Off Horizon</h3>
+            <p class="text-xs text-slate-500">Tracks loan balance evolution, annual repayments, and statutory government cancellation.</p>
+          </div>
+          <div class="flex items-center gap-3 text-xs font-medium text-slate-600">
+            <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-red-500"></span> Loan Balance</span>
+            <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-blue-600"></span> Annual Repayment</span>
+            <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-emerald-600"></span> Cumulative Repaid</span>
+          </div>
+        </div>
+
+        <div class="h-80 sm:h-96 relative">
+          <canvas id="studentTrajectoryChart"></canvas>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- TAB 3: LIFETIME SCHEDULE TABLE -->
+    <div id="tabContent-scheduleTable" class="tab-pane hidden space-y-4">
+      <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-4 border-b border-slate-100 gap-3">
+          <div>
+            <h3 class="font-bold text-slate-900 text-base">Full Year-by-Year Repayment & Market Schedule</h3>
+            <p class="text-xs text-slate-500">Complete annual projection of salary, monthly and annual repayments, interest, loan balance, and 3%/4%/5% investment pot growth.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="exportToCSV()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold flex items-center gap-1.5 border border-slate-300 transition">
+              📥 Export CSV
+            </button>
+            <button onclick="window.print()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
+              🖨️ Print Summary
+            </button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-50 text-slate-600 border-b border-slate-200">
+                <th class="py-2.5 px-3 font-semibold">Yr</th>
+                <th class="py-2.5 px-3 font-semibold">Approx Age</th>
+                <th class="py-2.5 px-3 font-semibold">Projected Salary</th>
+                <th class="py-2.5 px-3 font-semibold">Monthly Repay</th>
+                <th class="py-2.5 px-3 font-semibold">Annual Repay</th>
+                <th class="py-2.5 px-3 font-semibold">Interest Rate</th>
+                <th class="py-2.5 px-3 font-semibold">Interest Accrued</th>
+                <th class="py-2.5 px-3 font-semibold text-red-600">Remaining Balance</th>
+                <th class="py-2.5 px-3 font-semibold text-emerald-700">Market 3% Pot</th>
+                <th class="py-2.5 px-3 font-semibold text-emerald-700">Market 4% Pot</th>
+                <th class="py-2.5 px-3 font-semibold text-emerald-800">Market 5% Pot</th>
+              </tr>
+            </thead>
+            <tbody id="fullScheduleTableBody" class="divide-y divide-slate-100 font-mono">
+              <!-- Populated via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: RULES GUIDE & FAQS -->
+    <div id="tabContent-guideFaq" class="tab-pane hidden space-y-6">
+      <section class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+        <h2 class="text-xl font-bold text-slate-900 mb-2">England & Wales Student Finance System: Essential Rules</h2>
+        <p class="text-sm text-slate-600 mb-6">Student loans in England and Wales behave unlike any traditional bank loan or mortgage. Understanding these rules is crucial before making any repayment or parental contribution decisions.</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+          
+          <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-200">
+            <h3 class="font-bold text-blue-900 text-base mb-2">1. It is an Income-Contingent "Graduate Tax"</h3>
+            <p class="text-slate-700 leading-relaxed text-xs">
+              Under UK law, what you repay each month is <strong>100% determined by what you earn</strong>, never by how much you owe. If you earn under the threshold (£25k on Plan 5, £27,295 on Plan 2), you pay <strong>exactly £0</strong>, regardless of whether your loan balance is £10,000 or £100,000.
+            </p>
+          </div>
+
+          <div class="bg-emerald-50/50 p-4 rounded-xl border border-emerald-200">
+            <h3 class="font-bold text-emerald-900 text-base mb-2">2. The 30-Year & 40-Year Cancellation Rule</h3>
+            <p class="text-slate-700 leading-relaxed text-xs">
+              Any remaining loan balance is <strong>completely wiped clean</strong> by the UK government after 30 years (Plan 2) or 40 years (Plan 5) from the April following graduation. It does not affect credit ratings, and you never pass this debt to your heirs.
+            </p>
+          </div>
+
+          <div class="bg-amber-50/50 p-4 rounded-xl border border-amber-200">
+            <h3 class="font-bold text-amber-900 text-base mb-2">3. Plan 2 vs Plan 5 Comparison</h3>
+            <ul class="text-xs text-slate-700 space-y-1 list-disc pl-4 mt-2">
+              <li><strong>Plan 2 (England 2012-23 / Wales 2012+):</strong> Threshold £27,295. Repayment 9% above threshold. Written off after 30 years. Interest is RPI to RPI+3%.</li>
+              <li><strong>Plan 5 (England Aug 2023+):</strong> Threshold £25,000. Repayment 9% above threshold. Written off after 40 years. Interest is strictly flat RPI (0% real interest).</li>
+            </ul>
+          </div>
+
+          <div class="bg-purple-50/50 p-4 rounded-xl border border-purple-200">
+            <h3 class="font-bold text-purple-900 text-base mb-2">4. Why Paying Tuition Upfront Can Be a Mistake</h3>
+            <p class="text-slate-700 leading-relaxed text-xs">
+              If your child earns a typical graduate salary, they may never clear the full balance before the write-off date. Putting £27,750 into university fees means you just saved HMRC money! The student pays the exact same monthly deduction. Putting that £27,750 in a Lifetime ISA or Stocks ISA creates a huge house deposit instead.
+            </p>
+          </div>
+
+        </div>
+
+        <div class="mt-6 pt-6 border-t border-slate-200">
+          <h3 class="font-bold text-slate-900 text-base mb-3">Frequently Asked Questions for Parents & Students</h3>
+          
+          <div class="space-y-3 text-xs text-slate-700">
+            <details class="bg-slate-50 p-3 rounded-lg border border-slate-200 cursor-pointer">
+              <summary class="font-semibold text-slate-900 text-sm">Will having a student loan stop my child getting a mortgage?</summary>
+              <p class="mt-2 text-slate-600 leading-relaxed">
+                No. Student debt is not recorded on credit files (Experian, Equifax, TransUnion). Mortgage lenders only assess student loans as a regular deduction from net monthly income (reducing monthly disposable income slightly), exactly like council tax or pension contributions.
+              </p>
+            </details>
+
+            <details class="bg-slate-50 p-3 rounded-lg border border-slate-200 cursor-pointer">
+              <summary class="font-semibold text-slate-900 text-sm">What happens if my child loses their job or takes parental leave?</summary>
+              <p class="mt-2 text-slate-600 leading-relaxed">
+                Student loan repayments immediately stop. If their salary drops below the threshold, deductions cease automatically without penalty, default notices, or debt collectors.
+              </p>
+            </details>
+
+            <details class="bg-slate-50 p-3 rounded-lg border border-slate-200 cursor-pointer">
+              <summary class="font-semibold text-slate-900 text-sm">When does paying fees upfront actually make financial sense?</summary>
+              <p class="mt-2 text-slate-600 leading-relaxed">
+                Paying fees upfront makes mathematical sense ONLY if the graduate is destined for top-decile earnings (e.g., corporate law, investment banking, software engineering at FAANG, or senior medicine), where they will clear the entire loan balance well before the 30- or 40-year write-off mark. In that specific scenario, reducing debt upfront prevents compounding RPI interest.
+              </p>
+            </details>
+          </div>
+        </div>
+      </section>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500 no-print">
+    <div class="max-w-7xl mx-auto px-4">
+      <p>UK UniLoan Calculator & Parental Contribution Lab • Built for England & Wales Higher Education Finance • Figures based on official Department for Education & Student Loans Company statutory regulations.</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="app.js"></script>
+</body>
+</html>
