@@ -177,6 +177,20 @@ async def serve_js():
         return FileResponse(js_path, media_type="application/javascript")
     return JSONResponse(status_code=404, content={"error": "app.js not found"})
 
+@app.get("/sitemap.xml")
+async def serve_sitemap():
+    sitemap_path = os.path.join(BASE_DIR, "sitemap.xml")
+    if os.path.exists(sitemap_path):
+        return FileResponse(sitemap_path, media_type="application/xml")
+    return JSONResponse(status_code=404, content={"error": "sitemap.xml not found"})
+
+@app.get("/robots.txt")
+async def serve_robots():
+    robots_path = os.path.join(BASE_DIR, "robots.txt")
+    if os.path.exists(robots_path):
+        return FileResponse(robots_path, media_type="text/plain")
+    return JSONResponse(status_code=404, content={"error": "robots.txt not found"})
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8060))
     print(f"Starting UK Student Loan & Parental Contribution Calculator on http://localhost:{port}")
