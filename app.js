@@ -65,6 +65,17 @@ document.addEventListener('DOMContentLoaded', () => {
   runCalculation();
 });
 
+// Google Analytics Event Tracking Helper
+function trackGAEvent(eventName, eventParams = {}) {
+  try {
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', eventName, eventParams);
+    }
+  } catch (e) {
+    // Ignore analytics errors silently
+  }
+}
+
 // Tab Switching
 function switchTab(tabId) {
   document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -74,6 +85,8 @@ function switchTab(tabId) {
   const pane = document.getElementById(`tabContent-${tabId}`);
   if (btn) btn.classList.add('active');
   if (pane) pane.classList.remove('hidden');
+
+  trackGAEvent('tab_view', { tab_name: tabId });
 
   // Trigger chart resize if chart became visible
   if (tabId === 'parentLab' && parentCompareChartInstance) {
@@ -87,6 +100,7 @@ function switchTab(tabId) {
 // Mode Selector (Studying vs Graduated)
 function setStudentMode(mode) {
   state.mode = mode;
+  trackGAEvent('select_student_mode', { mode: mode });
   const btnStudying = document.getElementById('modeBtnStudying');
   const btnGraduated = document.getElementById('modeBtnGraduated');
   const studyingInputs = document.getElementById('studyingInputs');
@@ -150,6 +164,7 @@ function applyPreset(presetName) {
   document.getElementById('inputSalaryGrowth').value = p.growth;
   document.getElementById('salaryGrowthVal').innerText = p.growth + '% / yr';
 
+  trackGAEvent('select_preset', { preset: presetName, salary: p.salary });
   runCalculation();
 }
 
@@ -977,6 +992,7 @@ function exportToCSV() {
   const a = document.createElement('a');
   a.href = url;
   a.download = `UK_Student_Loan_Schedule_${state.planType}.csv`;
+  trackGAEvent('export_csv', { plan_type: state.planType });
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
