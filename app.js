@@ -1039,21 +1039,25 @@ function closeTipModal() {
 }
 
 function selectTipAmount(amount) {
-  currentTipAmount = amount;
+  currentTipAmount = amount === 2 ? 2 : 1;
   const btn1 = document.getElementById('tipBtn1');
   const btn2 = document.getElementById('tipBtn2');
-  const actionText = document.getElementById('tipActionText');
+  const displayAmount = document.getElementById('tipMonzoDisplayAmount');
+  const btnMonzo = document.getElementById('btnTipMonzo');
+  const note = encodeURIComponent('Tip for Dutta UK Student Loan Calculator');
 
-  if (amount === 1) {
+  if (currentTipAmount === 1) {
     if (btn1) btn1.className = 'p-3.5 rounded-xl border-2 border-amber-500 bg-amber-50 text-amber-950 font-bold text-sm flex flex-col items-center justify-center transition cursor-pointer';
     if (btn2) btn2.className = 'p-3.5 rounded-xl border-2 border-slate-200 hover:border-amber-400 bg-slate-50 text-slate-800 font-bold text-sm flex flex-col items-center justify-center transition cursor-pointer';
-    if (actionText) actionText.innerText = 'Send £1 Tip via Buy Me a Coffee';
+    if (displayAmount) displayAmount.innerText = '£1.00';
+    if (btnMonzo) btnMonzo.href = `https://monzo.me/anildutta/1?d=${note}`;
   } else {
     if (btn2) btn2.className = 'p-3.5 rounded-xl border-2 border-amber-500 bg-amber-50 text-amber-950 font-bold text-sm flex flex-col items-center justify-center transition cursor-pointer';
     if (btn1) btn1.className = 'p-3.5 rounded-xl border-2 border-slate-200 hover:border-amber-400 bg-slate-50 text-slate-800 font-bold text-sm flex flex-col items-center justify-center transition cursor-pointer';
-    if (actionText) actionText.innerText = 'Send £2 Tip via Buy Me a Coffee';
+    if (displayAmount) displayAmount.innerText = '£2.00';
+    if (btnMonzo) btnMonzo.href = `https://monzo.me/anildutta/2?d=${note}`;
   }
-  trackGAEvent('tip_amount_select', { amount: amount });
+  trackGAEvent('tip_amount_select', { amount: currentTipAmount, method: 'monzo' });
 }
 
 // Close modal on Escape key
