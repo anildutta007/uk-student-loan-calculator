@@ -427,186 +427,205 @@
         </div>
       </section>
 
-      <!-- 3-WAY COMPARISON CARDS: No Help vs Fee Contribution vs Market Pot -->
-      <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-        <!-- Column A: Without Parental Help -->
-        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover-card flex flex-col justify-between">
-          <div>
-            <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-100">
-              <h3 class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
-                <span class="w-3 h-3 rounded-full bg-slate-400 inline-block"></span>
-                Scenario A: Full Student Loan
-              </h3>
-              <span class="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded">No Parental Money</span>
-            </div>
-
-            <div class="space-y-3 text-sm">
-              <div class="flex justify-between items-baseline">
-                <span class="text-slate-500 text-xs">Loan at Graduation:</span>
-                <span id="colA_startBalance" class="font-bold text-slate-800 text-base">£58,431</span>
-              </div>
-              <div class="flex justify-between items-baseline">
-                <span class="text-slate-500 text-xs">Total Repaid by Student:</span>
-                <span id="colA_totalRepaid" class="font-bold text-slate-900 text-lg">£38,200</span>
-              </div>
-              <div class="flex justify-between items-baseline">
-                <span class="text-slate-500 text-xs">Total Interest Incurred:</span>
-                <span id="colA_interest" class="font-semibold text-slate-700">£42,100</span>
-              </div>
-              <div class="flex justify-between items-baseline">
-                <span class="text-slate-500 text-xs">Payoff / Status:</span>
-                <span id="colA_payoffStatus" class="font-bold text-amber-600">Written Off (Yr 40)</span>
-              </div>
-              <div class="flex justify-between items-baseline">
-                <span class="text-slate-500 text-xs">Debt Written Off by Gov:</span>
-                <span id="colA_writtenOff" class="font-bold text-emerald-600">£62,331</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="mt-4 pt-3 border-t border-slate-100 text-xs text-slate-400 text-center">
-            Student pays 9% above threshold via monthly salary deductions.
-          </div>
+      <!-- Zero Contribution Prompt Notice (shown when parent contribution is £0) -->
+      <section id="parentZeroContributionNotice" class="hidden bg-white rounded-2xl p-8 border border-slate-200 shadow-sm text-center">
+        <div class="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-3 border border-indigo-100 shadow-xs">
+          📊
         </div>
+        <h3 class="text-base font-bold text-slate-900 mb-1">No Parental Contribution Configured (£0)</h3>
+        <p class="text-xs text-slate-500 max-w-lg mx-auto leading-relaxed">
+          Comparison graphs, market investment pot projections, and payoff milestone tables are hidden because there is no upfront parental capital to compare against market compounding.
+        </p>
+        <p class="text-xs text-indigo-600 font-semibold mt-3">
+          💡 Enter an annual fee amount (e.g. £9,250/yr) or a lump sum (e.g. £25,000) in the controls above to generate full comparative charts.
+        </p>
+      </section>
 
-        <!-- Column B: With Parental Contribution -->
-        <div class="bg-blue-50/50 rounded-2xl p-5 border-2 border-blue-400 shadow-sm hover-card flex flex-col justify-between">
-          <div>
-            <div class="flex items-center justify-between pb-3 mb-3 border-b border-blue-200">
-              <h3 class="font-bold text-blue-900 text-sm flex items-center gap-1.5">
-                <span class="w-3 h-3 rounded-full bg-blue-600 inline-block"></span>
-                Scenario B: With Parental Help
-              </h3>
-              <span class="text-[11px] font-semibold text-blue-700 bg-blue-100 px-2 py-0.5 rounded">Fee Reduced</span>
-            </div>
+      <!-- Active Comparison Results Container (hidden when £0) -->
+      <div id="parentComparisonResults" class="space-y-6">
 
-            <div class="space-y-3 text-sm">
-              <div class="flex justify-between items-baseline">
-                <span class="text-slate-600 text-xs">Parent Capital Paid:</span>
-                <span id="colB_parentPaid" class="font-bold text-blue-700 text-base">£27,750</span>
+        <!-- 3-WAY COMPARISON CARDS: No Help vs Fee Contribution vs Market Pot -->
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+          <!-- Column A: Without Parental Help -->
+          <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover-card flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-100">
+                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
+                  <span class="w-3 h-3 rounded-full bg-slate-400 inline-block"></span>
+                  Scenario A: Full Student Loan
+                </h3>
+                <span class="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded">No Parental Money</span>
               </div>
-              <div class="flex justify-between items-baseline">
-                <span class="text-slate-600 text-xs">New Graduation Balance:</span>
-                <span id="colB_startBalance" class="font-bold text-slate-800">£30,681</span>
-              </div>
-              <div class="flex justify-between items-baseline">
-                <span class="text-slate-600 text-xs">Total Repaid by Student:</span>
-                <span id="colB_totalRepaid" class="font-bold text-slate-900 text-lg">£38,200</span>
-              </div>
-              <div class="flex justify-between items-baseline">
-                <span class="text-slate-600 text-xs">Payoff / Status:</span>
-                <span id="colB_payoffStatus" class="font-bold text-blue-800">Written Off (Yr 40)</span>
-              </div>
-              <div class="bg-white p-2.5 rounded-xl border border-blue-200 space-y-1 mt-2">
-                <div class="flex justify-between text-xs">
-                  <span class="text-slate-600">Student Repayments Saved:</span>
-                  <span id="colB_savings" class="font-bold text-slate-900">£0</span>
+
+              <div class="space-y-3 text-sm">
+                <div class="flex justify-between items-baseline">
+                  <span class="text-slate-500 text-xs">Loan at Graduation:</span>
+                  <span id="colA_startBalance" class="font-bold text-slate-800 text-base">£58,431</span>
                 </div>
-                <div class="flex justify-between text-xs">
-                  <span class="text-slate-600">Years Cleared Earlier:</span>
-                  <span id="colB_yearsEarlier" class="font-bold text-slate-900">0 yrs</span>
+                <div class="flex justify-between items-baseline">
+                  <span class="text-slate-500 text-xs">Total Repaid by Student:</span>
+                  <span id="colA_totalRepaid" class="font-bold text-slate-900 text-lg">£38,200</span>
                 </div>
-                <div class="flex justify-between text-xs">
-                  <span class="text-slate-600">Net Family Financial Gain:</span>
-                  <span id="colB_netGain" class="font-bold text-red-600">-£27,750</span>
+                <div class="flex justify-between items-baseline">
+                  <span class="text-slate-500 text-xs">Total Interest Incurred:</span>
+                  <span id="colA_interest" class="font-semibold text-slate-700">£42,100</span>
+                </div>
+                <div class="flex justify-between items-baseline">
+                  <span class="text-slate-500 text-xs">Payoff / Status:</span>
+                  <span id="colA_payoffStatus" class="font-bold text-amber-600">Written Off (Yr 40)</span>
+                </div>
+                <div class="flex justify-between items-baseline">
+                  <span class="text-slate-500 text-xs">Debt Written Off by Gov:</span>
+                  <span id="colA_writtenOff" class="font-bold text-emerald-600">£62,331</span>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div class="mt-4 pt-3 border-t border-blue-100 text-xs text-blue-600 font-medium text-center">
-            Does the student actually pay less over 30/40 years?
-          </div>
-        </div>
-
-        <!-- Column C: Alternative Market Investment (3%, 4%, 5%) -->
-        <div class="bg-emerald-50/60 rounded-2xl p-5 border-2 border-emerald-400 shadow-sm hover-card flex flex-col justify-between">
-          <div>
-            <div class="flex items-center justify-between pb-3 mb-3 border-b border-emerald-200">
-              <h3 class="font-bold text-emerald-950 text-sm flex items-center gap-1.5">
-                <span class="w-3 h-3 rounded-full bg-emerald-600 inline-block"></span>
-                Scenario C: Market Investment Pot
-              </h3>
-              <span class="text-[11px] font-semibold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded">Compound Growth</span>
-            </div>
-
-            <p class="text-xs text-emerald-800 mb-3">If parents invest the same <strong id="colC_capitalInvested">£27,750</strong> in Stocks & Shares ISA / Index Fund:</p>
-
-            <div class="space-y-2 text-sm bg-white p-3 rounded-xl border border-emerald-200">
-              <div class="flex justify-between items-baseline py-1 border-b border-slate-100">
-                <span class="text-slate-600 text-xs font-medium">Growth @ <span class="text-emerald-700 font-bold">3% p.a.</span> (Cash/Gilts):</span>
-                <span id="colC_pot3" class="font-bold text-emerald-900">£67,400</span>
-              </div>
-              <div class="flex justify-between items-baseline py-1 border-b border-slate-100">
-                <span class="text-slate-600 text-xs font-medium">Growth @ <span class="text-emerald-700 font-bold">4% p.a.</span> (Balanced):</span>
-                <span id="colC_pot4" class="font-bold text-emerald-900">£89,200</span>
-              </div>
-              <div class="flex justify-between items-baseline py-1 border-b border-slate-100">
-                <span class="text-slate-600 text-xs font-medium">Growth @ <span class="text-emerald-700 font-bold">5% p.a.</span> (Growth Fund):</span>
-                <span id="colC_pot5" class="font-bold text-emerald-900 text-base">£118,500</span>
-              </div>
-              <div class="flex justify-between items-baseline py-1">
-                <span class="text-slate-600 text-xs font-medium">Growth @ <span id="colC_customRateLabel" class="text-indigo-700 font-bold">6% p.a.</span> (Custom):</span>
-                <span id="colC_potCustom" class="font-bold text-indigo-900">£157,800</span>
-              </div>
-            </div>
-
-            <!-- House Deposit Callout -->
-            <div class="mt-3 bg-emerald-100/70 p-2.5 rounded-lg text-emerald-900 text-xs">
-              🏡 <strong>Liquid Wealth:</strong> This cash stays in the family! It can fund a <em>First Home Deposit</em>, marriage, or rainy day fund.
+            <div class="mt-4 pt-3 border-t border-slate-100 text-xs text-slate-400 text-center">
+              Student pays 9% above threshold via monthly salary deductions.
             </div>
           </div>
 
-          <div class="mt-4 pt-3 border-t border-emerald-100 text-xs text-emerald-700 font-medium text-center">
-            Full compound growth calculated over your selected horizon.
+          <!-- Column B: With Parental Contribution -->
+          <div class="bg-blue-50/50 rounded-2xl p-5 border-2 border-blue-400 shadow-sm hover-card flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between pb-3 mb-3 border-b border-blue-200">
+                <h3 class="font-bold text-blue-900 text-sm flex items-center gap-1.5">
+                  <span class="w-3 h-3 rounded-full bg-blue-600 inline-block"></span>
+                  Scenario B: With Parental Help
+                </h3>
+                <span class="text-[11px] font-semibold text-blue-700 bg-blue-100 px-2 py-0.5 rounded">Fee Reduced</span>
+              </div>
+
+              <div class="space-y-3 text-sm">
+                <div class="flex justify-between items-baseline">
+                  <span class="text-slate-600 text-xs">Parent Capital Paid:</span>
+                  <span id="colB_parentPaid" class="font-bold text-blue-700 text-base">£27,750</span>
+                </div>
+                <div class="flex justify-between items-baseline">
+                  <span class="text-slate-600 text-xs">New Graduation Balance:</span>
+                  <span id="colB_startBalance" class="font-bold text-slate-800">£30,681</span>
+                </div>
+                <div class="flex justify-between items-baseline">
+                  <span class="text-slate-600 text-xs">Total Repaid by Student:</span>
+                  <span id="colB_totalRepaid" class="font-bold text-slate-900 text-lg">£38,200</span>
+                </div>
+                <div class="flex justify-between items-baseline">
+                  <span class="text-slate-600 text-xs">Payoff / Status:</span>
+                  <span id="colB_payoffStatus" class="font-bold text-blue-800">Written Off (Yr 40)</span>
+                </div>
+                <div class="bg-white p-2.5 rounded-xl border border-blue-200 space-y-1 mt-2">
+                  <div class="flex justify-between text-xs">
+                    <span class="text-slate-600">Student Repayments Saved:</span>
+                    <span id="colB_savings" class="font-bold text-slate-900">£0</span>
+                  </div>
+                  <div class="flex justify-between text-xs">
+                    <span class="text-slate-600">Years Cleared Earlier:</span>
+                    <span id="colB_yearsEarlier" class="font-bold text-slate-900">0 yrs</span>
+                  </div>
+                  <div class="flex justify-between text-xs">
+                    <span class="text-slate-600">Net Family Financial Gain:</span>
+                    <span id="colB_netGain" class="font-bold text-red-600">-£27,750</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-blue-100 text-xs text-blue-600 font-medium text-center">
+              Does the student actually pay less over 30/40 years?
+            </div>
           </div>
-        </div>
 
-      </section>
+          <!-- Column C: Alternative Market Investment (3%, 4%, 5%) -->
+          <div class="bg-emerald-50/60 rounded-2xl p-5 border-2 border-emerald-400 shadow-sm hover-card flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between pb-3 mb-3 border-b border-emerald-200">
+                <h3 class="font-bold text-emerald-950 text-sm flex items-center gap-1.5">
+                  <span class="w-3 h-3 rounded-full bg-emerald-600 inline-block"></span>
+                  Scenario C: Market Investment Pot
+                </h3>
+                <span id="colC_horizonBadge" class="text-[11px] font-bold text-emerald-900 bg-emerald-200/90 px-2 py-0.5 rounded">40-Year Horizon</span>
+              </div>
 
-      <!-- COMPARISON CHART: Repayment Savings vs 3%, 4%, 5% Market Growth -->
-      <section class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-4 border-b border-slate-100 gap-2">
-          <div>
-            <h3 class="font-bold text-slate-900 text-base">Growth Trajectory: Parental Loan Savings vs Market Investment Pots</h3>
-            <p class="text-xs text-slate-500">Visualizing the cumulative student loan savings against compound investment pot values over 30 or 40 years.</p>
+              <p class="text-xs text-emerald-800 mb-3">If parents invest the same <strong id="colC_capitalInvested">£27,750</strong> in Stocks & Shares ISA / Index Fund over <strong id="colC_horizonPeriod" class="text-emerald-950 underline decoration-emerald-500 font-bold">40 Years (Full Term)</strong>:</p>
+
+              <div class="space-y-2 text-sm bg-white p-3 rounded-xl border border-emerald-200">
+                <div class="flex justify-between items-baseline py-1 border-b border-slate-100">
+                  <span class="text-slate-600 text-xs font-medium">Growth @ <span class="text-emerald-700 font-bold">3% p.a.</span> (Cash/Gilts) over <span class="colC_horizonYearsDisplay font-bold text-slate-800">40 yrs</span>:</span>
+                  <span id="colC_pot3" class="font-bold text-emerald-900">£67,400</span>
+                </div>
+                <div class="flex justify-between items-baseline py-1 border-b border-slate-100">
+                  <span class="text-slate-600 text-xs font-medium">Growth @ <span class="text-emerald-700 font-bold">4% p.a.</span> (Balanced) over <span class="colC_horizonYearsDisplay font-bold text-slate-800">40 yrs</span>:</span>
+                  <span id="colC_pot4" class="font-bold text-emerald-900">£89,200</span>
+                </div>
+                <div class="flex justify-between items-baseline py-1 border-b border-slate-100">
+                  <span class="text-slate-600 text-xs font-medium">Growth @ <span class="text-emerald-700 font-bold">5% p.a.</span> (Growth Fund) over <span class="colC_horizonYearsDisplay font-bold text-slate-800">40 yrs</span>:</span>
+                  <span id="colC_pot5" class="font-bold text-emerald-900 text-base">£118,500</span>
+                </div>
+                <div class="flex justify-between items-baseline py-1">
+                  <span class="text-slate-600 text-xs font-medium">Growth @ <span id="colC_customRateLabel" class="text-indigo-700 font-bold">6% p.a.</span> (Custom) over <span class="colC_horizonYearsDisplay font-bold text-slate-800">40 yrs</span>:</span>
+                  <span id="colC_potCustom" class="font-bold text-indigo-900">£157,800</span>
+                </div>
+              </div>
+
+              <!-- House Deposit Callout -->
+              <div class="mt-3 bg-emerald-100/70 p-2.5 rounded-lg text-emerald-900 text-xs">
+                🏡 <strong>Liquid Wealth:</strong> This cash stays in the family! It can fund a <em>First Home Deposit</em>, marriage, or rainy day fund.
+              </div>
+            </div>
+
+            <div id="colC_horizonFooter" class="mt-4 pt-3 border-t border-emerald-100 text-xs text-emerald-700 font-medium text-center">
+              Full compound growth calculated over your selected horizon.
+            </div>
           </div>
-          <div class="flex items-center gap-2 text-xs font-medium text-slate-600">
-            <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-blue-600"></span> Loan Savings</span>
-            <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-emerald-400"></span> 3% Pot</span>
-            <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-emerald-600"></span> 4% Pot</span>
-            <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-emerald-800"></span> 5% Pot</span>
+
+        </section>
+
+        <!-- COMPARISON CHART: Repayment Savings vs 3%, 4%, 5% Market Growth -->
+        <section class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-4 border-b border-slate-100 gap-2">
+            <div>
+              <h3 class="font-bold text-slate-900 text-base">Growth Trajectory: Parental Loan Savings vs Market Investment Pots (<span id="chartHorizonYearsLabel">40-Year Horizon</span>)</h3>
+              <p class="text-xs text-slate-500">Visualizing cumulative student loan savings against compound investment pot values over your selected <span id="chartHorizonDescLabel">40-year investment horizon</span>.</p>
+            </div>
+            <div class="flex items-center gap-2 text-xs font-medium text-slate-600">
+              <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-blue-600"></span> Loan Savings</span>
+              <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-emerald-400"></span> 3% Pot</span>
+              <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-emerald-600"></span> 4% Pot</span>
+              <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-emerald-800"></span> 5% Pot</span>
+            </div>
           </div>
-        </div>
 
-        <div class="h-80 sm:h-96 relative">
-          <canvas id="parentCompareChart"></canvas>
-        </div>
-      </section>
+          <div class="h-80 sm:h-96 relative">
+            <canvas id="parentCompareChart"></canvas>
+          </div>
+        </section>
 
-      <!-- MILESTONE COMPARISON TABLE -->
-      <section class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm overflow-hidden">
-        <h3 class="font-bold text-slate-900 text-base mb-1">Timeline Milestone Breakdown: Paying Loan vs Investing at 3%, 4%, 5%</h3>
-        <p class="text-xs text-slate-500 mb-4">Compare value available to the student at each decade of their adult life.</p>
-        <div class="overflow-x-auto">
-          <table class="w-full text-xs text-left border-collapse">
-            <thead>
-              <tr class="bg-slate-50 text-slate-600 border-b border-slate-200">
-                <th class="py-2.5 px-3 font-semibold">Milestone / Life Stage</th>
-                <th class="py-2.5 px-3 font-semibold text-blue-700">Cumulative Loan Savings (£)</th>
-                <th class="py-2.5 px-3 font-semibold text-emerald-700">Market Pot @ 3% (£)</th>
-                <th class="py-2.5 px-3 font-semibold text-emerald-700">Market Pot @ 4% (£)</th>
-                <th class="py-2.5 px-3 font-semibold text-emerald-800">Market Pot @ 5% (£)</th>
-                <th class="py-2.5 px-3 font-semibold text-indigo-700">Custom Market Pot (£)</th>
-              </tr>
-            </thead>
-            <tbody id="milestoneTableBody" class="divide-y divide-slate-100">
-              <!-- Populated dynamically via JS -->
-            </tbody>
-          </table>
-        </div>
-      </section>
+        <!-- MILESTONE COMPARISON TABLE -->
+        <section class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm overflow-hidden">
+          <h3 class="font-bold text-slate-900 text-base mb-1">Timeline Milestone Breakdown: Paying Loan vs Investing at 3%, 4%, 5%</h3>
+          <p class="text-xs text-slate-500 mb-4">Compare value available to the student at each decade of their adult life across your selected <span id="milestoneHorizonDescLabel" class="font-semibold text-slate-700">40-year horizon</span>.</p>
+          <div class="overflow-x-auto">
+            <table class="w-full text-xs text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-50 text-slate-600 border-b border-slate-200">
+                  <th class="py-2.5 px-3 font-semibold">Milestone / Life Stage</th>
+                  <th class="py-2.5 px-3 font-semibold text-blue-700">Cumulative Loan Savings (£)</th>
+                  <th class="py-2.5 px-3 font-semibold text-emerald-700">Market Pot @ 3% (£)</th>
+                  <th class="py-2.5 px-3 font-semibold text-emerald-700">Market Pot @ 4% (£)</th>
+                  <th class="py-2.5 px-3 font-semibold text-emerald-800">Market Pot @ 5% (£)</th>
+                  <th class="py-2.5 px-3 font-semibold text-indigo-700">Custom Market Pot (£)</th>
+                </tr>
+              </thead>
+              <tbody id="milestoneTableBody" class="divide-y divide-slate-100">
+                <!-- Populated dynamically via JS -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+      </div>
 
     </div>
 

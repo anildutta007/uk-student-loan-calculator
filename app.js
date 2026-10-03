@@ -569,16 +569,34 @@ function runCalculation() {
   });
 
   updateStudentDashboard(simBase, baseGradBalance, studyInterest);
-  updateTimelineMilestoneTable(simBase, simContrib, pot3, pot4, pot5, potCustom, maxHorizon);
+  if (parentOutlayTotal > 0) {
+    updateTimelineMilestoneTable(simBase, simContrib, pot3, pot4, pot5, potCustom, maxHorizon);
+    renderParentComparisonChart(simBase, simContrib, pot3, pot4, pot5, potCustom, maxHorizon);
+  }
   updateFullScheduleTable(simBase, pot3, pot4, pot5, maxHorizon);
 
-  // 6. Render Charts
-  renderParentComparisonChart(simBase, simContrib, pot3, pot4, pot5, potCustom, maxHorizon);
+  // 6. Render Student Chart
   renderStudentTrajectoryChart(simBase);
 }
 
 // Update Parental Contribution Dashboard
 function updateParentDashboard(data) {
+  // Toggle Results Container vs Zero Contribution Notice
+  const comparisonResults = document.getElementById('parentComparisonResults');
+  const zeroNotice = document.getElementById('parentZeroContributionNotice');
+
+  if (data.parentOutlayTotal <= 0) {
+    if (comparisonResults) comparisonResults.classList.add('hidden');
+    if (zeroNotice) zeroNotice.classList.remove('hidden');
+    if (parentCompareChartInstance) {
+      parentCompareChartInstance.destroy();
+      parentCompareChartInstance = null;
+    }
+  } else {
+    if (comparisonResults) comparisonResults.classList.remove('hidden');
+    if (zeroNotice) zeroNotice.classList.add('hidden');
+  }
+
   // Stat Badges
   document.getElementById('statTotalParentContribution').innerText = `£${data.parentOutlayTotal.toLocaleString('en-GB', { maximumFractionDigits: 0 })}`;
   if (data.parentOutlayTotal <= 0) {
@@ -590,6 +608,48 @@ function updateParentDashboard(data) {
   } else {
     document.getElementById('statParentFlowDesc').innerText = `Lump sum paid upfront`;
   }
+
+  // Format Horizon Period for Output
+  const horizonYears = data.simYears;
+  let horizonDesc = `${horizonYears} Years`;
+  let horizonBadgeText = `${horizonYears}-Yr Horizon`;
+
+  if (state.horizon === 'write_off') {
+    const planName = PLAN_CONFIGS[state.planType]?.label || 'Full Loan Term';
+    horizonDesc = `${horizonYears} Years (${planName} Term / Write-Off)`;
+    horizonBadgeText = `${horizonYears} Yrs (Full Term)`;
+  } else if (state.horizon === '20') {
+    horizonDesc = `20 Years (Early Career / House Buy)`;
+    horizonBadgeText = `20 Yrs (House Buy)`;
+  } else if (state.horizon === '10') {
+    horizonDesc = `10 Years (Medium Term)`;
+    horizonBadgeText = `10 Yrs (Medium Term)`;
+  }
+
+  // Update Period Output Displays in Scenario C Card
+  const colC_horizonPeriod = document.getElementById('colC_horizonPeriod');
+  if (colC_horizonPeriod) colC_horizonPeriod.innerText = horizonDesc;
+
+  const colC_horizonBadge = document.getElementById('colC_horizonBadge');
+  if (colC_horizonBadge) colC_horizonBadge.innerText = horizonBadgeText;
+
+  const colC_horizonFooter = document.getElementById('colC_horizonFooter');
+  if (colC_horizonFooter) {
+    colC_horizonFooter.innerHTML = `Compound value calculated over <strong>${horizonDesc}</strong> with annual compounding.`;
+  }
+
+  document.querySelectorAll('.colC_horizonYearsDisplay').forEach(el => {
+    el.innerText = `${horizonYears} yrs`;
+  });
+
+  const chartHorizonTitle = document.getElementById('chartHorizonYearsLabel');
+  if (chartHorizonTitle) chartHorizonTitle.innerText = `${horizonYears}-Year Horizon`;
+
+  const chartHorizonDesc = document.getElementById('chartHorizonDescLabel');
+  if (chartHorizonDesc) chartHorizonDesc.innerText = `${horizonYears}-year investment horizon (${horizonDesc})`;
+
+  const milestoneHorizonDesc = document.getElementById('milestoneHorizonDescLabel');
+  if (milestoneHorizonDesc) milestoneHorizonDesc.innerText = `${horizonYears}-year investment horizon`;
 
   // Column A: Without Parental Help
   document.getElementById('colA_startBalance').innerText = `£${Math.round(data.baseGradBalance).toLocaleString('en-GB')}`;
@@ -671,7 +731,7 @@ function updateParentDashboard(data) {
     verdictBadge.innerText = 'Ineffective Outlay';
     verdictBadge.className = 'text-xs font-bold px-2.5 py-1 rounded-full bg-red-100 text-red-800';
     verdictSummary.innerHTML = `Under this expected career trajectory, the student <strong>never clears the loan</strong> before statutory cancellation at Year ${data.maxHorizon}. Because repayments depend strictly on salary (not debt size), paying £${data.parentOutlayTotal.toLocaleString()} upfront reduces the student's monthly deductions by <strong class="text-red-600">£${Math.round(data.repaymentsSaved).toLocaleString()}</strong>. Your contribution simply subsidies HMRC write-off debt!`;
-    verdictRec.innerHTML = `Strongly advise <strong>AGAINST paying tuition fees upfront</strong>. Instead, invest that £${data.parentOutlayTotal.toLocaleString()} in a <strong>Stocks & Shares ISA or Lifetime ISA</strong>. Compounding at 5% p.a., it will grow into <strong>£${potAt20.toLocaleString()}</strong> by Year 20, providing a life-changing house deposit or safety net that remains in the family!`;
+    verdictRec.innerHTML = `Strongly advise <strong>AGAINST paying tuition fees upfront</strong>. Instead, invest that £${data.parentOutlayTotal.toLocaleString()} in a <strong>Stocks & Shares ISA or Lifetime ISA</strong>. Compounding at 5% p.a., it will grow into <strong>£${potAtEnd.toLocaleString()}</strong> over your selected <strong>${data.simYears}-year horizon</strong> (or £${potAt20.toLocaleString()} by Year 20 for a house deposit), keeping all capital inside the family!`;
   } else if (!data.simBase.isPaidOff && data.simContrib.isPaidOff) {
     // Partial benefit
     verdictBox.className = 'rounded-2xl p-6 border shadow-sm transition-all duration-300 bg-blue-50 border-blue-300';
@@ -680,7 +740,7 @@ function updateParentDashboard(data) {
     verdictBadge.innerText = 'Crossover Case';
     verdictBadge.className = 'text-xs font-bold px-2.5 py-1 rounded-full bg-blue-100 text-blue-800';
     verdictSummary.innerHTML = `With your £${data.parentOutlayTotal.toLocaleString()} contribution, the loan is paid off in <strong>Year ${data.simContrib.payoffYear}</strong> (saving the student £${Math.round(data.repaymentsSaved).toLocaleString()} in lifetime deductions). Net family financial impact is <strong>£${Math.round(data.netFamilyGain).toLocaleString()}</strong>.`;
-    verdictRec.innerHTML = `Evaluate whether having <strong>liquid cash (£${potAtEnd.toLocaleString()} at 5% growth)</strong> in an ISA for buying a first home in their 20s or 30s is more valuable than locking that cash into wiping out Student Finance England debt.`;
+    verdictRec.innerHTML = `Evaluate whether having <strong>liquid cash (£${potAtEnd.toLocaleString()} at 5% growth over ${data.simYears} years)</strong> in an ISA for buying a first home in their 20s or 30s is more valuable than locking that cash into wiping out Student Finance England debt.`;
   } else {
     // High Earner
     verdictBox.className = 'rounded-2xl p-6 border shadow-sm transition-all duration-300 bg-emerald-50 border-emerald-300';
