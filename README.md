@@ -1,4 +1,4 @@
-# UK UniLoan Calculator & Parental Contribution Lab
+# Dutta UK University Loan Repayment Calculator & Parental Contribution Lab
 > **England & Wales Student Loan Simulator & Parental Investment Opportunity Cost Analyzer**
 
 An interactive, accurate financial decision tool designed for students (currently studying or graduated) and parents in England & Wales. It simulates lifetime loan repayments and models the financial wisdom of paying tuition fees upfront versus investing that capital into the market at 3%, 4%, and 5% compound growth.

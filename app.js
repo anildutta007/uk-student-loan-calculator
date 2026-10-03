@@ -1018,3 +1018,47 @@ function exportToCSV() {
   a.click();
   document.body.removeChild(a);
 }
+
+// --- Tip the Developer Modal Logic ---
+let currentTipAmount = 1;
+
+function openTipModal() {
+  const modal = document.getElementById('tipModal');
+  if (modal) {
+    modal.classList.remove('hidden');
+    selectTipAmount(1);
+  }
+  trackGAEvent('tip_modal_open');
+}
+
+function closeTipModal() {
+  const modal = document.getElementById('tipModal');
+  if (modal) {
+    modal.classList.add('hidden');
+  }
+}
+
+function selectTipAmount(amount) {
+  currentTipAmount = amount;
+  const btn1 = document.getElementById('tipBtn1');
+  const btn2 = document.getElementById('tipBtn2');
+  const actionText = document.getElementById('tipActionText');
+
+  if (amount === 1) {
+    if (btn1) btn1.className = 'p-3.5 rounded-xl border-2 border-amber-500 bg-amber-50 text-amber-950 font-bold text-sm flex flex-col items-center justify-center transition cursor-pointer';
+    if (btn2) btn2.className = 'p-3.5 rounded-xl border-2 border-slate-200 hover:border-amber-400 bg-slate-50 text-slate-800 font-bold text-sm flex flex-col items-center justify-center transition cursor-pointer';
+    if (actionText) actionText.innerText = 'Send £1 Tip via Buy Me a Coffee';
+  } else {
+    if (btn2) btn2.className = 'p-3.5 rounded-xl border-2 border-amber-500 bg-amber-50 text-amber-950 font-bold text-sm flex flex-col items-center justify-center transition cursor-pointer';
+    if (btn1) btn1.className = 'p-3.5 rounded-xl border-2 border-slate-200 hover:border-amber-400 bg-slate-50 text-slate-800 font-bold text-sm flex flex-col items-center justify-center transition cursor-pointer';
+    if (actionText) actionText.innerText = 'Send £2 Tip via Buy Me a Coffee';
+  }
+  trackGAEvent('tip_amount_select', { amount: amount });
+}
+
+// Close modal on Escape key
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeTipModal();
+  }
+});
