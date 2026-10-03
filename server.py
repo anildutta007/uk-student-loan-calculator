@@ -39,7 +39,7 @@ class StudentCalcRequest(BaseModel):
     plan_type: str = Field("plan_5", description="'plan_5', 'plan_2', 'plan_1'")
     starting_salary: float = Field(32000.0, ge=0)
     salary_growth_rate: float = Field(0.03, ge=0, le=0.30)
-    rpi: float = Field(0.032, ge=0, le=0.15)
+    rpi: float = Field(0.041, ge=0, le=0.15)
     # If studying
     course_length_years: int = Field(3, ge=1, le=6)
     tuition_per_year: float = Field(9250.0, ge=0)
@@ -55,7 +55,7 @@ class ParentEvalRequest(BaseModel):
     plan_type: str = Field("plan_5", description="'plan_5', 'plan_2', 'plan_1'")
     starting_salary: float = Field(32000.0, ge=0)
     salary_growth_rate: float = Field(0.03, ge=0, le=0.30)
-    rpi: float = Field(0.032, ge=0, le=0.15)
+    rpi: float = Field(0.041, ge=0, le=0.15)
     course_length_years: int = Field(3, ge=1, le=6)
     tuition_per_year: float = Field(9250.0, ge=0)
     maintenance_per_year: float = Field(10227.0, ge=0)

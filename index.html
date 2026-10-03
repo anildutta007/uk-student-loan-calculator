@@ -69,7 +69,7 @@
           <div class="flex items-center gap-2">
             <h1 class="text-xl font-bold text-slate-900 tracking-tight">UK UniLoan Calculator</h1>
             <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">England & Wales</span>
-            <span class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-2 py-0.5 rounded-full">Plan 2 & Plan 5</span>
+            <span class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-2 py-0.5 rounded-full">Updated for 2026/27</span>
           </div>
           <p class="text-xs text-slate-500">Student Repayment Forecasts • Parental Fee Impact • 3%, 4%, 5% Market Growth Comparison</p>
         </div>
@@ -144,11 +144,11 @@
         <div>
           <label class="block font-semibold text-slate-700 mb-1 text-xs">Student Loan Plan</label>
           <select id="inputPlanType" onchange="runCalculation()" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-900 font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none">
-            <option value="plan_5" selected>Plan 5 (England - Aug 2023 onwards)</option>
-            <option value="plan_2">Plan 2 (England 2012-23 / Wales 2012+)</option>
-            <option value="plan_1">Plan 1 (England & Wales - Pre-2012)</option>
+            <option value="plan_5" selected>Plan 5 (England: started on/after 1 Aug 2023)</option>
+            <option value="plan_2">Plan 2 (England: 1 Sept 2012 – 31 July 2023 | Wales: 1 Sept 2012 onwards)</option>
+            <option value="plan_1">Plan 1 (England & Wales: pre-1 Sept 2012 | Northern Ireland)</option>
           </select>
-          <p id="planInfoText" class="text-[11px] text-slate-500 mt-1">£25,000 threshold, 9% repayment, 40-year write-off, RPI interest.</p>
+          <p id="planInfoText" class="text-[11px] text-slate-500 mt-1">£25,000 threshold (£2,083/mo), 9% repayment, 40-year write-off, flat RPI interest (currently 4.1%).</p>
         </div>
 
         <!-- Studying Inputs: Tuition & Maintenance -->
@@ -156,9 +156,10 @@
           <div>
             <label class="block font-semibold text-slate-700 mb-1 text-xs">Tuition Fee per Year (£)</label>
             <input type="number" id="inputTuition" value="9250" step="250" oninput="runCalculation()" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-900 font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none">
-            <div class="flex gap-1 mt-1">
+            <div class="flex gap-1 mt-1 flex-wrap">
               <button onclick="setTuition(9250)" class="text-[10px] bg-slate-100 hover:bg-slate-200 px-1.5 py-0.5 rounded text-slate-600">Standard £9,250</button>
               <button onclick="setTuition(9535)" class="text-[10px] bg-slate-100 hover:bg-slate-200 px-1.5 py-0.5 rounded text-slate-600">2025/26 £9,535</button>
+              <button onclick="setTuition(9790)" class="text-[10px] bg-slate-100 hover:bg-slate-200 px-1.5 py-0.5 rounded text-slate-600">2026/27 £9,790</button>
               <button onclick="setTuition(9000)" class="text-[10px] bg-slate-100 hover:bg-slate-200 px-1.5 py-0.5 rounded text-slate-600">Wales £9,000</button>
             </div>
           </div>
@@ -224,13 +225,13 @@
         <div>
           <div class="flex justify-between items-center mb-1">
             <label class="block font-semibold text-slate-700 text-xs">Assumed RPI Inflation</label>
-            <span id="rpiVal" class="text-xs font-bold text-slate-600">3.2%</span>
+            <span id="rpiVal" class="text-xs font-bold text-blue-600">4.1%</span>
           </div>
-          <input type="range" id="inputRPI" min="1.5" max="6.0" step="0.1" value="3.2" oninput="document.getElementById('rpiVal').innerText = this.value + '%'; runCalculation();" class="w-full h-2 bg-slate-200 rounded-lg cursor-pointer">
+          <input type="range" id="inputRPI" min="1.5" max="6.0" step="0.1" value="4.1" oninput="document.getElementById('rpiVal').innerText = this.value + '%'; runCalculation();" class="w-full h-2 bg-slate-200 rounded-lg cursor-pointer">
           <div class="flex justify-between text-[10px] text-slate-400 mt-1">
-            <span>2.0%</span>
-            <span>3.2% (Target)</span>
-            <span>6.0%</span>
+            <span>2.0% (BoE)</span>
+            <span>4.1% (Current SLC Rate)</span>
+            <span>6.0% (Cap)</span>
           </div>
         </div>
 
@@ -667,37 +668,68 @@
     <!-- TAB 4: RULES GUIDE & FAQS -->
     <div id="tabContent-guideFaq" class="tab-pane hidden space-y-6">
       <section class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
-        <h2 class="text-xl font-bold text-slate-900 mb-2">England & Wales Student Finance System: Essential Rules</h2>
-        <p class="text-sm text-slate-600 mb-6">Student loans in England and Wales behave unlike any traditional bank loan or mortgage. Understanding these rules is crucial before making any repayment or parental contribution decisions.</p>
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-4 border-b border-slate-100 gap-2">
+          <div>
+            <h2 class="text-xl font-bold text-slate-900">England & Wales Student Finance System: Statutory Rules</h2>
+            <p class="text-xs text-slate-500 mt-1">Official regulations verified directly against Department for Education & GOV.UK guidance.</p>
+          </div>
+          <span class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap">Updated for 2026/27</span>
+        </div>
+
+        <!-- Official Sources Banner -->
+        <div class="bg-blue-50/70 border border-blue-200 rounded-xl p-4 mb-6">
+          <div class="flex items-start gap-3">
+            <span class="text-xl">🏛️</span>
+            <div>
+              <h4 class="font-bold text-blue-900 text-xs uppercase tracking-wider">Official GOV.UK Direct Verification Sources</h4>
+              <p class="text-xs text-blue-800 mt-0.5">All repayment thresholds, interest formulas, and write-off dates in this calculator mirror official GOV.UK published schedules:</p>
+              <div class="flex flex-wrap gap-3 mt-2 text-xs">
+                <a href="https://www.gov.uk/repaying-your-student-loan/which-repayment-plan-you-are-on" target="_blank" rel="noopener noreferrer" class="text-blue-700 underline font-semibold hover:text-blue-900 flex items-center gap-1">
+                  ↗ Which Repayment Plan You're On
+                </a>
+                <span class="text-blue-300">•</span>
+                <a href="https://www.gov.uk/repaying-your-student-loan/when-you-start-repaying" target="_blank" rel="noopener noreferrer" class="text-blue-700 underline font-semibold hover:text-blue-900 flex items-center gap-1">
+                  ↗ When You Start Repaying & Thresholds
+                </a>
+                <span class="text-blue-300">•</span>
+                <a href="https://www.gov.uk/repaying-your-student-loan/what-you-pay" target="_blank" rel="noopener noreferrer" class="text-blue-700 underline font-semibold hover:text-blue-900 flex items-center gap-1">
+                  ↗ What You Pay & Interest Rates
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
           
           <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-200">
             <h3 class="font-bold text-blue-900 text-base mb-2">1. It is an Income-Contingent "Graduate Tax"</h3>
             <p class="text-slate-700 leading-relaxed text-xs">
-              Under UK law, what you repay each month is <strong>100% determined by what you earn</strong>, never by how much you owe. If you earn under the threshold (£25k on Plan 5, £27,295 on Plan 2), you pay <strong>exactly £0</strong>, regardless of whether your loan balance is £10,000 or £100,000.
+              Under UK law, what you repay each month is <strong>100% determined by what you earn</strong>, never by how much you owe. If you earn under the statutory threshold (£25,000 on Plan 5, £29,385 on Plan 2, £26,900 on Plan 1), you pay <strong>exactly £0</strong>, regardless of whether your loan balance is £10,000 or £100,000. Repayments start the April after leaving your course.
             </p>
           </div>
 
           <div class="bg-emerald-50/50 p-4 rounded-xl border border-emerald-200">
-            <h3 class="font-bold text-emerald-900 text-base mb-2">2. The 30-Year & 40-Year Cancellation Rule</h3>
+            <h3 class="font-bold text-emerald-900 text-base mb-2">2. Statutory 30-Year & 40-Year Cancellation</h3>
             <p class="text-slate-700 leading-relaxed text-xs">
-              Any remaining loan balance is <strong>completely wiped clean</strong> by the UK government after 30 years (Plan 2) or 40 years (Plan 5) from the April following graduation. It does not affect credit ratings, and you never pass this debt to your heirs.
+              Any remaining loan balance is <strong>completely wiped clean</strong> by the UK government after 30 years (Plan 2) or 40 years (Plan 5) from the April following graduation. It does not affect credit ratings, and student loan balances are never inherited by children or family members.
             </p>
           </div>
 
           <div class="bg-amber-50/50 p-4 rounded-xl border border-amber-200">
-            <h3 class="font-bold text-amber-900 text-base mb-2">3. Plan 2 vs Plan 5 Comparison</h3>
-            <ul class="text-xs text-slate-700 space-y-1 list-disc pl-4 mt-2">
-              <li><strong>Plan 2 (England 2012-23 / Wales 2012+):</strong> Threshold £27,295. Repayment 9% above threshold. Written off after 30 years. Interest is RPI to RPI+3%.</li>
-              <li><strong>Plan 5 (England Aug 2023+):</strong> Threshold £25,000. Repayment 9% above threshold. Written off after 40 years. Interest is strictly flat RPI (0% real interest).</li>
+            <h3 class="font-bold text-amber-900 text-base mb-2">3. Plan Rules & Course Start Dates (GOV.UK)</h3>
+            <ul class="text-xs text-slate-700 space-y-1.5 mt-2">
+              <li><strong>Plan 5 (Student Finance England):</strong> Started on/after 1 August 2023. Threshold £25,000/yr (£2,083/mo). Repays 9% over threshold. Cancelled after 40 years. Interest is strictly flat RPI (currently 4.1%).</li>
+              <li><strong>Plan 2 (England 2012–2023 / Wales 2012+):</strong> Started 1 Sept 2012 – 31 July 2023 (England) or 1 Sept 2012 onwards (Wales). Threshold £29,385/yr (£2,448/mo). Repays 9% over threshold. Cancelled after 30 years. Variable interest 4.1% to 6.0% (capped).</li>
+              <li><strong>Plan 1 (Pre-2012 & Northern Ireland):</strong> Started before 1 Sept 2012 (England/Wales) or Northern Ireland. Threshold £26,900/yr (£2,241/mo). Repays 9% over threshold. Cancelled after 25 years. Interest currently 4.1%.</li>
+              <li><strong>Postgraduate Loan (England & Wales):</strong> Master's or Doctoral loans. Threshold £21,000/yr (£1,750/mo). Repays 6% concurrently over threshold. Cancelled after 30 years. Interest currently 6.0%.</li>
             </ul>
           </div>
 
           <div class="bg-purple-50/50 p-4 rounded-xl border border-purple-200">
-            <h3 class="font-bold text-purple-900 text-base mb-2">4. Why Paying Tuition Upfront Can Be a Mistake</h3>
+            <h3 class="font-bold text-purple-900 text-base mb-2">4. Why Paying Fees Upfront Can Cost Families Dearly</h3>
             <p class="text-slate-700 leading-relaxed text-xs">
-              If your child earns a typical graduate salary, they may never clear the full balance before the write-off date. Putting £27,750 into university fees means you just saved HMRC money! The student pays the exact same monthly deduction. Putting that £27,750 in a Lifetime ISA or Stocks ISA creates a huge house deposit instead.
+              Because monthly repayments depend entirely on earnings and debt is written off after 30–40 years, an average earner will never pay off their full balance before cancellation. In that scenario, paying £28,000+ upfront in parental contributions does not reduce monthly student payslip deductions by a single penny — it simply saves HMRC money!
             </p>
           </div>
 
@@ -710,21 +742,21 @@
             <details class="bg-slate-50 p-3 rounded-lg border border-slate-200 cursor-pointer">
               <summary class="font-semibold text-slate-900 text-sm">Will having a student loan stop my child getting a mortgage?</summary>
               <p class="mt-2 text-slate-600 leading-relaxed">
-                No. Student debt is not recorded on credit files (Experian, Equifax, TransUnion). Mortgage lenders only assess student loans as a regular deduction from net monthly income (reducing monthly disposable income slightly), exactly like council tax or pension contributions.
+                No. Student debt is not recorded on credit files (Experian, Equifax, TransUnion) and does not harm credit scores. Mortgage lenders only assess student loan repayments as a regular monthly deduction from net disposable income, exactly like income tax or pension contributions.
               </p>
             </details>
 
             <details class="bg-slate-50 p-3 rounded-lg border border-slate-200 cursor-pointer">
               <summary class="font-semibold text-slate-900 text-sm">What happens if my child loses their job or takes parental leave?</summary>
               <p class="mt-2 text-slate-600 leading-relaxed">
-                Student loan repayments immediately stop. If their salary drops below the threshold, deductions cease automatically without penalty, default notices, or debt collectors.
+                Student loan repayments immediately stop. If their salary drops below the threshold (£29,385 on Plan 2 or £25,000 on Plan 5), deductions cease automatically through PAYE with no penalties, arrears, or debt collector contact.
               </p>
             </details>
 
             <details class="bg-slate-50 p-3 rounded-lg border border-slate-200 cursor-pointer">
               <summary class="font-semibold text-slate-900 text-sm">When does paying fees upfront actually make financial sense?</summary>
               <p class="mt-2 text-slate-600 leading-relaxed">
-                Paying fees upfront makes mathematical sense ONLY if the graduate is destined for top-decile earnings (e.g., corporate law, investment banking, software engineering at FAANG, or senior medicine), where they will clear the entire loan balance well before the 30- or 40-year write-off mark. In that specific scenario, reducing debt upfront prevents compounding RPI interest.
+                Paying tuition fees upfront makes mathematical sense ONLY if the graduate is on track for upper-decile lifetime earnings (e.g., commercial law, quantitative finance, investment banking, high-level software engineering), where they are virtually certain to pay off the entire balance before statutory write-off. In that specific scenario, reducing the principal upfront prevents compounding interest. For typical career trajectories, investing the same capital into an ISA produces far greater family wealth and financial flexibility.
               </p>
             </details>
           </div>

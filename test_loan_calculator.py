@@ -16,14 +16,15 @@ from engine import (
 class TestUKStudentLoanEngine(unittest.TestCase):
 
     def test_plan_configs(self):
-        self.assertEqual(PLAN_CONFIGS["plan_2"]["repayment_threshold"], 27295.0)
+        self.assertEqual(PLAN_CONFIGS["plan_2"]["repayment_threshold"], 29385.0)
         self.assertEqual(PLAN_CONFIGS["plan_2"]["write_off_years"], 30)
         self.assertEqual(PLAN_CONFIGS["plan_5"]["repayment_threshold"], 25000.0)
         self.assertEqual(PLAN_CONFIGS["plan_5"]["write_off_years"], 40)
+        self.assertEqual(PLAN_CONFIGS["plan_1"]["repayment_threshold"], 26900.0)
 
     def test_take_home_pay_calculation(self):
-        # Salary £35,000 with Plan 2 (£27,295 threshold)
-        annual_sl = (35000 - 27295) * 0.09
+        # Salary £35,000 with Plan 2 (£29,385 threshold)
+        annual_sl = (35000 - 29385) * 0.09
         res = calculate_take_home_pay(35000, student_loan_annual=annual_sl)
         
         self.assertEqual(res["annual_gross"], 35000.0)
@@ -65,12 +66,12 @@ class TestUKStudentLoanEngine(unittest.TestCase):
         self.assertAlmostEqual(calculate_interest_rate_post_study("plan_5", 30000, 0.03), 0.03)
         self.assertAlmostEqual(calculate_interest_rate_post_study("plan_5", 80000, 0.03), 0.03)
 
-        # Plan 2 below lower threshold (£27,295) -> RPI
+        # Plan 2 below lower threshold (£29,385) -> RPI
         self.assertAlmostEqual(calculate_interest_rate_post_study("plan_2", 25000, 0.03), 0.03)
-        # Plan 2 above upper threshold (£49,130) -> RPI + 3%
+        # Plan 2 above upper threshold (£52,884) -> RPI + 3% (capped at 6%)
         self.assertAlmostEqual(calculate_interest_rate_post_study("plan_2", 60000, 0.03), 0.06)
         # Plan 2 midpoint -> RPI + 1.5%
-        mid_salary = (27295.0 + 49130.0) / 2.0
+        mid_salary = (29385.0 + 52884.0) / 2.0
         self.assertAlmostEqual(calculate_interest_rate_post_study("plan_2", mid_salary, 0.03), 0.045)
 
     def test_market_compound_investment_growth(self):

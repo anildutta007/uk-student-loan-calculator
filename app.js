@@ -13,7 +13,7 @@ let state = {
   gradBalance: 48000,
   salary: 32000,
   salaryGrowth: 0.035,
-  rpi: 0.032,
+  rpi: 0.041,
   hasPostgrad: false,
   // Parental contribution
   contribType: 'annual_fee',
@@ -26,33 +26,42 @@ let state = {
 // Statutory Plan Configurations
 const PLAN_CONFIGS = {
   plan_5: {
-    name: 'Plan 5 (England - Aug 2023+)',
+    name: 'Plan 5 (England: courses started on/after 1 August 2023)',
     threshold: 25000,
+    monthlyThreshold: 2083,
+    weeklyThreshold: 480,
     rate: 0.09,
     writeOffYears: 40,
-    info: '£25,000 threshold, 9% repayment, 40-year write-off, flat RPI interest (0% real rate).'
+    info: '£25,000 threshold (£2,083/mo), 9% repayment, 40-year write-off, flat RPI interest (currently 4.1%).'
   },
   plan_2: {
-    name: 'Plan 2 (England 2012-23 / Wales 2012+)',
-    threshold: 27295,
-    upperThreshold: 49130,
+    name: 'Plan 2 (England: 1 Sept 2012 – 31 July 2023 | Wales: 1 Sept 2012 onwards)',
+    threshold: 29385,
+    monthlyThreshold: 2448,
+    weeklyThreshold: 565,
+    upperThreshold: 52884,
     rate: 0.09,
     writeOffYears: 30,
-    info: '£27,295 threshold, 9% repayment, 30-year write-off, sliding interest (RPI to RPI+3%).'
+    info: '£29,385 threshold (£2,448/mo), 9% repayment, 30-year write-off, variable interest 4.1% to 6.0% (capped).'
   },
   plan_1: {
-    name: 'Plan 1 (England & Wales Pre-2012)',
-    threshold: 24990,
+    name: 'Plan 1 (England & Wales: pre-1 Sept 2012 | Northern Ireland)',
+    threshold: 26900,
+    monthlyThreshold: 2241,
+    weeklyThreshold: 517,
     rate: 0.09,
     writeOffYears: 25,
-    info: '£24,990 threshold, 9% repayment, 25-year write-off, lower of RPI or BoE Base + 1%.'
+    info: '£26,900 threshold (£2,241/mo), 9% repayment, 25-year write-off, interest currently 4.1%.'
   }
 };
 
 const POSTGRAD_CONFIG = {
   threshold: 21000,
+  monthlyThreshold: 1750,
+  weeklyThreshold: 403,
   rate: 0.06,
-  writeOffYears: 30
+  writeOffYears: 30,
+  interestRate: 0.060
 };
 
 // Chart instances
@@ -188,7 +197,7 @@ function readInputsFromDOM() {
   state.gradBalance = parseFloat(document.getElementById('inputGradBalance').value) || 48000;
   state.salary = parseFloat(document.getElementById('inputSalary').value) || 32000;
   state.salaryGrowth = (parseFloat(document.getElementById('inputSalaryGrowth').value) || 3.5) / 100;
-  state.rpi = (parseFloat(document.getElementById('inputRPI').value) || 3.2) / 100;
+  state.rpi = (parseFloat(document.getElementById('inputRPI').value) || 4.1) / 100;
   state.hasPostgrad = document.getElementById('checkPostgrad').checked;
 
   state.contribType = document.getElementById('inputContribType').value;
@@ -219,8 +228,8 @@ function calculateInStudyBalance(courseYears, tuition, maintenance, parentAnnual
   let balance = 0;
   let studyRate = rpi;
 
-  if (planType === 'plan_2') studyRate = rpi + 0.03;
-  else if (planType === 'plan_1') studyRate = Math.min(rpi, 0.045);
+  if (planType === 'plan_2') studyRate = Math.min(rpi + 0.03, 0.060); // Capped at 6.0% on GOV.UK
+  else if (planType === 'plan_1') studyRate = Math.min(rpi, 0.041);
 
   for (let yr = 1; yr <= courseYears; yr++) {
     const interestExisting = balance * studyRate;
@@ -238,14 +247,16 @@ function calculateInStudyBalance(courseYears, tuition, maintenance, parentAnnual
 function getPostStudyInterestRate(planType, salary, rpi) {
   if (planType === 'plan_5') return rpi;
   if (planType === 'plan_2') {
-    const lower = 27295;
-    const upper = 49130;
+    const lower = 29385;
+    const upper = 52884;
+    const cap = 0.060;
+    const maxAddition = Math.max(0, Math.min(0.03, cap - rpi));
     if (salary <= lower) return rpi;
-    if (salary >= upper) return rpi + 0.03;
+    if (salary >= upper) return rpi + maxAddition;
     const prop = (salary - lower) / (upper - lower);
-    return rpi + (0.03 * prop);
+    return rpi + (maxAddition * prop);
   }
-  if (planType === 'plan_1') return Math.min(rpi, 0.045);
+  if (planType === 'plan_1') return Math.min(rpi, 0.041);
   return rpi;
 }
 
@@ -313,7 +324,7 @@ function simulateLifetime(startBalance, startSalary, growthRate, planType, rpi, 
     // PG balance update
     let actualPG = 0;
     if (hasPostgrad && balancePG > 0) {
-      const pgRate = rpi + 0.03;
+      const pgRate = Math.min(rpi + 0.03, 0.060); // Capped at 6.0% as published on GOV.UK
       const maxPG = balancePG * (1 + pgRate);
       if (expectedPG >= maxPG) {
         actualPG = maxPG;
@@ -439,6 +450,7 @@ function runCalculation() {
   let contribGradBalance = 0;
   let parentOutlayTotal = 0;
   let parentFlow = [];
+  let studyInterest = 0;
 
   const maxHorizon = PLAN_CONFIGS[state.planType]?.writeOffYears || 40;
   const simYears = state.horizon === 'write_off' ? maxHorizon : parseInt(state.horizon);
@@ -449,6 +461,7 @@ function runCalculation() {
       state.courseYears, state.tuition, state.maintenance, 0, state.rpi, state.planType
     );
     baseGradBalance = baseStudy.graduationBalance;
+    studyInterest = baseStudy.totalStudyInterest;
 
     // Contrib: Parent helps
     let parentAnnualPortion = 0;
@@ -536,7 +549,7 @@ function runCalculation() {
     simYears,
   });
 
-  updateStudentDashboard(simBase, baseGradBalance);
+  updateStudentDashboard(simBase, baseGradBalance, studyInterest);
   updateTimelineMilestoneTable(simBase, simContrib, pot3, pot4, pot5, potCustom, maxHorizon);
   updateFullScheduleTable(simBase, pot3, pot4, pot5, maxHorizon);
 
@@ -641,12 +654,12 @@ function updateParentDashboard(data) {
     verdictBadge.innerText = 'Financially Effective';
     verdictBadge.className = 'text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800';
     verdictSummary.innerHTML = `The student's earnings are high enough to clear the loan in both cases. Your £${data.parentOutlayTotal.toLocaleString()} contribution saves <strong>£${Math.round(data.interestSaved).toLocaleString()} in compound interest</strong> and clears the debt <strong>${data.yearsEarlier} years earlier</strong>!`;
-    verdictRec.innerHTML = `Paying down the loan gives a <strong>guaranteed, tax-free return</strong> equal to the student loan interest rate. If you prefer certainty over stock market volatility, reducing the loan balance is mathematically sound here.`;
+    verdictRec.innerHTML = `Under this high-earner path where the loan is cleared before write-off, reducing the principal avoids compounding interest, generating an effective return matching the loan rate. However, this outcome is conditional on sustained high earnings over a multi-decade career; voluntary repayments cannot be refunded if earnings decrease.`;
   }
 }
 
 // Update Student Repayment Dashboard
-function updateStudentDashboard(sim, gradBalance) {
+function updateStudentDashboard(sim, gradBalance, studyInterest = 0) {
   // Initial Payslip
   const firstYearRepay = sim.schedule[0]?.totalAnnualRepay || 0;
   const payslip = calculateTaxAndNI(state.salary, firstYearRepay);
@@ -666,6 +679,14 @@ function updateStudentDashboard(sim, gradBalance) {
 
   // KPI Cards
   document.getElementById('kpiStartBalance').innerText = `£${Math.round(gradBalance).toLocaleString()}`;
+  const studyInterestEl = document.getElementById('kpiInStudyInterest');
+  if (studyInterestEl) {
+    if (state.mode === 'studying') {
+      studyInterestEl.innerText = `Includes £${Math.round(studyInterest).toLocaleString()} in-study interest (${state.courseYears} yrs)`;
+    } else {
+      studyInterestEl.innerText = 'Entered graduation balance';
+    }
+  }
   document.getElementById('kpiTotalRepaid').innerText = `£${Math.round(sim.totalRepaid).toLocaleString()}`;
   const ratio = Math.round((sim.totalRepaid / Math.max(1, gradBalance)) * 100);
   document.getElementById('kpiRepaidRatio').innerText = `${ratio}% of original debt repaid`;

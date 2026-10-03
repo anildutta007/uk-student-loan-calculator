@@ -15,41 +15,45 @@ from typing import List, Dict, Any, Optional
 # --- Statutory UK Student Loan Parameters ---
 PLAN_CONFIGS = {
     "plan_5": {
-        "name": "Plan 5 (England - Aug 2023 onwards)",
+        "name": "Plan 5 (England: courses started on or after 1 August 2023)",
         "country": "England",
-        "description": "Started undergraduate course on/after 1 August 2023",
+        "description": "Started undergraduate course, PGCE, or Advanced Learner Loan on or after 1 August 2023 (Student Finance England)",
         "repayment_threshold": 25000.0,
         "monthly_threshold": 2083.33,
+        "weekly_threshold": 480.77,
         "repayment_rate": 0.09,
         "write_off_years": 40,
-        "study_interest_formula": "rpi",  # flat RPI, no +3%
+        "study_interest_formula": "rpi",  # flat RPI, 0% real rate
         "post_study_interest_formula": "rpi",  # flat RPI
-        "default_rpi": 0.032,  # 3.2% default RPI target
+        "default_rpi": 0.041,  # 4.1% current statutory rate published on GOV.UK
     },
     "plan_2": {
-        "name": "Plan 2 (England 2012-2023, Wales 2012+)",
+        "name": "Plan 2 (England: 1 Sept 2012 – 31 July 2023 | Wales: 1 Sept 2012 onwards)",
         "country": "England & Wales",
-        "description": "Started university between Sept 2012 and July 2023 (England) or Sept 2012 onwards (Wales)",
-        "repayment_threshold": 27295.0,
-        "monthly_threshold": 2274.58,
+        "description": "Started university between 1 September 2012 and 31 July 2023 (England) or 1 September 2012 onwards (Wales)",
+        "repayment_threshold": 29385.0,
+        "monthly_threshold": 2448.75,
+        "weekly_threshold": 565.10,
+        "upper_threshold": 52884.0,
         "repayment_rate": 0.09,
         "write_off_years": 30,
-        "study_interest_formula": "rpi_plus_3",
+        "study_interest_formula": "rpi_plus_3_capped",  # RPI + 3% capped at 6.0%
         "post_study_interest_formula": "plan_2_sliding",
-        "default_rpi": 0.032,
-        "upper_threshold": 49130.0,
+        "default_rpi": 0.041,
+        "cap_rate": 0.060,  # 6.0% prevailing market rate cap
     },
     "plan_1": {
-        "name": "Plan 1 (England & Wales - Pre-2012)",
-        "country": "England & Wales",
-        "description": "Started university before 1 September 2012",
-        "repayment_threshold": 24990.0,
-        "monthly_threshold": 2082.50,
+        "name": "Plan 1 (England & Wales: pre-1 Sept 2012 | Northern Ireland)",
+        "country": "England, Wales & Northern Ireland",
+        "description": "Started university before 1 September 2012 (England/Wales) or any time (Northern Ireland)",
+        "repayment_threshold": 26900.0,
+        "monthly_threshold": 2241.67,
+        "weekly_threshold": 517.31,
         "repayment_rate": 0.09,
         "write_off_years": 25,
         "study_interest_formula": "plan_1_rate",
         "post_study_interest_formula": "plan_1_rate",
-        "default_rpi": 0.032,
+        "default_rpi": 0.041,
     },
 }
 
@@ -57,9 +61,11 @@ POSTGRAD_CONFIG = {
     "name": "Postgraduate Loan (Master's / Doctoral)",
     "repayment_threshold": 21000.0,
     "monthly_threshold": 1750.00,
+    "weekly_threshold": 403.85,
     "repayment_rate": 0.06,
     "write_off_years": 30,
-    "interest_formula": "rpi_plus_3",
+    "interest_formula": "rpi_plus_3_capped",
+    "default_rate": 0.060,  # 6.0% currently published on GOV.UK
 }
 
 # --- Tax & NI 2024-2026 Brackets (England & Wales) ---
@@ -134,7 +140,7 @@ def calculate_in_study_loan_balance(
     tuition_per_year: float,
     maintenance_per_year: float,
     parent_annual_contribution: float = 0.0,
-    rpi: float = 0.032,
+    rpi: float = 0.041,
     plan_type: str = "plan_5",
 ) -> Dict[str, Any]:
     """
@@ -150,11 +156,11 @@ def calculate_in_study_loan_balance(
 
     # In-study interest rate
     if plan_type == "plan_5":
-        study_rate = rpi  # Plan 5 is strictly RPI
+        study_rate = rpi  # Plan 5 is strictly RPI (currently 4.1%)
     elif plan_type == "plan_2":
-        study_rate = rpi + 0.03  # Plan 2 is RPI + 3% while studying
+        study_rate = min(rpi + 0.03, 0.060)  # Plan 2 is RPI + 3%, capped at 6.0% (currently 6.0%)
     elif plan_type == "plan_1":
-        study_rate = min(rpi, 0.045)  # Plan 1 lower cap
+        study_rate = min(rpi, 0.041)  # Plan 1 currently 4.1%
     else:
         study_rate = rpi
 
@@ -187,24 +193,26 @@ def calculate_in_study_loan_balance(
     }
 
 
-def calculate_interest_rate_post_study(plan_type: str, salary: float, rpi: float) -> float:
+def calculate_interest_rate_post_study(plan_type: str, salary: float, rpi: float = 0.041) -> float:
     """Calculates statutory interest rate based on plan rules and graduate salary."""
     if plan_type == "plan_5":
-        # Plan 5: Just RPI (no real interest)
+        # Plan 5: Just RPI (no real interest, currently 4.1%)
         return rpi
     elif plan_type == "plan_2":
-        lower_threshold = 27295.0
-        upper_threshold = 49130.0
+        lower_threshold = 29385.0
+        upper_threshold = 52884.0
+        cap_rate = 0.060
+        max_addition = max(0.0, min(0.03, cap_rate - rpi))
         if salary <= lower_threshold:
             return rpi
         elif salary >= upper_threshold:
-            return rpi + 0.03
+            return rpi + max_addition
         else:
             proportion = (salary - lower_threshold) / (upper_threshold - lower_threshold)
-            return rpi + (0.03 * proportion)
+            return rpi + (max_addition * proportion)
     elif plan_type == "plan_1":
-        # Plan 1: lower of RPI or Bank Rate + 1%
-        return min(rpi, 0.045)
+        # Plan 1: lower of RPI or Bank Rate + 1% (currently 4.1%)
+        return min(rpi, 0.041)
     else:
         return rpi
 
@@ -214,7 +222,7 @@ def simulate_loan_lifetime(
     starting_salary: float,
     salary_growth_rate: float,
     plan_type: str = "plan_5",
-    rpi: float = 0.032,
+    rpi: float = 0.041,
     has_postgrad: bool = False,
     postgrad_balance: float = 0.0,
     salary_milestones: Optional[Dict[int, float]] = None,
@@ -286,7 +294,7 @@ def simulate_loan_lifetime(
         # Postgrad handling
         actual_pg_repay = 0.0
         if has_postgrad and current_pg_balance > 0:
-            pg_rate = rpi + 0.03
+            pg_rate = min(rpi + 0.03, 0.060)  # Capped at 6.0% as published on GOV.UK
             max_pg_payable = current_pg_balance * (1.0 + pg_rate)
             if expected_pg_repay >= max_pg_payable:
                 actual_pg_repay = max_pg_payable
@@ -378,7 +386,7 @@ def evaluate_parental_contribution(
     plan_type: str,
     starting_salary: float,
     salary_growth_rate: float,
-    rpi: float = 0.032,
+    rpi: float = 0.041,
     # For studying
     course_length_years: int = 3,
     tuition_per_year: float = 9250.0,
@@ -543,8 +551,10 @@ def evaluate_parental_contribution(
             f"and saves the student £{student_repayments_saved:,.0f} in total payslip deductions (Net family gain: +£{net_family_financial_gain:,.0f})."
         )
         verdict_recommendation = (
-            f"Recommendation: Paying down the loan yields a guaranteed, tax-free return equal to the loan interest rate ({sim_base['schedule'][0]['interest_rate_percent']}%). "
-            f"Since market returns (3% to 5%) may be lower than or comparable to RPI interest, reducing the loan balance is a solid financial move."
+            f"Recommendation: Under this high-earning scenario where the student clears the balance before write-off, "
+            f"reducing the loan balance avoids compounding interest (currently {sim_base['schedule'][0]['interest_rate_percent']}%). "
+            f"This provides a return equivalent to the loan interest rate, but this outcome is conditional on sustained high graduate earnings; "
+            f"voluntary repayments cannot be refunded if earnings drop."
         )
 
     # First year payslip comparison for current salary

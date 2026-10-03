@@ -9,9 +9,9 @@ An interactive, accurate financial decision tool designed for students (currentl
 
 ### 1. Student Repayment Simulator (England & Wales)
 * **Undergraduate Plans Supported:**
-  * **Plan 5 (England 2023+):** £25,000 threshold, 9% repayment, 40-year write-off, flat RPI inflation interest.
-  * **Plan 2 (England 2012–2023 / Wales 2012+):** £27,295 threshold, 9% repayment, 30-year write-off, sliding interest scale (RPI to RPI+3%).
-  * **Plan 1 (Pre-2012):** £24,990 threshold, 9% repayment, 25-year write-off.
+  * **Plan 5 (England 2023+):** £25,000 threshold, 9% repayment, 40-year write-off, flat RPI inflation interest (4.1%).
+  * **Plan 2 (England 2012–2023 / Wales 2012+):** £29,385 threshold, 9% repayment, 30-year write-off, sliding interest scale (4.1% to 6.0% capped).
+  * **Plan 1 (Pre-2012 / NI):** £26,900 threshold, 9% repayment, 25-year write-off.
   * **Postgraduate Loan:** +6% repayment above £21,000 (concurrent repayment).
 * **Current vs Expected Salary Modeler:**
   * Starting salary inputs and annual career growth progression (1% to 8%).
@@ -72,15 +72,14 @@ python test_api_endpoints.py
 
 ---
 
-## 🏛️ Statutory UK Student Finance Rules Reference
-
-| Metric | Plan 5 (England 2023+) | Plan 2 (England 2012-23 / Wales 2012+) | Plan 1 (Pre-2012) |
-|---|---|---|---|
-| **Repayment Threshold** | £25,000 / yr (£2,083/mo) | £27,295 / yr (£2,274/mo) | £24,990 / yr (£2,082/mo) |
-| **Repayment Rate** | 9% above threshold | 9% above threshold | 9% above threshold |
-| **Interest Rate** | Flat RPI (0% real) | RPI to RPI + 3% (sliding scale) | min(RPI, BoE Base + 1%) |
-| **Write-Off Period** | 40 years post-study | 30 years post-study | 25 years (or age 65) |
-| **Postgraduate Loan** | 6% above £21,000 (concurrent) | 6% above £21,000 (concurrent) | 6% above £21,000 (concurrent) |
+| Metric | Plan 5 (England 2023+) | Plan 2 (England 2012–23 / Wales 2012+) | Plan 1 (Pre-2012 / NI) | Postgraduate |
+|---|---|---|---|---|
+| **Course Start Date** | On/after 1 Aug 2023 (England) | 1 Sept 2012 – 31 July 2023 (Eng) / 1 Sept 2012+ (Wales) | Pre-1 Sept 2012 (Eng/Wales) / Northern Ireland | Master's & Doctoral |
+| **Annual Threshold** | £25,000 / yr | £29,385 / yr | £26,900 / yr | £21,000 / yr |
+| **Monthly Threshold** | £2,083 / mo | £2,448 / mo | £2,241 / mo | £1,750 / mo |
+| **Repayment Rate** | 9% above threshold | 9% above threshold | 9% above threshold | 6% above threshold |
+| **Current Interest Rate** | 4.1% (flat RPI) | 4.1% to 6.0% (income-variable, capped) | 4.1% (statutory rate) | 6.0% (capped) |
+| **Write-Off Period** | 40 years post-study | 30 years post-study | 25 years | 30 years |
 
 ---
 
