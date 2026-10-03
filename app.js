@@ -188,22 +188,41 @@ function setMaintenance(val) {
   runCalculation();
 }
 
+// Robust input number parser: preserves 0, handles empty strings, and clamps negative values
+function parseInputNumber(elementId, fallback, allowZero = true) {
+  const el = document.getElementById(elementId);
+  if (!el) return fallback;
+  const raw = el.value.trim();
+  if (raw === '') {
+    return allowZero ? 0 : fallback;
+  }
+  const val = parseFloat(raw);
+  if (isNaN(val)) {
+    return fallback;
+  }
+  if (val < 0) {
+    el.value = 0;
+    return 0;
+  }
+  return val;
+}
+
 // Read inputs from DOM into State
 function readInputsFromDOM() {
   state.planType = document.getElementById('inputPlanType').value;
-  state.tuition = parseFloat(document.getElementById('inputTuition').value) || 9250;
-  state.maintenance = parseFloat(document.getElementById('inputMaintenance').value) || 10227;
-  state.courseYears = parseInt(document.getElementById('inputCourseYears').value) || 3;
-  state.gradBalance = parseFloat(document.getElementById('inputGradBalance').value) || 48000;
-  state.salary = parseFloat(document.getElementById('inputSalary').value) || 32000;
+  state.tuition = parseInputNumber('inputTuition', 9250, true);
+  state.maintenance = parseInputNumber('inputMaintenance', 10227, true);
+  state.courseYears = parseInt(document.getElementById('inputCourseYears').value, 10) || 3;
+  state.gradBalance = parseInputNumber('inputGradBalance', 48000, true);
+  state.salary = parseInputNumber('inputSalary', 32000, true);
   state.salaryGrowth = (parseFloat(document.getElementById('inputSalaryGrowth').value) || 3.5) / 100;
   state.rpi = (parseFloat(document.getElementById('inputRPI').value) || 4.1) / 100;
   state.hasPostgrad = document.getElementById('checkPostgrad').checked;
 
   state.contribType = document.getElementById('inputContribType').value;
-  state.parentAnnual = parseFloat(document.getElementById('inputParentAnnual').value) || 9250;
-  state.parentLump = parseFloat(document.getElementById('inputParentLump').value) || 25000;
-  state.customMarketRate = (parseFloat(document.getElementById('inputCustomMarketRate').value) || 6.0) / 100;
+  state.parentAnnual = parseInputNumber('inputParentAnnual', 9250, true);
+  state.parentLump = parseInputNumber('inputParentLump', 25000, true);
+  state.customMarketRate = parseInputNumber('inputCustomMarketRate', 6.0, true) / 100;
   state.horizon = document.getElementById('inputHorizonYears').value;
 
   // Plan info text update
@@ -562,7 +581,9 @@ function runCalculation() {
 function updateParentDashboard(data) {
   // Stat Badges
   document.getElementById('statTotalParentContribution').innerText = `£${data.parentOutlayTotal.toLocaleString('en-GB', { maximumFractionDigits: 0 })}`;
-  if (state.mode === 'studying' && state.contribType === 'annual_fee') {
+  if (data.parentOutlayTotal <= 0) {
+    document.getElementById('statParentFlowDesc').innerText = `No upfront parental capital`;
+  } else if (state.mode === 'studying' && state.contribType === 'annual_fee') {
     document.getElementById('statParentFlowDesc').innerText = `£${state.tuition.toLocaleString()} / yr × ${state.courseYears} yrs`;
   } else if (state.mode === 'studying' && state.contribType === 'custom_annual') {
     document.getElementById('statParentFlowDesc').innerText = `£${state.parentAnnual.toLocaleString()} / yr × ${state.courseYears} yrs`;
@@ -600,12 +621,18 @@ function updateParentDashboard(data) {
   document.getElementById('colB_yearsEarlier').innerText = `${data.yearsEarlier} years`;
 
   const netGainEl = document.getElementById('colB_netGain');
-  if (data.netFamilyGain >= 0) {
+  if (data.parentOutlayTotal <= 0) {
+    netGainEl.innerText = '£0';
+    netGainEl.className = 'font-bold text-slate-500';
+  } else if (data.netFamilyGain > 0) {
     netGainEl.innerText = `+£${Math.round(data.netFamilyGain).toLocaleString('en-GB')}`;
     netGainEl.className = 'font-bold text-emerald-600';
-  } else {
+  } else if (data.netFamilyGain < 0) {
     netGainEl.innerText = `-£${Math.round(Math.abs(data.netFamilyGain)).toLocaleString('en-GB')}`;
     netGainEl.className = 'font-bold text-red-600';
+  } else {
+    netGainEl.innerText = '£0';
+    netGainEl.className = 'font-bold text-slate-500';
   }
 
   // Column C: Market Pot
@@ -628,7 +655,15 @@ function updateParentDashboard(data) {
   const potAt20 = Math.round(data.pot5[19] || data.pot5[data.pot5.length - 1]);
   const potAtEnd = Math.round(data.pot5[horizonIdx] || data.pot5[data.pot5.length - 1]);
 
-  if (!data.simBase.isPaidOff && !data.simContrib.isPaidOff) {
+  if (data.parentOutlayTotal <= 0) {
+    verdictBox.className = 'rounded-2xl p-6 border shadow-sm transition-all duration-300 bg-slate-50 border-slate-300';
+    verdictIcon.innerText = 'ℹ️';
+    verdictTitle.innerText = 'No Parental Contribution Set (£0)';
+    verdictBadge.innerText = 'Standard Borrowing';
+    verdictBadge.className = 'text-xs font-bold px-2.5 py-1 rounded-full bg-slate-200 text-slate-700';
+    verdictSummary.innerHTML = `With a £0 parental contribution, the student borrows 100% of tuition and living expenses through Student Finance England, entering repayment with an estimated <strong>£${Math.round(data.baseGradBalance).toLocaleString()}</strong> starting balance.`;
+    verdictRec.innerHTML = `To evaluate whether paying tuition upfront saves money or whether investing into a Stocks & Shares ISA yields a higher financial return, enter an annual fee contribution (e.g. £9,250/yr) or a lump sum (e.g. £25,000) above.`;
+  } else if (!data.simBase.isPaidOff && !data.simContrib.isPaidOff) {
     // Both written off -> Huge Tax Trap!
     verdictBox.className = 'rounded-2xl p-6 border shadow-sm transition-all duration-300 bg-amber-50 border-amber-300';
     verdictIcon.innerText = '⚠️';
@@ -979,7 +1014,7 @@ function exportToCSV() {
   );
 
   const annualFlow = state.mode === 'studying' && state.contribType !== 'lump_sum'
-    ? Array(state.courseYears).fill(state.tuition)
+    ? Array(state.courseYears).fill(state.contribType === 'annual_fee' ? state.tuition : state.parentAnnual)
     : Array(maxHorizon).fill(0);
   const lump = (state.mode === 'studying' && state.contribType === 'lump_sum') || state.mode === 'graduated'
     ? state.parentLump
