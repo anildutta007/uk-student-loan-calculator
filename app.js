@@ -104,6 +104,9 @@ function switchTab(tabId) {
   if (tabId === 'studentCalc' && studentTrajectoryChartInstance) {
     studentTrajectoryChartInstance.resize();
   }
+  if (tabId === 'userGuide') {
+    updateGuideSlide();
+  }
 }
 
 // Mode Selector (Studying vs Graduated)
@@ -1159,5 +1162,102 @@ function selectTipAmount(amount) {
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
     closeTipModal();
+  }
+});
+
+// --- User Guide Interactive Presentation Controller ---
+let currentGuideSlide = 1;
+const totalGuideSlides = 8;
+
+const guideSpeakerNotesData = {
+  1: "Welcome to the Dutta UK University Loan Repayment Calculator user guide. This tool is designed to solve widespread confusion around student loans by simulating real monthly payslips, statutory write-offs, and comparing upfront fees against market investing.",
+  2: "Rule #1 is the biggest takeaway: student loan repayments depend strictly on what you earn, not what you owe. If you earn £35,000, your monthly payment is identical whether your balance is £15k or £85k, and any remaining balance is cancelled after 30 or 40 years.",
+  3: "Walk users through the top configuration panel. Explain 'Still Studying' vs 'Already Graduated'. Outline Plan 5 (£25k threshold, 40-yr term) vs Plan 2 (£29,385 threshold, 30-yr term), and show how the salary growth slider models different career trajectories.",
+  4: "Showcase Tab 1. Explain the monthly PAYE deduction card (Income Tax, NI 8%, Student Loan 9%). Emphasize the marginal deduction rate (37% or 43%). Explain the red debt curve vs green cumulative repayment line on the 30/40-year chart.",
+  5: "Introduce Tab 2: The Parental Strategy Lab. Walk through the 3 scenarios: A (Full loan), B (Parent pays tuition), C (Parent invests in ISA at 3%, 4%, 5%). Point out the Strategic Guidance Box which gives plain-English recommendations.",
+  6: "Explain the Investment Horizon dropdown: demonstrate why 20 years is often the most practical horizon for parents who want to help with a first house deposit. Highlight that entering £0 cleanly hides all comparison graphs.",
+  7: "Explain Tab 3: The Full Lifetime Schedule. Show how financial advisors or detail-oriented parents can inspect the exact amortization table year-by-year and export it to Excel via CSV.",
+  8: "Conclude with the 3 golden rules. Emphasize that voluntary student loan paydowns are non-refundable, and mention that the tool is 100% free with an optional £1 or £2 Monzo developer tip."
+};
+
+function updateGuideSlide() {
+  for (let i = 1; i <= totalGuideSlides; i++) {
+    const el = document.getElementById(`guideSlide-${i}`);
+    if (el) {
+      if (i === currentGuideSlide) {
+        el.classList.remove('hidden');
+        el.classList.add('block');
+      } else {
+        el.classList.remove('block');
+        el.classList.add('hidden');
+      }
+    }
+  }
+
+  const counter = document.getElementById('guideSlideCounter');
+  if (counter) counter.innerText = `Slide ${currentGuideSlide} of ${totalGuideSlides}`;
+
+  const btnPrev = document.getElementById('btnGuidePrev');
+  if (btnPrev) btnPrev.disabled = currentGuideSlide === 1;
+
+  const btnNext = document.getElementById('btnGuideNext');
+  if (btnNext) {
+    btnNext.innerText = currentGuideSlide === totalGuideSlides ? 'Finish Guide 🎉' : 'Next Slide →';
+  }
+
+  const notesEl = document.getElementById('guideNotesContent');
+  if (notesEl) notesEl.innerText = guideSpeakerNotesData[currentGuideSlide] || '';
+
+  renderGuideDots();
+}
+
+function renderGuideDots() {
+  const container = document.getElementById('guideSlideDots');
+  if (!container) return;
+  container.innerHTML = '';
+  for (let i = 1; i <= totalGuideSlides; i++) {
+    const dot = document.createElement('button');
+    dot.className = `w-2 h-2 rounded-full transition cursor-pointer ${i === currentGuideSlide ? 'bg-blue-400 w-5' : 'bg-slate-700 hover:bg-slate-500'}`;
+    dot.onclick = () => { currentGuideSlide = i; updateGuideSlide(); };
+    container.appendChild(dot);
+  }
+}
+
+function nextGuideSlide() {
+  if (currentGuideSlide < totalGuideSlides) {
+    currentGuideSlide++;
+    updateGuideSlide();
+    trackGAEvent('guide_slide_view', { slide: currentGuideSlide });
+  }
+}
+
+function prevGuideSlide() {
+  if (currentGuideSlide > 1) {
+    currentGuideSlide--;
+    updateGuideSlide();
+    trackGAEvent('guide_slide_view', { slide: currentGuideSlide });
+  }
+}
+
+function toggleGuideNotes() {
+  const drawer = document.getElementById('guideSpeakerNotes');
+  if (drawer) drawer.classList.toggle('hidden');
+}
+
+function restartGuideDeck() {
+  currentGuideSlide = 1;
+  updateGuideSlide();
+}
+
+// Keyboard navigation for User Guide slides
+document.addEventListener('keydown', (e) => {
+  const guideTab = document.getElementById('tabContent-userGuide');
+  if (guideTab && !guideTab.classList.contains('hidden')) {
+    if (e.key === 'ArrowRight' || e.key === ' ') {
+      if (e.key === ' ') e.preventDefault();
+      nextGuideSlide();
+    } else if (e.key === 'ArrowLeft') {
+      prevGuideSlide();
+    }
   }
 });

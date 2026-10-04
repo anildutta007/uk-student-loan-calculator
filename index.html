@@ -96,6 +96,9 @@
         <button onclick="switchTab('scheduleTable')" id="tabBtn-scheduleTable" class="tab-btn py-3 px-3 text-slate-600 border-b-2 border-transparent hover:text-blue-600 flex items-center gap-2 whitespace-nowrap">
           <span>📊</span> Lifetime Year-by-Year Schedule
         </button>
+        <button onclick="switchTab('userGuide')" id="tabBtn-userGuide" class="tab-btn py-3 px-3 text-slate-600 border-b-2 border-transparent hover:text-blue-600 flex items-center gap-2 whitespace-nowrap">
+          <span>📽️</span> User Guide
+        </button>
         <button onclick="switchTab('guideFaq')" id="tabBtn-guideFaq" class="tab-btn py-3 px-3 text-slate-600 border-b-2 border-transparent hover:text-blue-600 flex items-center gap-2 whitespace-nowrap">
           <span>📘</span> UK Rules Guide & FAQs
         </button>
@@ -671,7 +674,347 @@
       </div>
     </div>
 
-    <!-- TAB 4: RULES GUIDE & FAQS -->
+    <!-- TAB 4: USER GUIDE & INTERACTIVE PRESENTATION -->
+    <div id="tabContent-userGuide" class="tab-pane hidden space-y-6">
+
+      <!-- Presentation Hero Container -->
+      <section class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+        
+        <!-- Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-4 border-b border-slate-100 gap-3">
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">Interactive Training Deck</span>
+              <span class="bg-slate-100 text-slate-700 text-xs font-medium px-2 py-0.5 rounded-full">8 Slides • Keyboard Nav (← / →)</span>
+            </div>
+            <h2 class="text-xl font-bold text-slate-900 mt-1">Application User Guide & Presentation</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Master every feature: monthly payslip impact, Plan 2 vs Plan 5 write-offs, and the parental tuition vs ISA opportunity lab.</p>
+          </div>
+
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <span id="guideSlideCounter" class="text-xs font-mono font-bold bg-slate-100 px-3 py-1.5 rounded-lg text-slate-700 border border-slate-200">
+              Slide 1 of 8
+            </span>
+            <button onclick="toggleGuideNotes()" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition flex items-center gap-1.5 cursor-pointer">
+              <span>📝</span> <span>Speaker Notes</span>
+            </button>
+            <button onclick="restartGuideDeck()" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition flex items-center gap-1 cursor-pointer">
+              <span>🔄</span> <span>Restart</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Interactive Slide Deck Viewport -->
+        <div class="bg-slate-950 text-white rounded-2xl p-6 sm:p-8 min-h-[440px] flex flex-col justify-between border border-slate-800 relative shadow-inner">
+          
+          <!-- Slide 1: Welcome & Purpose -->
+          <div id="guideSlide-1" class="space-y-4">
+            <div class="inline-flex items-center gap-2 bg-blue-500/20 border border-blue-500/30 px-3 py-1 rounded-full text-xs font-semibold text-blue-300">
+              <span>🎯</span> Slide 1: Core Purpose
+            </div>
+            <h3 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight leading-snug">
+              Master the <span class="text-blue-400">UK Student Loan & Parental Strategy Calculator</span>
+            </h3>
+            <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-3xl">
+              UK higher education finance is widely misunderstood. Most families treat student loans like mortgages or credit cards, leading to expensive mistakes. This interactive guide trains you to use every calculator feature in under 5 minutes.
+            </p>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+              <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800">
+                <span class="text-xl">💷</span>
+                <h4 class="font-bold text-white text-xs mt-1">1. Payslip Deductions</h4>
+                <p class="text-[11px] text-slate-400 mt-0.5">Understand your true monthly net salary after Income Tax, NI (8%), and loan (9%).</p>
+              </div>
+              <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800">
+                <span class="text-xl">⚖️</span>
+                <h4 class="font-bold text-white text-xs mt-1">2. Plan 2 vs Plan 5</h4>
+                <p class="text-[11px] text-slate-400 mt-0.5">Explore the £29,385 vs £25,000 thresholds and 30- vs 40-year statutory debt write-offs.</p>
+              </div>
+              <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800">
+                <span class="text-xl">🏡</span>
+                <h4 class="font-bold text-white text-xs mt-1">3. Parental ISA Opportunity</h4>
+                <p class="text-[11px] text-slate-400 mt-0.5">Model paying £9,250/yr tuition vs building an ISA house deposit compounding at 3–5%.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Slide 2: Rule #1 -->
+          <div id="guideSlide-2" class="hidden space-y-4">
+            <div class="inline-flex items-center gap-2 bg-amber-500/20 border border-amber-500/30 px-3 py-1 rounded-full text-xs font-semibold text-amber-300">
+              <span>💡</span> Slide 2: The Core Rule
+            </div>
+            <h3 class="text-xl sm:text-2xl font-extrabold text-white tracking-tight">
+              Rule #1: Repayments Depend on <span class="text-amber-400">Salary</span>, Never Debt Size
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+              <div class="p-4 rounded-xl bg-rose-950/20 border border-rose-800/40 space-y-2">
+                <div class="flex items-center gap-1.5 text-rose-400 font-bold text-xs uppercase tracking-wider">
+                  <span>❌</span> The Bank Loan Myth
+                </div>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                  "If my loan is £50,000 instead of £25,000, my monthly payments are doubled, and paying tuition upfront will immediately reduce my monthly payments."
+                </p>
+                <div class="text-[11px] text-rose-300/80 font-mono">Costly trap: Parents give £27,750 upfront for £0 monthly deduction savings.</div>
+              </div>
+              <div class="p-4 rounded-xl bg-emerald-950/20 border border-emerald-800/40 space-y-2">
+                <div class="flex items-center gap-1.5 text-emerald-400 font-bold text-xs uppercase tracking-wider">
+                  <span>✅</span> The UK Statutory Reality (Income-Contingent)
+                </div>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                  Deductions are strictly <strong>9% of earnings above the threshold</strong> (£25k for Plan 5, £29,385 for Plan 2). Earning £35k costs the exact same £75/mo whether balance is £15k or £85k.
+                </p>
+                <div class="text-[11px] text-emerald-300/80 font-mono">Whatever remains unpaid after 30 or 40 years is cancelled by the UK Government!</div>
+              </div>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-300 flex items-center justify-between">
+              <span class="text-slate-400 font-medium">Bottom line:</span>
+              <span class="font-bold text-amber-300">Unless your career salary clears the balance before write-off, debt size does not matter!</span>
+            </div>
+          </div>
+
+          <!-- Slide 3: Quick Setup -->
+          <div id="guideSlide-3" class="hidden space-y-4">
+            <div class="inline-flex items-center gap-2 bg-indigo-500/20 border border-indigo-500/30 px-3 py-1 rounded-full text-xs font-semibold text-indigo-300">
+              <span>⚙️</span> Slide 3: 30-Second Setup
+            </div>
+            <h3 class="text-xl sm:text-2xl font-extrabold text-white tracking-tight">
+              Configuring the Top Setup Controls
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+              <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 space-y-1.5">
+                <span class="font-bold text-blue-400 block">1. Status Toggle</span>
+                <p class="text-slate-400 leading-relaxed">
+                  • <strong>Currently Studying:</strong> Set course length (3–5 yrs), tuition (£9,250), & maintenance loan (£8.6k–£13.3k).<br>
+                  • <strong>Already Graduated:</strong> Enter your exact current SLC balance.
+                </p>
+              </div>
+              <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 space-y-1.5">
+                <span class="font-bold text-blue-400 block">2. Plan Selection</span>
+                <p class="text-slate-400 leading-relaxed">
+                  • <strong>Plan 5:</strong> England post-Aug 2023 (£25k thres, 40-yr term).<br>
+                  • <strong>Plan 2:</strong> England 2012–2023 / Wales (£29,385 thres, 30-yr term).<br>
+                  • <strong>Postgrad:</strong> Tick box for Master's/PhD (+6% > £21k).
+                </p>
+              </div>
+              <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 space-y-1.5">
+                <span class="font-bold text-blue-400 block">3. Salary & Growth</span>
+                <p class="text-slate-400 leading-relaxed">
+                  Enter your expected graduation salary (e.g. £32,000) and adjust the growth slider (3.5% typical, 5–8% fast track).
+                </p>
+              </div>
+            </div>
+            <div class="bg-blue-950/40 border border-blue-800/40 p-2.5 rounded-xl text-xs text-blue-300">
+              💡 <strong>Instant Simulation:</strong> Every chart, table, and verdict updates immediately in real-time as you tweak any control.
+            </div>
+          </div>
+
+          <!-- Slide 4: Tab 1 - Monthly Payslip -->
+          <div id="guideSlide-4" class="hidden space-y-4">
+            <div class="inline-flex items-center gap-2 bg-blue-500/20 border border-blue-500/30 px-3 py-1 rounded-full text-xs font-semibold text-blue-300">
+              <span>🎓</span> Slide 4: Tab 1
+            </div>
+            <h3 class="text-xl sm:text-2xl font-extrabold text-white tracking-tight">
+              Student Repayment Calculator & Monthly Payslip
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+              <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+                <span class="font-bold text-white text-sm block">PAYE Deduction Breakdown</span>
+                <p class="text-slate-400">Shows how gross salary translates into actual monthly take-home pay:</p>
+                <div class="space-y-1 bg-slate-950 p-2.5 rounded-lg border border-slate-800 font-mono text-[11px]">
+                  <div class="flex justify-between text-slate-300"><span>Income Tax (20%/40%):</span><span>£324 / mo</span></div>
+                  <div class="flex justify-between text-slate-300"><span>National Insurance (8%):</span><span>£130 / mo</span></div>
+                  <div class="flex justify-between text-amber-300 font-bold"><span>Student Loan (9%):</span><span>£53 / mo</span></div>
+                  <div class="flex justify-between text-emerald-400 font-bold border-t border-slate-800 pt-1"><span>Net Take-Home Pay:</span><span>£2,160 / mo</span></div>
+                </div>
+                <p class="text-slate-400">Effective marginal deduction rate is <strong>37.0%</strong> (or 43% with Postgrad).</p>
+              </div>
+              <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+                <span class="font-bold text-white text-sm block">30- / 40-Year Trajectory Chart</span>
+                <p class="text-slate-400">Inspect the multi-decade curve:</p>
+                <ul class="space-y-1.5 text-slate-300">
+                  <li>• <strong class="text-red-400">Red line:</strong> Outstanding debt. If it stays above zero, it drops to 0 at write-off.</li>
+                  <li>• <strong class="text-emerald-400">Green line:</strong> Cumulative lifetime repayments made.</li>
+                  <li>• <strong class="text-blue-400">Outcome badge:</strong> Confirms if loan is written off or paid off in full.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Slide 5: Tab 2 - Parental Strategy Lab -->
+          <div id="guideSlide-5" class="hidden space-y-4">
+            <div class="inline-flex items-center gap-2 bg-emerald-500/20 border border-emerald-500/30 px-3 py-1 rounded-full text-xs font-semibold text-emerald-300">
+              <span>👨‍👩‍👦</span> Slide 5: Tab 2
+            </div>
+            <h3 class="text-xl sm:text-2xl font-extrabold text-white tracking-tight">
+              Parental Strategy Lab: Tuition Fees vs Market ISA
+            </h3>
+            <p class="text-xs text-slate-300">
+              Compare paying tuition fees against investing that exact same capital in an ISA:
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+              <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
+                <span class="font-bold text-slate-400">Scenario A: Full Loan</span>
+                <p class="text-[11px] text-slate-400">Student borrows 100%. Repayments deducted according to salary.</p>
+              </div>
+              <div class="p-3 rounded-xl bg-blue-950/40 border border-blue-800/50 space-y-1">
+                <span class="font-bold text-blue-300">Scenario B: Parent Helps</span>
+                <p class="text-[11px] text-slate-400">Parent pays £9,250/yr or lump sum. Displays repayments saved & net family gain.</p>
+              </div>
+              <div class="p-3 rounded-xl bg-emerald-950/40 border border-emerald-800/50 space-y-1">
+                <span class="font-bold text-emerald-300">Scenario C: Market Pot</span>
+                <p class="text-[11px] text-slate-400">Invests same capital at 3%, 4%, and 5% compound growth over your horizon.</p>
+              </div>
+            </div>
+            <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 space-y-1.5 text-xs">
+              <span class="font-bold text-amber-300 block">Plain-English Strategic Verdict:</span>
+              <p class="text-slate-300 leading-relaxed">
+                • <strong>Graduate Tax Trap:</strong> If student never clears the loan, alerts parents that fee support saves £0 in monthly deductions and recommends an ISA instead for a house deposit.<br>
+                • <strong>High Earner Paydown:</strong> Confirms when early fee contribution avoids compound interest for top-decile earners.
+              </p>
+            </div>
+          </div>
+
+          <!-- Slide 6: Horizons & Zero State -->
+          <div id="guideSlide-6" class="hidden space-y-4">
+            <div class="inline-flex items-center gap-2 bg-purple-500/20 border border-purple-500/30 px-3 py-1 rounded-full text-xs font-semibold text-purple-300">
+              <span>⏱️</span> Slide 6: Advanced Controls
+            </div>
+            <h3 class="text-xl sm:text-2xl font-extrabold text-white tracking-tight">
+              Investment Horizons & Zero Contribution Mode
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+              <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+                <span class="font-bold text-white text-sm block">Comparison Investment Horizons</span>
+                <p class="text-slate-400 leading-relaxed">
+                  Select your timeframe in the dropdown:
+                </p>
+                <ul class="space-y-1.5 text-slate-300">
+                  <li>• <strong>Full Loan Term (30 or 40 Yrs):</strong> Matches statutory debt write-off.</li>
+                  <li>• <strong>20 Years (House Buy):</strong> Realistic time when a child needs a first home deposit.</li>
+                  <li>• <strong>10 Years (Medium Term):</strong> Mid-term liquid compounding.</li>
+                </ul>
+                <p class="text-emerald-400 text-[11px] font-semibold pt-1">
+                  Scenario C explicitly states the horizon (e.g. "Growth @ 5% over 40 yrs: £70,400").
+                </p>
+              </div>
+              <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+                <span class="font-bold text-white text-sm block">Zero Contribution Mode (£0)</span>
+                <p class="text-slate-400 leading-relaxed">
+                  When parents are not contributing (£0):
+                </p>
+                <ul class="space-y-1.5 text-slate-300">
+                  <li>• <strong>No confusing flat graphs:</strong> Comparison charts and milestone tables are cleanly hidden.</li>
+                  <li>• <strong>Clean Guidance Notice:</strong> Confirms that with £0 parental money, the student borrows 100% via SFE.</li>
+                  <li>• <strong>No negative values:</strong> Numeric inputs clamp at min=0.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Slide 7: Tab 3 - Schedule & CSV -->
+          <div id="guideSlide-7" class="hidden space-y-4">
+            <div class="inline-flex items-center gap-2 bg-teal-500/20 border border-teal-500/30 px-3 py-1 rounded-full text-xs font-semibold text-teal-300">
+              <span>📊</span> Slide 7: Tab 3
+            </div>
+            <h3 class="text-xl sm:text-2xl font-extrabold text-white tracking-tight">
+              Lifetime Schedule Table & CSV Export
+            </h3>
+            <p class="text-xs text-slate-300">
+              Inspect the complete annual audit trail from graduation to statutory write-off:
+            </p>
+            <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 space-y-2 text-xs">
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] font-mono text-slate-300 bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                <div><strong class="text-blue-400">Year & Age:</strong> Yr 1 (Age 22) to Yr 40</div>
+                <div><strong class="text-blue-400">Projected Salary:</strong> Adjusted for annual growth</div>
+                <div><strong class="text-amber-400">Monthly Repay:</strong> SLC salary deduction</div>
+                <div><strong class="text-emerald-400">Market Pots:</strong> 3%, 4%, and 5% values</div>
+              </div>
+              <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-1 text-slate-400">
+                <span>• Click <strong>📥 Export CSV</strong> to download for Microsoft Excel or Google Sheets.</span>
+                <span>• Click <strong>🖨️ Print Summary</strong> for a clean 1-page PDF report.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Slide 8: Key Takeaways -->
+          <div id="guideSlide-8" class="hidden space-y-4">
+            <div class="inline-flex items-center gap-2 bg-emerald-500/20 border border-emerald-500/30 px-3 py-1 rounded-full text-xs font-semibold text-emerald-300">
+              <span>🚀</span> Slide 8: Summary
+            </div>
+            <h3 class="text-xl sm:text-2xl font-extrabold text-white tracking-tight">
+              Key Takeaways & Developer Support
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+              <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 space-y-1.5">
+                <span class="font-bold text-white text-sm block">3 Golden Rules:</span>
+                <ol class="space-y-1 list-decimal list-inside text-slate-300 leading-relaxed">
+                  <li>Student loans act as a 9% graduate tax; don't evaluate them like bank mortgages.</li>
+                  <li>Plan 5 graduates pay for 40 years starting at £25,000 threshold.</li>
+                  <li>Investing fee capital in an ISA keeps liquid cash in the family for a first home deposit.</li>
+                </ol>
+              </div>
+              <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 space-y-1.5">
+                <span class="font-bold text-white text-sm block">100% Free & Developer Tipping:</span>
+                <p class="text-slate-400 leading-relaxed">
+                  This calculator is free forever without ads or sign-ups. If it helped you or your family make an informed decision, you can voluntarily tip £1 or £2 via <strong>Monzo Direct Pay</strong> (Apple Pay / Google Pay / UK Cards) in the header.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Deck Navigation Footer Controls -->
+          <div class="flex items-center justify-between pt-4 border-t border-slate-800 mt-4">
+            <button id="btnGuidePrev" onclick="prevGuideSlide()" class="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-white text-xs font-semibold border border-slate-700 transition cursor-pointer disabled:cursor-not-allowed">
+              ← Previous Slide
+            </button>
+            <div class="flex items-center gap-1.5" id="guideSlideDots">
+              <!-- Dots rendered by JS -->
+            </div>
+            <button id="btnGuideNext" onclick="nextGuideSlide()" class="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold transition cursor-pointer shadow-md">
+              Next Slide →
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Speaker Notes Drawer (Expandable) -->
+        <div id="guideSpeakerNotes" class="mt-4 p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700 hidden">
+          <div class="font-bold text-slate-900 flex items-center gap-1.5 mb-1">
+            <span>📝</span> Presenter / Speaker Notes:
+          </div>
+          <p id="guideNotesContent" class="leading-relaxed text-slate-600">
+            Welcome everyone to this training session. Start by introducing the URL www.ukstudentloancalculator.co.uk. Explain that this tool solves widespread confusion around England & Wales student finance by simulating real monthly payslips and comparing paying fees vs investing in an ISA.
+          </p>
+        </div>
+
+      </section>
+
+      <!-- Quick Start Reference Cards (Below Slide Deck) -->
+      <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover-card">
+          <span class="text-2xl mb-2 block">1️⃣</span>
+          <h4 class="font-bold text-slate-900 text-sm mb-1">Setup Your Profile</h4>
+          <p class="text-slate-600 leading-relaxed">Choose Studying or Graduated, pick Plan 5 or Plan 2, and enter your expected starting salary and career growth slider.</p>
+        </div>
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover-card">
+          <span class="text-2xl mb-2 block">2️⃣</span>
+          <h4 class="font-bold text-slate-900 text-sm mb-1">Check Monthly Payslip</h4>
+          <p class="text-slate-600 leading-relaxed">View Tab 1 to see your exact net take-home salary after Income Tax, NI (8%), and Student Loan (9%) deductions.</p>
+        </div>
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover-card">
+          <span class="text-2xl mb-2 block">3️⃣</span>
+          <h4 class="font-bold text-slate-900 text-sm mb-1">Test Parental Strategy</h4>
+          <p class="text-slate-600 leading-relaxed">View Tab 2 to test whether paying £9,250/yr tuition upfront saves money or if compounding in an ISA builds a bigger house deposit.</p>
+        </div>
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover-card">
+          <span class="text-2xl mb-2 block">4️⃣</span>
+          <h4 class="font-bold text-slate-900 text-sm mb-1">Audit & Export CSV</h4>
+          <p class="text-slate-600 leading-relaxed">View Tab 3 to inspect the full 40-year schedule, download an Excel-ready CSV, or print a 1-page PDF summary report.</p>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- TAB 5: RULES GUIDE & FAQS -->
     <div id="tabContent-guideFaq" class="tab-pane hidden space-y-6">
       <section class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-4 border-b border-slate-100 gap-2">
