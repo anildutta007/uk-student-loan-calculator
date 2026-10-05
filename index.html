@@ -212,9 +212,6 @@
             <span class="group-hover:scale-125 transition-transform">☕</span>
             <span>Tip Developer (£1 / £2)</span>
           </button>
-          <a href="/classic.html" class="text-[11px] font-bold text-blue-600 hover:text-blue-800 bg-slate-100 hover:bg-slate-200 px-2.5 py-1.5 rounded-lg border border-slate-200 transition">
-            Classic View ↗
-          </a>
         </div>
       </header>
 
@@ -570,16 +567,21 @@
       <!-- STEP 3: RESULTS PERSPECTIVES (STUDENT PAYSLIP VS PARENT ADVISOR) -->
       <section class="space-y-4">
         
-        <!-- Tab Navigation Switcher -->
-        <div class="grid grid-cols-2 gap-3 p-1.5 bg-slate-200/80 rounded-2xl">
-          <button onclick="switchPerspective('student')" id="tab-student" class="perspective-tab active py-2.5 px-4 rounded-xl text-center font-bold text-xs sm:text-sm transition cursor-pointer flex items-center justify-center gap-2">
+        <!-- Tab Navigation Switcher (3 Perspective Views) -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 p-1.5 bg-slate-200/80 rounded-2xl">
+          <button onclick="switchPerspective('student')" id="tab-student" class="perspective-tab active py-2.5 px-3 rounded-xl text-center font-bold text-xs sm:text-sm transition cursor-pointer flex items-center justify-center gap-2">
             <span>🎓</span>
-            <span>Student Payslip &amp; Career Repayment</span>
+            <span>Student Repayment</span>
           </button>
           
-          <button onclick="switchPerspective('parent')" id="tab-parent" class="perspective-tab bg-white text-slate-700 border border-slate-200 py-2.5 px-4 rounded-xl text-center font-bold text-xs sm:text-sm transition cursor-pointer flex items-center justify-center gap-2 hover:bg-slate-50">
+          <button onclick="switchPerspective('parent')" id="tab-parent" class="perspective-tab bg-white text-slate-700 border border-slate-200 py-2.5 px-3 rounded-xl text-center font-bold text-xs sm:text-sm transition cursor-pointer flex items-center justify-center gap-2 hover:bg-slate-50">
             <span>👨‍👩‍👦</span>
-            <span>I am a Parent (Upfront Contribution)</span>
+            <span>I am a Parent (Contribution)</span>
+          </button>
+
+          <button onclick="switchPerspective('info')" id="tab-info" class="perspective-tab bg-white text-slate-700 border border-slate-200 py-2.5 px-3 rounded-xl text-center font-bold text-xs sm:text-sm transition cursor-pointer flex items-center justify-center gap-2 hover:bg-slate-50">
+            <span>ℹ️</span>
+            <span>Information &amp; Assumptions</span>
           </button>
         </div>
 
@@ -768,6 +770,301 @@
 
         </div>
 
+        <!-- PERSPECTIVE C: INFORMATION & SYSTEM ASSUMPTIONS -->
+        <div id="perspective-info" class="bg-white rounded-xl p-5 sm:p-6 border border-slate-200 shadow-sm space-y-6 hidden">
+          
+          <!-- Header Banner -->
+          <div class="border-b border-slate-100 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-indigo-100 text-indigo-800">Knowledge Hub &amp; Statutory Guide</span>
+                <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-slate-100 text-slate-700 border border-slate-200">England &amp; Wales</span>
+              </div>
+              <h3 class="text-base sm:text-lg font-black text-slate-900 mt-1">Information, Useful Links &amp; System Assumptions</h3>
+              <p class="text-xs text-slate-500">Official statutory rules, mathematics of repayments and interest, and verified external portals.</p>
+            </div>
+            <div class="text-xs font-bold text-slate-600 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 self-start sm:self-auto">
+              Statutory Basis: <span class="text-slate-900 font-black">2026/27 Academic Year</span>
+            </div>
+          </div>
+
+          <!-- SECTION 1: VERIFIED OFFICIAL & RESOURCE LINKS -->
+          <div class="space-y-3">
+            <div class="flex items-center gap-2">
+              <span class="text-base">🌐</span>
+              <h4 class="text-xs sm:text-sm font-extrabold uppercase tracking-wide text-slate-800">
+                Useful Websites &amp; Official Portals (Student Finance England &amp; Wales)
+              </h4>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              
+              <!-- Link 1: GOV.UK Repayment Guide -->
+              <a href="https://www.gov.uk/repaying-your-student-loan" target="_blank" rel="noopener noreferrer" class="p-3.5 rounded-xl border border-slate-200 hover:border-blue-500 hover:bg-blue-50/40 transition group flex flex-col justify-between">
+                <div class="space-y-1">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-black text-blue-700 group-hover:underline">GOV.UK — Repaying Your Student Loan</span>
+                    <span class="text-[11px] text-blue-600 font-bold">Visit ↗</span>
+                  </div>
+                  <p class="text-[11px] text-slate-600 leading-relaxed">
+                    The official UK Government statutory guide covering repayment thresholds, deduction rules, overseas income rates, and repayment plan classifications.
+                  </p>
+                </div>
+                <span class="text-[10px] font-bold text-slate-400 mt-2 block">Source: Department for Education</span>
+              </a>
+
+              <!-- Link 2: Student Loans Company (SLC) Portal -->
+              <a href="https://www.gov.uk/sign-in-to-your-student-loan-repayment-account" target="_blank" rel="noopener noreferrer" class="p-3.5 rounded-xl border border-slate-200 hover:border-blue-500 hover:bg-blue-50/40 transition group flex flex-col justify-between">
+                <div class="space-y-1">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-black text-blue-700 group-hover:underline">SLC — Check Your Student Loan Account</span>
+                    <span class="text-[11px] text-blue-600 font-bold">Visit ↗</span>
+                  </div>
+                  <p class="text-[11px] text-slate-600 leading-relaxed">
+                    Sign in with your Customer Reference Number (CRN) to view your actual live outstanding balance, accrued interest, and past PAYE deduction statements.
+                  </p>
+                </div>
+                <span class="text-[10px] font-bold text-slate-400 mt-2 block">Source: Student Loans Company</span>
+              </a>
+
+              <!-- Link 3: MoneySavingExpert (Martin Lewis) -->
+              <a href="https://www.moneysavingexpert.com/students/student-loans-tuition-fees-changes/" target="_blank" rel="noopener noreferrer" class="p-3.5 rounded-xl border border-slate-200 hover:border-blue-500 hover:bg-blue-50/40 transition group flex flex-col justify-between">
+                <div class="space-y-1">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-black text-blue-700 group-hover:underline">MoneySavingExpert — Martin Lewis' Guide</span>
+                    <span class="text-[11px] text-blue-600 font-bold">Visit ↗</span>
+                  </div>
+                  <p class="text-[11px] text-slate-600 leading-relaxed">
+                    Martin Lewis' guide explaining why student loans act as an earnings-linked "graduate contribution" rather than standard commercial debt.
+                  </p>
+                </div>
+                <span class="text-[10px] font-bold text-slate-400 mt-2 block">Source: MoneySavingExpert.com</span>
+              </a>
+
+              <!-- Link 4: Save the Student Finance Hub -->
+              <a href="https://www.savethestudent.org/student-finance" target="_blank" rel="noopener noreferrer" class="p-3.5 rounded-xl border border-slate-200 hover:border-blue-500 hover:bg-blue-50/40 transition group flex flex-col justify-between">
+                <div class="space-y-1">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-black text-blue-700 group-hover:underline">Save The Student — Finance &amp; Living Costs</span>
+                    <span class="text-[11px] text-blue-600 font-bold">Visit ↗</span>
+                  </div>
+                  <p class="text-[11px] text-slate-600 leading-relaxed">
+                    Independent student finance guides, maintenance loan calculators, living cost benchmarks, rent analysis, and university budgeting advice.
+                  </p>
+                </div>
+                <span class="text-[10px] font-bold text-slate-400 mt-2 block">Source: Save The Student UK</span>
+              </a>
+
+              <!-- Link 5: Institute for Fiscal Studies (IFS) -->
+              <a href="https://ifs.org.uk/education-skills/higher-education" target="_blank" rel="noopener noreferrer" class="p-3.5 rounded-xl border border-slate-200 hover:border-blue-500 hover:bg-blue-50/40 transition group flex flex-col justify-between">
+                <div class="space-y-1">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-black text-blue-700 group-hover:underline">Institute for Fiscal Studies (IFS) Analysis</span>
+                    <span class="text-[11px] text-blue-600 font-bold">Visit ↗</span>
+                  </div>
+                  <p class="text-[11px] text-slate-600 leading-relaxed">
+                    In-depth economic research analysing the distributional impact of Plan 5 versus Plan 2, graduate write-off rates, and government loan subsidization.
+                  </p>
+                </div>
+                <span class="text-[10px] font-bold text-slate-400 mt-2 block">Source: Institute for Fiscal Studies</span>
+              </a>
+
+              <!-- Link 6: Student Finance Wales -->
+              <a href="https://www.studentfinancewales.co.uk/" target="_blank" rel="noopener noreferrer" class="p-3.5 rounded-xl border border-slate-200 hover:border-blue-500 hover:bg-blue-50/40 transition group flex flex-col justify-between">
+                <div class="space-y-1">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-black text-blue-700 group-hover:underline">Student Finance Wales (Cyllid Myfyrwyr)</span>
+                    <span class="text-[11px] text-blue-600 font-bold">Visit ↗</span>
+                  </div>
+                  <p class="text-[11px] text-slate-600 leading-relaxed">
+                    Official guidance for Welsh students, who remain under Plan 2 rules (30-year write-off and £27,295 threshold) alongside Welsh Government living grants.
+                  </p>
+                </div>
+                <span class="text-[10px] font-bold text-slate-400 mt-2 block">Source: Welsh Government / Llywodraeth Cymru</span>
+              </a>
+
+            </div>
+          </div>
+
+          <!-- SECTION 2: STATUTORY SYSTEM RULES (PLAN 2 VS PLAN 5) -->
+          <div class="space-y-3">
+            <div class="flex items-center gap-2">
+              <span class="text-base">⚖️</span>
+              <h4 class="text-xs sm:text-sm font-extrabold uppercase tracking-wide text-slate-800">
+                Statutory Plan Comparison: Plan 2 vs Plan 5 Rules
+              </h4>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              
+              <!-- Plan 2 Card -->
+              <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+                <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                  <span class="px-2 py-0.5 rounded text-[11px] font-black bg-blue-100 text-blue-800">Plan 2</span>
+                  <span class="text-[10px] font-bold text-slate-500">2012 to July 2023 Starters (&amp; Wales)</span>
+                </div>
+                <ul class="text-xs text-slate-700 space-y-2">
+                  <li class="flex items-start gap-2">
+                    <span class="text-blue-600 font-bold">&bull;</span>
+                    <div><strong>Repayment Threshold:</strong> <strong>£27,295 / year</strong> (£2,274.58 / month, £524.90 / week). Deductions are 9% on gross earnings above this threshold.</div>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <span class="text-blue-600 font-bold">&bull;</span>
+                    <div><strong>Statutory Write-Off Term:</strong> <strong>30 years</strong> after the April following graduation. Any remaining balance is completely cancelled tax-free.</div>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <span class="text-blue-600 font-bold">&bull;</span>
+                    <div><strong>Interest Rate:</strong> In study: RPI + 3.0%. Post-study: scales from RPI (for earnings &le; £27,295) up to RPI + 3.0% (for earnings &ge; £49,130).</div>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <span class="text-blue-600 font-bold">&bull;</span>
+                    <div><strong>Typical Outcome:</strong> Due to interest rates compounding faster than repayments for most earners, approximately 75% of Plan 2 graduates never clear the loan before statutory write-off.</div>
+                  </li>
+                </ul>
+              </div>
+
+              <!-- Plan 5 Card -->
+              <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+                <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                  <span class="px-2 py-0.5 rounded text-[11px] font-black bg-emerald-100 text-emerald-800">Plan 5</span>
+                  <span class="text-[10px] font-bold text-slate-500">August 2023 Onwards Starters (England)</span>
+                </div>
+                <ul class="text-xs text-slate-700 space-y-2">
+                  <li class="flex items-start gap-2">
+                    <span class="text-emerald-600 font-bold">&bull;</span>
+                    <div><strong>Repayment Threshold:</strong> <strong>£25,000 / year</strong> (£2,083.33 / month, £480.76 / week). Deductions are 9% on gross earnings above this threshold.</div>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <span class="text-emerald-600 font-bold">&bull;</span>
+                    <div><strong>Statutory Write-Off Term:</strong> <strong>40 years</strong> after the April following graduation (10 years longer than Plan 2).</div>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <span class="text-emerald-600 font-bold">&bull;</span>
+                    <div><strong>Interest Rate:</strong> Strictly capped at <strong>RPI inflation</strong>. No real interest is charged above inflation regardless of your salary.</div>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <span class="text-emerald-600 font-bold">&bull;</span>
+                    <div><strong>Typical Outcome:</strong> Because of the 40-year duration and lower threshold, over 50% of Plan 5 graduates are projected to repay their balance in full during their careers.</div>
+                  </li>
+                </ul>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- SECTION 3: CALCULATION METHODOLOGY & MATHEMATICAL FORMULAS -->
+          <div class="space-y-3">
+            <div class="flex items-center gap-2">
+              <span class="text-base">🧮</span>
+              <h4 class="text-xs sm:text-sm font-extrabold uppercase tracking-wide text-slate-800">
+                How The Calculator Works: Formulas &amp; Methodology
+              </h4>
+            </div>
+
+            <div class="bg-slate-50 p-4 sm:p-5 rounded-xl border border-slate-200 space-y-4 text-xs text-slate-700">
+              
+              <!-- Sub 1: Payslip Model -->
+              <div class="space-y-1.5">
+                <h5 class="text-xs font-bold text-slate-900 uppercase tracking-wide flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-blue-600"></span>
+                  1. Monthly Payslip Deduction Formula
+                </h5>
+                <p class="leading-relaxed">
+                  Student loan repayments are collected via <strong>PAYE (Pay As You Earn)</strong> automatically through payroll. Deductions are calculated monthly using:
+                </p>
+                <div class="bg-white p-2.5 rounded-lg border border-slate-200 font-mono text-[11px] text-slate-800 overflow-x-auto">
+                  Monthly Deduction = max(0, Gross Annual Salary - Repayment Threshold) &times; 9% &divide; 12
+                </div>
+                <p class="text-[11px] text-slate-500">
+                  Example: On Plan 5 with a £35,000 salary: (£35,000 - £25,000) &times; 9% = £900/year = <strong>£75.00/month</strong> deducted from your payslip alongside standard Income Tax (20%) and National Insurance (8%).
+                </p>
+              </div>
+
+              <!-- Sub 2: Career Amortization Simulation -->
+              <div class="space-y-1.5 border-t border-slate-200 pt-3">
+                <h5 class="text-xs font-bold text-slate-900 uppercase tracking-wide flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                  2. Career Progression &amp; Debt Amortization Engine
+                </h5>
+                <p class="leading-relaxed">
+                  For each career year from graduation until statutory write-off (30 or 40 years), the simulation computes:
+                </p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] font-mono bg-white p-2.5 rounded-lg border border-slate-200">
+                  <div>Salary(t) = Starting Salary &times; (1 + Wage Growth)^t</div>
+                  <div>Annual Repayment = max(0, Salary(t) - Threshold) &times; 9%</div>
+                  <div>Interest Accrued = Outstanding Balance &times; Statutory Interest Rate</div>
+                  <div>Ending Balance = max(0, Balance + Interest - Repayment)</div>
+                </div>
+                <p class="text-[11px] text-slate-500">
+                  When year reaches the statutory term limit, any balance remaining is written off 100% tax-free by the UK government.
+                </p>
+              </div>
+
+              <!-- Sub 3: Parent Upfront Contribution Model -->
+              <div class="space-y-1.5 border-t border-slate-200 pt-3">
+                <h5 class="text-xs font-bold text-slate-900 uppercase tracking-wide flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
+                  3. Parental Upfront Contribution vs ISA Opportunity Model
+                </h5>
+                <p class="leading-relaxed">
+                  Unlike a mortgage or personal loan, paying student fees upfront does <strong>not</strong> reduce the monthly payment on your child's payslip. Repayments depend 100% on earnings, not loan balance.
+                </p>
+                <p class="leading-relaxed">
+                  If your child's career trajectory results in the loan writing off at the term limit, every pound paid upfront simply replaces money the UK government would have written off for free.
+                </p>
+                <div class="bg-white p-2.5 rounded-lg border border-slate-200 text-[11px] space-y-1">
+                  <div><strong>Alternative Opportunity Value:</strong> Compounding ISA Value = Upfront Contribution &times; (1 + r)^t</div>
+                  <div class="text-slate-500">Where <em>r</em> is the annual ISA/investment rate (default 3%, 4%, or 5%) over <em>t</em> years until statutory cancellation.</div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- SECTION 4: FREQUENTLY ASKED QUESTIONS & STATUTORY PROTECTIONS -->
+          <div class="space-y-3">
+            <div class="flex items-center gap-2">
+              <span class="text-base">🛡️</span>
+              <h4 class="text-xs sm:text-sm font-extrabold uppercase tracking-wide text-slate-800">
+                Key Protections &amp; Frequently Asked Questions
+              </h4>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-700">
+              
+              <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+                <strong class="text-slate-900 block font-bold">Does a student loan affect personal credit scores?</strong>
+                <p class="text-[11px] text-slate-600 leading-relaxed">
+                  <strong>No.</strong> UK student loans never appear on consumer credit files (Experian, Equifax, TransUnion) and cannot trigger CCJs or defaults.
+                </p>
+              </div>
+
+              <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+                <strong class="text-slate-900 block font-bold">What happens if a graduate stops working or takes leave?</strong>
+                <p class="text-[11px] text-slate-600 leading-relaxed">
+                  If earnings drop below the threshold (career break, maternity/paternity leave, illness, postgraduate study), monthly repayments immediately drop to <strong>£0</strong> with zero penalty or arrears.
+                </p>
+              </div>
+
+              <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+                <strong class="text-slate-900 block font-bold">Does a student loan affect mortgage affordability?</strong>
+                <p class="text-[11px] text-slate-600 leading-relaxed">
+                  The debt balance is not counted as commercial debt, but mortgage underwriters factor the monthly 9% salary deduction into net take-home affordability checks.
+                </p>
+              </div>
+
+              <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+                <strong class="text-slate-900 block font-bold">What happens if a graduate moves abroad?</strong>
+                <p class="text-[11px] text-slate-600 leading-relaxed">
+                  SLC calculates country-specific price-level adjusted repayment thresholds. Graduates must complete an Overseas Income Assessment form annually to establish their equivalent monthly repayment.
+                </p>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
       </section>
 
       <!-- Mobile Home Indicator Bar (Rendered only in Mobile Mode) -->
@@ -786,9 +1083,6 @@
         <p class="text-[11px] text-slate-500 mt-0.5">Calculations based strictly on statutory Department for Education &amp; Student Loans Company regulations. Information only, not financial advice.</p>
       </div>
       <div class="flex items-center gap-4 flex-shrink-0">
-        <a href="/classic.html" class="text-blue-400 hover:text-blue-300 font-semibold underline">
-          Switch to Classic View ↗
-        </a>
         <button onclick="openTipModal()" class="text-amber-400 hover:text-amber-300 font-bold whitespace-nowrap flex items-center gap-1 cursor-pointer">
           <span>☕</span> Tip Developer (£1 / £2)
         </button>
@@ -1178,18 +1472,23 @@
 
     function switchPerspective(p) {
       state.perspective = p;
-      document.getElementById('perspective-student').classList.toggle('hidden', p !== 'student');
-      document.getElementById('perspective-parent').classList.toggle('hidden', p !== 'parent');
+      const studEl = document.getElementById('perspective-student');
+      const parEl = document.getElementById('perspective-parent');
+      const infoEl = document.getElementById('perspective-info');
+      if (studEl) studEl.classList.toggle('hidden', p !== 'student');
+      if (parEl) parEl.classList.toggle('hidden', p !== 'parent');
+      if (infoEl) infoEl.classList.toggle('hidden', p !== 'info');
       
       const tabStud = document.getElementById('tab-student');
       const tabPar = document.getElementById('tab-parent');
-      if (p === 'student') {
-        tabStud.className = 'perspective-tab active py-2.5 px-4 rounded-xl text-center font-bold text-xs sm:text-sm transition cursor-pointer flex items-center justify-center gap-2';
-        tabPar.className = 'perspective-tab bg-white text-slate-700 border border-slate-200 py-2.5 px-4 rounded-xl text-center font-bold text-xs sm:text-sm transition cursor-pointer flex items-center justify-center gap-2 hover:bg-slate-50';
-      } else {
-        tabPar.className = 'perspective-tab active py-2.5 px-4 rounded-xl text-center font-bold text-xs sm:text-sm transition cursor-pointer flex items-center justify-center gap-2';
-        tabStud.className = 'perspective-tab bg-white text-slate-700 border border-slate-200 py-2.5 px-4 rounded-xl text-center font-bold text-xs sm:text-sm transition cursor-pointer flex items-center justify-center gap-2 hover:bg-slate-50';
-      }
+      const tabInfo = document.getElementById('tab-info');
+
+      const activeClass = 'perspective-tab active py-2.5 px-3 rounded-xl text-center font-bold text-xs sm:text-sm transition cursor-pointer flex items-center justify-center gap-2';
+      const inactiveClass = 'perspective-tab bg-white text-slate-700 border border-slate-200 py-2.5 px-3 rounded-xl text-center font-bold text-xs sm:text-sm transition cursor-pointer flex items-center justify-center gap-2 hover:bg-slate-50';
+
+      if (tabStud) tabStud.className = (p === 'student') ? activeClass : inactiveClass;
+      if (tabPar) tabPar.className = (p === 'parent') ? activeClass : inactiveClass;
+      if (tabInfo) tabInfo.className = (p === 'info') ? activeClass : inactiveClass;
 
       recalculateResults();
     }
@@ -1927,10 +2226,102 @@
     }
 
     // ====================================================================
-    // DYNAMIC PARENT SECTION:
-    // IF £0: Shows 1 chart (Loan with No Investment)
-    // IF > £0: Shows 2 side-by-side charts (Pay Upfront vs Invest in ISA)
+    // PARENT UPFRONT CONTRIBUTION SIMULATION & EXCEL EXPORT ENGINE
     // ====================================================================
+    let latestParentSimNoContrib = null;
+    let latestParentSimWithContrib = null;
+    let latestParentIsaGrowth = [];
+    let latestParentTotalYears = 30;
+    let latestParentCareerStartAge = 24;
+    let latestParentWipeoutAge = 54;
+    let latestParentChildSavings = 0;
+
+    function downloadParentComparisonExcelCsv() {
+      if (!latestParentSimNoContrib || !latestParentSimWithContrib) return;
+
+      const isPlan5 = (state.homeCountry === 'england' && state.startYear >= 2023);
+      const planName = isPlan5 ? "Plan 5" : "Plan 2";
+      const writeOffYears = latestParentTotalYears;
+      const gradYear = state.startYear + state.duration;
+      const isGraduated = gradYear <= CURRENT_YEAR;
+      const repaymentStartYear = isGraduated ? state.workStartYear : (gradYear + 1);
+      const careerStartAge = latestParentCareerStartAge;
+      const wipeoutAge = latestParentWipeoutAge;
+      const wipeoutYear = repaymentStartYear + writeOffYears;
+
+      const noContribSim = latestParentSimNoContrib;
+      const withContribSim = latestParentSimWithContrib;
+      const contrib = state.parentContribution;
+      const rate = state.investmentRate / 100;
+
+      const childSavings = latestParentChildSavings;
+      const isaFutureVal = Math.round(contrib * Math.pow(1 + rate, writeOffYears));
+      const isBadIdea = (childSavings <= 0 || noContribSim.clearedYearIndex === null);
+
+      let csv = "\uFEFF"; // UTF-8 BOM for Microsoft Excel
+      csv += "DUTTA UK UNIVERSITY STUDENT LOAN CALCULATOR - PARENTAL UPFRONT CONTRIBUTION ANALYSIS\n";
+      csv += `Student Loan Plan,${planName} (${writeOffYears}-Year Statutory Term)\n`;
+      csv += `Country of Origin,${state.homeCountry === 'england' ? 'England' : 'Wales'}\n`;
+      csv += `Child Current Age,${state.currentAge}\n`;
+      csv += `Repayment Start Year,${repaymentStartYear} (Age ${careerStartAge})\n`;
+      csv += `Statutory Cancellation Year,${wipeoutYear} (Age ${wipeoutAge})\n`;
+      csv += `Total Initial Starting University Debt,"£${fullDebtAmount.toLocaleString()}"\n`;
+      csv += `Parent Upfront Contribution Amount,"£${contrib.toLocaleString()}"\n`;
+      csv += `Child Starting Annual Salary,"£${state.salary.toLocaleString()}"\n`;
+      csv += `Annual Salary Wage Growth Rate,${state.salaryGrowth}%\n`;
+      csv += `Alternative ISA Investment Return Rate,${state.investmentRate}%\n`;
+      csv += `Child Lifetime Repayment Savings from Contribution,"£${childSavings.toLocaleString()}"\n`;
+      csv += `Compounding Value of Upfront Money if Invested in ISA,"£${isaFutureVal.toLocaleString()}"\n`;
+      csv += `Financial Observation,"${isBadIdea ? 'No Benefit - Paying upfront saves £0 in repayments because remaining debt cancels automatically; family forgives compounding ISA nest egg' : 'Financial Benefit - High graduate earnings clear loan early before write-off, saving interest'}"\n\n`;
+
+      csv += "Career Year,Calendar Year,Child Age,Projected Gross Salary,Option 1 [Upfront] - Ending Balance,Option 1 [Upfront] - Annual Repayment,Option 1 [Upfront] - Cumulative Repaid,Option 1 [Upfront] - ISA Fund Value,Option 2 [ISA] - Ending Balance,Option 2 [ISA] - Annual Repayment,Option 2 [ISA] - Cumulative Repaid,Option 2 [ISA] - Compounding ISA Fund Value,Net Family Wealth Advantage (Option 2 ISA vs Option 1 Upfront),Milestone Note\n";
+
+      for (let y = 0; y <= writeOffYears; y++) {
+        const rowNo = noContribSim.yearlyBreakdown[y] || noContribSim.yearlyBreakdown[0];
+        const rowWith = withContribSim.yearlyBreakdown[y] || withContribSim.yearlyBreakdown[0];
+        const calYear = repaymentStartYear + y;
+        const age = careerStartAge + y;
+        const curIsa = Math.round(contrib * Math.pow(1 + rate, y));
+        const childPaidDiff = rowNo.cumulativeRepaid - rowWith.cumulativeRepaid;
+        const netAdvantage = curIsa - childPaidDiff;
+
+        let note = "";
+        if (y === 0) note = "Course Graduation";
+        else if (rowWith.balance === 0 && rowNo.balance > 0) note = "Option 1 Cleared Early; Option 2 Continues Standard 9% Deductions";
+        else if (rowNo.balance === 0) note = "Option 2 Fully Cleared";
+        else if (y === writeOffYears) note = "Statutory Write-Off by UK Government";
+
+        const line = [
+          y === 0 ? "Year 0 (Graduation)" : "Year " + y,
+          calYear,
+          age,
+          `"£${rowNo.salary.toLocaleString()}"`,
+          `"£${rowWith.balance.toLocaleString()}"`,
+          `"£${rowWith.annualRepayment.toLocaleString()}"`,
+          `"£${rowWith.cumulativeRepaid.toLocaleString()}"`,
+          `"£0"`,
+          `"£${rowNo.balance.toLocaleString()}"`,
+          `"£${rowNo.annualRepayment.toLocaleString()}"`,
+          `"£${rowNo.cumulativeRepaid.toLocaleString()}"`,
+          `"£${curIsa.toLocaleString()}"`,
+          `"£${netAdvantage.toLocaleString()}"`,
+          `"${note}"`
+        ].join(",");
+        csv += line + "\n";
+      }
+
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Parent_Contribution_Analysis_${planName.replace(/\s+/g, '_')}_Salary_${state.salary}_Contrib_${contrib}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // Dynamic Parent Section: 1 full chart if £0, 2 side-by-side interactive charts if > £0
     function renderDynamicParentSection(simNoContrib, simWithContrib, totalYears, childSavings, wipeoutAge, careerStartAge) {
       careerStartAge = careerStartAge || state.currentAge;
       const wrapper = document.getElementById('parentChartsDynamicWrapper');
@@ -1943,11 +2334,22 @@
       }
       const finalIsaVal = isaGrowth[totalYears];
 
-      // CASE A: ZERO PARENT CONTRIBUTION -> SHOW EXACTLY 1 CHART
+      // Cache state for inspection and Excel download
+      latestParentSimNoContrib = simNoContrib;
+      latestParentSimWithContrib = simWithContrib;
+      latestParentIsaGrowth = isaGrowth;
+      latestParentTotalYears = totalYears;
+      latestParentCareerStartAge = careerStartAge;
+      latestParentWipeoutAge = wipeoutAge;
+      latestParentChildSavings = childSavings;
+
+      // ==================================================================
+      // CASE A: ZERO PARENT CONTRIBUTION -> SHOW 1 FULL-WIDTH INTERACTIVE CHART
+      // ==================================================================
       if (state.parentContribution === 0) {
         wrapper.innerHTML = `
           <div class="bg-slate-50 p-4 sm:p-5 rounded-xl border border-slate-200 space-y-3">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
               <div>
                 <div class="flex items-center gap-2">
                   <span class="text-base">📊</span>
@@ -1959,43 +2361,89 @@
                   Because upfront contribution is £0, your child borrows 100% and makes income-contingent repayments.
                 </p>
               </div>
-              <span class="text-[11px] font-bold text-slate-700 bg-white px-2.5 py-1 rounded border border-slate-200">
-                1 Single Chart (No Investment Growth)
-              </span>
+
+              <div class="flex flex-wrap items-center gap-3">
+                <button onclick="downloadParentComparisonExcelCsv()" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white rounded-lg text-xs font-bold shadow-xs transition cursor-pointer" title="Download Parent Excel schedule (.csv)">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                  <span>Download Excel (.csv)</span>
+                </button>
+              </div>
             </div>
 
-            <div id="parentSingleChart" class="w-full bg-white p-3 rounded-lg border border-slate-200 overflow-x-auto">
-              ${createSvgSingleLoanChart(simNoContrib, totalYears, careerStartAge)}
+            <!-- Live Data Hover Inspector Strip -->
+            <div id="parentSingleInspector" class="bg-white p-2.5 rounded-lg border border-slate-200 text-xs transition-all shadow-xs">
+              <div class="flex items-center justify-between gap-2 text-slate-600 text-[11px]">
+                <div class="flex items-center gap-2">
+                  <span class="text-sm">👆</span>
+                  <span class="font-bold text-slate-700">Interactive Inspector:</span>
+                  <span>Hover or scroll over the graph points below to inspect any year's projected balance &amp; repayments.</span>
+                </div>
+                <span class="text-[10px] text-blue-600 font-bold bg-blue-50 px-2 py-0.5 rounded border border-blue-200 hidden sm:inline">1 Point Per Year</span>
+              </div>
             </div>
 
-            <div class="flex items-center justify-center gap-6 text-[11px] text-slate-600 bg-white p-2.5 rounded-lg border border-slate-200">
-              <span class="inline-flex items-center gap-1.5"><span class="w-3 h-1 bg-blue-600 rounded"></span> <strong>Outstanding Loan Balance</strong></span>
-              <span class="inline-flex items-center gap-1.5"><span class="w-3 h-1 bg-amber-500 rounded border border-dashed border-amber-600"></span> <strong>Cumulative Repayments Paid</strong></span>
+            <div id="parentSingleChartWrapper" class="w-full bg-white p-3 rounded-lg border border-slate-200 overflow-x-auto relative">
+              <!-- Rendered via createSvgSingleLoanChart -->
+            </div>
+
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[11px] text-slate-600 bg-white p-2.5 rounded-lg border border-slate-200">
+              <div class="flex items-center gap-6">
+                <span class="inline-flex items-center gap-1.5"><span class="w-3 h-1 bg-blue-600 rounded"></span> <strong>Outstanding Loan Balance</strong></span>
+                <span class="inline-flex items-center gap-1.5"><span class="w-3 h-1 bg-amber-500 rounded border border-dashed border-amber-600"></span> <strong>Cumulative Repayments Paid</strong></span>
+              </div>
+              <button onclick="downloadParentComparisonExcelCsv()" class="text-emerald-700 hover:text-emerald-800 font-bold underline flex items-center gap-1 cursor-pointer">
+                <span>📊 Export Schedule to Excel (.csv)</span>
+              </button>
             </div>
           </div>
         `;
+
+        renderParentSingleInteractiveChart(simNoContrib, totalYears, careerStartAge);
         return;
       }
 
-      // CASE B: CONTRIBUTING > £0 -> SHOW 2 SEPARATE SCENARIO CHARTS SIDE-BY-SIDE
+      // ==================================================================
+      // CASE B: CONTRIBUTING > £0 -> SHOW 2 SEPARATE INTERACTIVE SCENARIO CHARTS
+      // ==================================================================
       wrapper.innerHTML = `
         <div class="space-y-3">
           
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
-              <h4 class="text-xs sm:text-sm font-extrabold text-slate-900">
-                Compare The Two Financial Paths Side-by-Side:
-              </h4>
+              <div class="flex items-center gap-2">
+                <span class="text-base">⚖️</span>
+                <h4 class="text-xs sm:text-sm font-extrabold text-slate-900">
+                  Compare The Two Financial Paths Side-by-Side:
+                </h4>
+              </div>
               <p class="text-[11px] text-slate-500">
                 Chart 1 shows paying fees to university &bull; Chart 2 shows keeping the money in a ${state.investmentRate}% ISA instead.
               </p>
             </div>
 
-            <div class="flex items-center gap-1.5 bg-white p-1 rounded-lg border border-slate-200 self-start sm:self-auto text-xs font-semibold">
-              <span class="text-[10px] text-slate-500 px-1">ISA Growth Rate:</span>
-              <button onclick="setInvestmentRate(3)" class="rate-btn ${state.investmentRate === 3 ? 'active' : ''} px-2 py-0.5 rounded text-[11px] cursor-pointer">3%</button>
-              <button onclick="setInvestmentRate(4)" class="rate-btn ${state.investmentRate === 4 ? 'active' : ''} px-2 py-0.5 rounded text-[11px] cursor-pointer">4%</button>
-              <button onclick="setInvestmentRate(5)" class="rate-btn ${state.investmentRate === 5 ? 'active' : ''} px-2 py-0.5 rounded text-[11px] cursor-pointer">5%</button>
+            <div class="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+              <div class="flex items-center gap-1.5 bg-white p-1 rounded-lg border border-slate-200 text-xs font-semibold">
+                <span class="text-[10px] text-slate-500 px-1">ISA Growth:</span>
+                <button onclick="setInvestmentRate(3)" class="rate-btn ${state.investmentRate === 3 ? 'active' : ''} px-2 py-0.5 rounded text-[11px] cursor-pointer">3%</button>
+                <button onclick="setInvestmentRate(4)" class="rate-btn ${state.investmentRate === 4 ? 'active' : ''} px-2 py-0.5 rounded text-[11px] cursor-pointer">4%</button>
+                <button onclick="setInvestmentRate(5)" class="rate-btn ${state.investmentRate === 5 ? 'active' : ''} px-2 py-0.5 rounded text-[11px] cursor-pointer">5%</button>
+              </div>
+              <button onclick="downloadParentComparisonExcelCsv()" class="inline-flex items-center gap-1 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white rounded-lg text-xs font-bold shadow-xs transition cursor-pointer" title="Download full parent comparison audit">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                <span>Download Excel (.csv)</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Synchronized Live Comparison Hover Inspector Strip -->
+          <div id="parentDualHoverInspector" class="bg-white p-2.5 rounded-lg border border-slate-200 text-xs transition-all shadow-xs">
+            <div class="flex items-center justify-between gap-2 text-slate-600 text-[11px]">
+              <div class="flex items-center gap-2">
+                <span class="text-sm">👆</span>
+                <span class="font-bold text-slate-700">Interactive Year Inspector:</span>
+                <span>Hover or drag over either chart below to compare Year-by-Year loan balances vs Compounding ISA fund.</span>
+              </div>
+              <span class="text-[10px] text-blue-600 font-bold bg-blue-50 px-2 py-0.5 rounded border border-blue-200 hidden sm:inline">1 Point Per Year On Both Charts</span>
             </div>
           </div>
 
@@ -2012,8 +2460,8 @@
                 <p class="text-[11px] text-slate-500">Reduced loan debt, but £0 money remaining in an investment pot.</p>
               </div>
 
-              <div class="w-full bg-white p-2.5 rounded-lg border border-rose-100 overflow-x-auto">
-                ${createSvgOption1Chart(simWithContrib, isaGrowth, totalYears, careerStartAge)}
+              <div id="opt1ChartWrapper" class="w-full bg-white p-2.5 rounded-lg border border-rose-100 overflow-x-auto relative">
+                <!-- Injected via createSvgOption1Chart -->
               </div>
 
               <!-- Option 1 Legend -->
@@ -2030,7 +2478,7 @@
               </div>
             </div>
 
-            <!-- CHART 2: OPTION 2 - KEEP CASH IN 4% ISA -->
+            <!-- CHART 2: OPTION 2 - KEEP CASH IN ISA -->
             <div class="bg-emerald-50/60 p-4 rounded-xl border border-emerald-200 space-y-3 flex flex-col justify-between">
               <div>
                 <div class="flex items-center justify-between">
@@ -2041,8 +2489,8 @@
                 <p class="text-[11px] text-slate-500">Standard student loan (wiped at Age ${wipeoutAge}) &plus; Compounding ISA nest egg.</p>
               </div>
 
-              <div class="w-full bg-white p-2.5 rounded-lg border border-emerald-100 overflow-x-auto">
-                ${createSvgOption2Chart(simNoContrib, isaGrowth, totalYears, careerStartAge)}
+              <div id="opt2ChartWrapper" class="w-full bg-white p-2.5 rounded-lg border border-emerald-100 overflow-x-auto relative">
+                <!-- Injected via createSvgOption2Chart -->
               </div>
 
               <!-- Option 2 Legend -->
@@ -2062,136 +2510,509 @@
           </div>
 
           <!-- Plain-English Verdict Strip -->
-          <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 text-[11px] text-blue-900 flex items-start gap-2">
-            <span class="text-sm">💡</span>
-            <div>
-              <strong>Why Chart 2 Wins:</strong> 
-              Look at Chart 1 vs Chart 2. Under Option 1, paying £${state.parentContribution.toLocaleString()} upfront does not give your child lower monthly deductions, and leaves them with £0 house deposit (giving up the green investment curve). Under Option 2, the loan debt cancels anyway, and your cash compounds into a <strong>£${finalIsaVal.toLocaleString()}</strong> house deposit!
+          <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 text-[11px] text-blue-900 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div class="flex items-start gap-2">
+              <span class="text-sm flex-shrink-0">💡</span>
+              <div>
+                <strong>Why Option 2 (ISA) Wins:</strong> 
+                Under Option 1, paying £${state.parentContribution.toLocaleString()} upfront does not give your child lower monthly deductions, and leaves them with £0 house deposit. Under Option 2, the loan debt cancels anyway at Age ${wipeoutAge}, and your cash compounds into a <strong>£${finalIsaVal.toLocaleString()}</strong> house deposit!
+              </div>
             </div>
+            <button onclick="downloadParentComparisonExcelCsv()" class="text-emerald-700 hover:text-emerald-800 font-bold underline whitespace-nowrap self-start sm:self-auto cursor-pointer">
+              <span>📊 Export Full Comparison (.csv)</span>
+            </button>
           </div>
 
         </div>
       `;
+
+      renderParentDualInteractiveCharts(simWithContrib, simNoContrib, isaGrowth, totalYears, careerStartAge);
     }
 
-    // SVG Generator: Single Loan Chart (for £0 contribution)
-    function createSvgSingleLoanChart(sim, totalYears, careerStartAge) {
+    // ==================================================================
+    // PARENT CASE A: SINGLE FULL-WIDTH INTERACTIVE SVG (FOR £0 CONTRIB)
+    // ==================================================================
+    function renderParentSingleInteractiveChart(sim, totalYears, careerStartAge) {
       careerStartAge = careerStartAge || state.currentAge;
-      const w = 700, h = 230, padL = 55, padR = 25, padT = 20, padB = 30;
+      const container = document.getElementById('parentSingleChartWrapper');
+      if (!container) return;
+
+      const w = 740, h = 240, padL = 55, padR = 25, padT = 20, padB = 30;
       const plotW = w - padL - padR, plotH = h - padT - padB;
       const maxVal = Math.max(...sim.balanceHistory, ...sim.cumulativeRepaidHistory, 40000);
       const maxY = Math.ceil(maxVal / 10000) * 10000;
+
       const getX = i => padL + (i / totalYears) * plotW;
       const getY = val => padT + plotH - (Math.min(maxY, val) / maxY) * plotH;
 
-      let svg = `<svg viewBox="0 0 ${w} ${h}" class="w-full h-auto min-w-[500px]" style="font-family: inherit;">`;
+      let svg = `<svg id="parentSingleSvg" viewBox="0 0 ${w} ${h}" class="w-full h-auto min-w-[550px] select-none" style="font-family: inherit;">`;
+      svg += `
+        <defs>
+          <linearGradient id="parentBlueGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#2563eb" stop-opacity="0.22" />
+            <stop offset="100%" stop-color="#2563eb" stop-opacity="0.01" />
+          </linearGradient>
+          <filter id="parentTipShadow" x="-10%" y="-10%" width="130%" height="130%">
+            <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.35"/>
+          </filter>
+        </defs>
+      `;
+
+      // Y-axis grid & labels
       for (let i = 0; i <= 4; i++) {
         const val = (maxY / 4) * i;
         const yPos = getY(val);
-        svg += `<line x1="${padL}" y1="${yPos}" x2="${w - padR}" y2="${yPos}" stroke="#e2e8f0" stroke-dasharray="${i === 0 ? '0' : '4,4'}" />`;
+        svg += `<line x1="${padL}" y1="${yPos}" x2="${w - padR}" y2="${yPos}" stroke="#e2e8f0" stroke-dasharray="${i === 0 ? '0' : '4,4'}" stroke-width="1" />`;
         svg += `<text x="${padL - 8}" y="${yPos + 4}" text-anchor="end" font-size="10" fill="#64748b" font-weight="600">£${Math.round(val/1000)}k</text>`;
       }
-      for (let i = 0; i <= totalYears; i += Math.max(1, Math.round(totalYears / 6))) {
-        svg += `<text x="${getX(i)}" y="${h - 10}" text-anchor="middle" font-size="10" fill="#64748b">Age ${careerStartAge + i}</text>`;
+
+      // X-axis age ticks
+      const xStep = Math.max(1, Math.round(totalYears / 6));
+      for (let i = 0; i <= totalYears; i += xStep) {
+        const xPos = getX(i);
+        const age = careerStartAge + i;
+        svg += `<line x1="${xPos}" y1="${padT}" x2="${xPos}" y2="${padT + plotH}" stroke="#f1f5f9" stroke-width="1" />`;
+        svg += `<text x="${xPos}" y="${h - 10}" text-anchor="middle" font-size="10" fill="#64748b" font-weight="600">Age ${age}</text>`;
       }
+      svg += `<text x="${getX(totalYears)}" y="${h - 10}" text-anchor="middle" font-size="10" fill="#1e293b" font-weight="bold">Age ${careerStartAge + totalYears}</text>`;
+
+      // Area fill
+      let areaD = `M ${getX(0)} ${getY(sim.balanceHistory[0])}`;
+      for (let i = 1; i <= totalYears; i++) areaD += ` L ${getX(i)} ${getY(sim.balanceHistory[i])}`;
+      areaD += ` L ${getX(totalYears)} ${getY(0)} L ${getX(0)} ${getY(0)} Z`;
+      svg += `<path d="${areaD}" fill="url(#parentBlueGrad)" />`;
+
+      // Outstanding Balance curve
       let bD = `M ${getX(0)} ${getY(sim.balanceHistory[0])}`;
       for (let i = 1; i <= totalYears; i++) bD += ` L ${getX(i)} ${getY(sim.balanceHistory[i])}`;
-      svg += `<path d="${bD}" fill="none" stroke="#2563eb" stroke-width="2.5" />`;
+      svg += `<path d="${bD}" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round" />`;
 
+      // Cumulative Repayments curve
       let rD = `M ${getX(0)} ${getY(sim.cumulativeRepaidHistory[0])}`;
       for (let i = 1; i <= totalYears; i++) rD += ` L ${getX(i)} ${getY(sim.cumulativeRepaidHistory[i])}`;
-      svg += `<path d="${rD}" fill="none" stroke="#f59e0b" stroke-width="2.2" stroke-dasharray="5,4" />`;
-      svg += `</svg>`;
-      return svg;
-    }
+      svg += `<path d="${rD}" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-dasharray="5,4" stroke-linecap="round" />`;
 
-    // SVG Generator: Option 1 (Paid Upfront) - Shows reduced debt & forgone investment curve
-    function createSvgOption1Chart(simWithContrib, isaGrowth, totalYears, careerStartAge) {
-      careerStartAge = careerStartAge || state.currentAge;
-      const w = 340, h = 180, padL = 45, padR = 15, padT = 15, padB = 25;
-      const plotW = w - padL - padR, plotH = h - padT - padB;
-      const maxVal = Math.max(...simWithContrib.balanceHistory, ...isaGrowth, 45000);
-      const maxY = Math.ceil(maxVal / 15000) * 15000;
-      const getX = i => padL + (i / totalYears) * plotW;
-      const getY = val => padT + plotH - (Math.min(maxY, val) / maxY) * plotH;
-
-      let svg = `<svg viewBox="0 0 ${w} ${h}" class="w-full h-auto min-w-[280px]" style="font-family: inherit;">`;
-      for (let i = 0; i <= 3; i++) {
-        const val = (maxY / 3) * i;
-        const yPos = getY(val);
-        svg += `<line x1="${padL}" y1="${yPos}" x2="${w - padR}" y2="${yPos}" stroke="#e2e8f0" stroke-dasharray="${i === 0 ? '0' : '3,3'}" />`;
-        svg += `<text x="${padL - 6}" y="${yPos + 3}" text-anchor="end" font-size="9" fill="#94a3b8">£${Math.round(val/1000)}k</text>`;
+      // Discrete points for EVERY SINGLE YEAR
+      for (let i = 0; i <= totalYears; i++) {
+        const xPt = getX(i);
+        svg += `<circle cx="${xPt}" cy="${getY(sim.balanceHistory[i])}" r="3" fill="#2563eb" stroke="#ffffff" stroke-width="1.2" />`;
+        svg += `<circle cx="${xPt}" cy="${getY(sim.cumulativeRepaidHistory[i])}" r="2.8" fill="#f59e0b" stroke="#ffffff" stroke-width="1.2" />`;
       }
-      svg += `<text x="${getX(0)}" y="${h - 8}" text-anchor="start" font-size="9" fill="#64748b">Age ${careerStartAge}</text>`;
-      svg += `<text x="${getX(totalYears)}" y="${h - 8}" text-anchor="end" font-size="9" fill="#64748b">Age ${careerStartAge + totalYears}</text>`;
 
-      // Reduced Loan Balance (Blue)
-      let bD = `M ${getX(0)} ${getY(simWithContrib.balanceHistory[0])}`;
-      for (let i = 1; i <= totalYears; i++) bD += ` L ${getX(i)} ${getY(simWithContrib.balanceHistory[i])}`;
-      svg += `<path d="${bD}" fill="none" stroke="#2563eb" stroke-width="2" />`;
+      // Static labels
+      svg += `<text x="${getX(0) + 8}" y="${getY(sim.balanceHistory[0]) - 8}" font-size="10" font-weight="bold" fill="#1e40af">£${Math.round(sim.balanceHistory[0]).toLocaleString()}</text>`;
+      const lastRepaid = sim.cumulativeRepaidHistory[totalYears];
+      svg += `<text x="${getX(totalYears) - 6}" y="${getY(lastRepaid) - 8}" text-anchor="end" font-size="10" font-weight="bold" fill="#b45309">Repaid: £${Math.round(lastRepaid).toLocaleString()}</text>`;
 
-      // Child Repayments (Purple)
-      let rD = `M ${getX(0)} ${getY(simWithContrib.cumulativeRepaidHistory[0])}`;
-      for (let i = 1; i <= totalYears; i++) rD += ` L ${getX(i)} ${getY(simWithContrib.cumulativeRepaidHistory[i])}`;
-      svg += `<path d="${rD}" fill="none" stroke="#7c3aed" stroke-width="2" stroke-dasharray="4,3" />`;
+      // Interactive guidelines & floating tooltip
+      svg += `
+        <line id="parentSingleCrosshair" x1="0" y1="${padT}" x2="0" y2="${padT + plotH}" stroke="#64748b" stroke-width="1.5" stroke-dasharray="3,3" opacity="0" pointer-events="none" />
+        <circle id="parentSingleActiveBalDot" cx="0" cy="0" r="6" fill="#2563eb" stroke="#ffffff" stroke-width="2.5" opacity="0" pointer-events="none" />
+        <circle id="parentSingleActiveRepayDot" cx="0" cy="0" r="5.5" fill="#f59e0b" stroke="#ffffff" stroke-width="2.5" opacity="0" pointer-events="none" />
 
-      // Forgone Investment Growth (Dashed emerald ghost curve)
-      let iD = `M ${getX(0)} ${getY(isaGrowth[0])}`;
-      for (let i = 1; i <= totalYears; i++) iD += ` L ${getX(i)} ${getY(isaGrowth[i])}`;
-      svg += `<path d="${iD}" fill="none" stroke="#10b981" stroke-width="1.8" stroke-dasharray="3,3" opacity="0.75" />`;
+        <g id="parentSingleTooltipGroup" opacity="0" pointer-events="none" filter="url(#parentTipShadow)">
+          <rect width="190" height="96" rx="8" ry="8" fill="#0f172a" fill-opacity="0.94" stroke="#334155" stroke-width="1" />
+          <text id="parentSingleTipTitle" x="12" y="18" fill="#ffffff" font-size="11" font-weight="bold">Year 1 • Age 22</text>
+          <text id="parentSingleTipSalary" x="12" y="35" fill="#93c5fd" font-size="10">Salary: £45,000</text>
+          <text id="parentSingleTipBal" x="12" y="52" fill="#60a5fa" font-size="10" font-weight="bold">Loan Balance: £55,359</text>
+          <text id="parentSingleTipRepay" x="12" y="69" fill="#fbbf24" font-size="10" font-weight="bold">Cumulative Repaid: £1,800</text>
+          <text id="parentSingleTipDeduct" x="12" y="85" fill="#cbd5e1" font-size="9.5">Repayment: £150/mo</text>
+        </g>
 
-      // Actual ISA Pot = £0 Baseline
-      svg += `<line x1="${padL}" y1="${getY(0)}" x2="${w - padR}" y2="${getY(0)}" stroke="#dc2626" stroke-width="2" />`;
-      svg += `<text x="${w - padR}" y="${getY(0) - 5}" text-anchor="end" font-size="8" fill="#dc2626" font-weight="bold">Actual ISA = £0</text>`;
-
-      const lastIsa = isaGrowth[totalYears];
-      svg += `<text x="${getX(totalYears) - 4}" y="${getY(lastIsa) - 6}" text-anchor="end" font-size="8" fill="#059669" font-weight="bold">Forgone ISA: £${Math.round(lastIsa/1000)}k</text>`;
+        <rect id="parentSingleOverlay" x="${padL}" y="${padT}" width="${plotW}" height="${plotH}" fill="transparent" style="cursor: crosshair; touch-action: none;" />
+      `;
 
       svg += `</svg>`;
-      return svg;
+      container.innerHTML = svg;
+
+      const overlay = document.getElementById('parentSingleOverlay');
+      if (overlay) {
+        function handlePointer(clientX) {
+          const rect = overlay.getBoundingClientRect();
+          const relX = clientX - rect.left;
+          const ratio = Math.max(0, Math.min(1, relX / rect.width));
+          const yearIdx = Math.round(ratio * totalYears);
+          updateParentSingleYearInspection(yearIdx, sim, totalYears, careerStartAge, padL, plotW, padT, plotH, maxY, w, padR, h, padB);
+        }
+
+        overlay.addEventListener('mousemove', e => handlePointer(e.clientX));
+        overlay.addEventListener('touchmove', e => {
+          if (e.touches && e.touches[0]) handlePointer(e.touches[0].clientX);
+        }, { passive: true });
+        overlay.addEventListener('touchstart', e => {
+          if (e.touches && e.touches[0]) handlePointer(e.touches[0].clientX);
+        }, { passive: true });
+      }
+
+      updateParentSingleYearInspection(1, sim, totalYears, careerStartAge, padL, plotW, padT, plotH, maxY, w, padR, h, padB);
     }
 
-    // SVG Generator: Option 2 (Invest in ISA) - Shows standard debt & actual compounding ISA
-    function createSvgOption2Chart(simNoContrib, isaGrowth, totalYears, careerStartAge) {
+    function updateParentSingleYearInspection(yearIndex, sim, totalYears, careerStartAge, padL, plotW, padT, plotH, maxY, w, padR, h, padB) {
+      if (!sim || !sim.yearlyBreakdown) return;
+      const row = sim.yearlyBreakdown[yearIndex] || sim.yearlyBreakdown[0];
+      if (!row) return;
+
+      const gradYear = state.startYear + state.duration;
+      const isGraduated = gradYear <= CURRENT_YEAR;
+      const repaymentStartYear = isGraduated ? state.workStartYear : (gradYear + 1);
+      const calYear = repaymentStartYear + row.yearIndex;
+      const age = careerStartAge + row.yearIndex;
+
+      const xPos = padL + (row.yearIndex / totalYears) * plotW;
+      const yBalPos = padT + plotH - (Math.min(maxY, row.balance) / maxY) * plotH;
+      const yRepayPos = padT + plotH - (Math.min(maxY, row.cumulativeRepaid) / maxY) * plotH;
+
+      const crosshair = document.getElementById('parentSingleCrosshair');
+      const balDot = document.getElementById('parentSingleActiveBalDot');
+      const repayDot = document.getElementById('parentSingleActiveRepayDot');
+      const tipGroup = document.getElementById('parentSingleTooltipGroup');
+
+      if (crosshair) {
+        crosshair.setAttribute('x1', xPos);
+        crosshair.setAttribute('x2', xPos);
+        crosshair.setAttribute('opacity', '1');
+      }
+      if (balDot) {
+        balDot.setAttribute('cx', xPos);
+        balDot.setAttribute('cy', yBalPos);
+        balDot.setAttribute('opacity', '1');
+      }
+      if (repayDot) {
+        repayDot.setAttribute('cx', xPos);
+        repayDot.setAttribute('cy', yRepayPos);
+        repayDot.setAttribute('opacity', '1');
+      }
+
+      if (tipGroup) {
+        tipGroup.setAttribute('opacity', '1');
+        const tipWidth = 190;
+        const tipHeight = 96;
+        let tipX = (xPos + tipWidth + 12 > w - padR) ? (xPos - tipWidth - 10) : (xPos + 10);
+        let tipY = Math.max(padT + 4, Math.min(h - padB - tipHeight - 4, yBalPos - 45));
+        tipGroup.setAttribute('transform', `translate(${tipX}, ${tipY})`);
+
+        const tTitle = document.getElementById('parentSingleTipTitle');
+        const tSalary = document.getElementById('parentSingleTipSalary');
+        const tBal = document.getElementById('parentSingleTipBal');
+        const tRepay = document.getElementById('parentSingleTipRepay');
+        const tDeduct = document.getElementById('parentSingleTipDeduct');
+
+        if (tTitle) tTitle.textContent = `${row.yearIndex === 0 ? 'Start' : 'Year ' + row.yearIndex} • Age ${age} (${calYear})`;
+        if (tSalary) tSalary.textContent = `Salary: £${row.salary.toLocaleString()}`;
+        if (tBal) tBal.textContent = `Balance: £${row.balance.toLocaleString()}`;
+        if (tRepay) tRepay.textContent = `Repaid: £${row.cumulativeRepaid.toLocaleString()}`;
+        if (tDeduct) tDeduct.textContent = row.yearIndex === 0 ? `Starting Debt` : `Deduction: £${row.monthlyRepayment.toLocaleString()}/mo`;
+      }
+
+      const inspector = document.getElementById('parentSingleInspector');
+      if (inspector) {
+        inspector.innerHTML = `
+          <div class="flex flex-wrap items-center justify-between gap-2.5 w-full bg-blue-50/80 border border-blue-200 rounded-lg p-2.5">
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 rounded text-[11px] font-black bg-blue-600 text-white">
+                ${row.yearIndex === 0 ? 'Starting Debt' : 'Career Year ' + row.yearIndex}
+              </span>
+              <span class="text-xs font-black text-slate-800">Age ${age} &bull; ${calYear}</span>
+              <span class="text-[10px] text-slate-600 font-bold bg-white px-1.5 py-0.5 rounded border border-slate-200">${row.status}</span>
+            </div>
+            <div class="flex flex-wrap items-center gap-3 sm:gap-5 text-xs">
+              <div><span class="text-[10px] text-slate-500 uppercase font-bold block">Gross Salary</span><strong class="text-slate-900 font-black">£${row.salary.toLocaleString()}</strong></div>
+              <div><span class="text-[10px] text-blue-600 uppercase font-bold block">Loan Balance</span><strong class="text-blue-700 font-black">£${row.balance.toLocaleString()}</strong></div>
+              <div><span class="text-[10px] text-amber-600 uppercase font-bold block">Cumulative Repaid</span><strong class="text-amber-700 font-black">£${row.cumulativeRepaid.toLocaleString()}</strong></div>
+              <div><span class="text-[10px] text-slate-500 uppercase font-bold block">Deduction</span><strong class="text-slate-800 font-black">£${row.annualRepayment.toLocaleString()} <span class="text-[10px] text-slate-500 font-normal">(£${row.monthlyRepayment}/mo)</span></strong></div>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    // ==================================================================
+    // PARENT CASE B: DUAL INTERACTIVE SVGS (OPTION 1 VS OPTION 2)
+    // ==================================================================
+    function renderParentDualInteractiveCharts(simWithContrib, simNoContrib, isaGrowth, totalYears, careerStartAge) {
       careerStartAge = careerStartAge || state.currentAge;
-      const w = 340, h = 180, padL = 45, padR = 15, padT = 15, padB = 25;
+      const opt1Container = document.getElementById('opt1ChartWrapper');
+      const opt2Container = document.getElementById('opt2ChartWrapper');
+      if (!opt1Container || !opt2Container) return;
+
+      const w = 360, h = 210, padL = 45, padR = 15, padT = 18, padB = 26;
       const plotW = w - padL - padR, plotH = h - padT - padB;
       const maxVal = Math.max(...simNoContrib.balanceHistory, ...isaGrowth, 45000);
       const maxY = Math.ceil(maxVal / 15000) * 15000;
+
       const getX = i => padL + (i / totalYears) * plotW;
       const getY = val => padT + plotH - (Math.min(maxY, val) / maxY) * plotH;
 
-      let svg = `<svg viewBox="0 0 ${w} ${h}" class="w-full h-auto min-w-[280px]" style="font-family: inherit;">`;
+      // -------------------------------------------------------------
+      // CHART 1: OPTION 1 (PAY UPFRONT)
+      // -------------------------------------------------------------
+      let svg1 = `<svg id="opt1Svg" viewBox="0 0 ${w} ${h}" class="w-full h-auto min-w-[280px] select-none" style="font-family: inherit;">`;
+      svg1 += `
+        <defs>
+          <filter id="opt1TipShadow" x="-10%" y="-10%" width="130%" height="130%">
+            <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-opacity="0.3"/>
+          </filter>
+        </defs>
+      `;
       for (let i = 0; i <= 3; i++) {
         const val = (maxY / 3) * i;
         const yPos = getY(val);
-        svg += `<line x1="${padL}" y1="${yPos}" x2="${w - padR}" y2="${yPos}" stroke="#e2e8f0" stroke-dasharray="${i === 0 ? '0' : '3,3'}" />`;
-        svg += `<text x="${padL - 6}" y="${yPos + 3}" text-anchor="end" font-size="9" fill="#94a3b8">£${Math.round(val/1000)}k</text>`;
+        svg1 += `<line x1="${padL}" y1="${yPos}" x2="${w - padR}" y2="${yPos}" stroke="#e2e8f0" stroke-dasharray="${i === 0 ? '0' : '3,3'}" />`;
+        svg1 += `<text x="${padL - 6}" y="${yPos + 3}" text-anchor="end" font-size="9" fill="#94a3b8">£${Math.round(val/1000)}k</text>`;
       }
-      svg += `<text x="${getX(0)}" y="${h - 8}" text-anchor="start" font-size="9" fill="#64748b">Age ${careerStartAge}</text>`;
-      svg += `<text x="${getX(totalYears)}" y="${h - 8}" text-anchor="end" font-size="9" fill="#64748b">Age ${careerStartAge + totalYears}</text>`;
+      svg1 += `<text x="${getX(0)}" y="${h - 8}" text-anchor="start" font-size="9" fill="#64748b">Age ${careerStartAge}</text>`;
+      svg1 += `<text x="${getX(totalYears)}" y="${h - 8}" text-anchor="end" font-size="9" fill="#64748b">Age ${careerStartAge + totalYears}</text>`;
 
-      // Full Loan Balance (Red Dashed)
-      let bD = `M ${getX(0)} ${getY(simNoContrib.balanceHistory[0])}`;
-      for (let i = 1; i <= totalYears; i++) bD += ` L ${getX(i)} ${getY(simNoContrib.balanceHistory[i])}`;
-      svg += `<path d="${bD}" fill="none" stroke="#ef4444" stroke-width="1.8" stroke-dasharray="3,3" />`;
+      // Reduced loan curve (Blue)
+      let bD1 = `M ${getX(0)} ${getY(simWithContrib.balanceHistory[0])}`;
+      for (let i = 1; i <= totalYears; i++) bD1 += ` L ${getX(i)} ${getY(simWithContrib.balanceHistory[i])}`;
+      svg1 += `<path d="${bD1}" fill="none" stroke="#2563eb" stroke-width="2" />`;
 
-      // Child Repayments (Amber Dashed)
-      let rD = `M ${getX(0)} ${getY(simNoContrib.cumulativeRepaidHistory[0])}`;
-      for (let i = 1; i <= totalYears; i++) rD += ` L ${getX(i)} ${getY(simNoContrib.cumulativeRepaidHistory[i])}`;
-      svg += `<path d="${rD}" fill="none" stroke="#f59e0b" stroke-width="1.8" stroke-dasharray="4,3" />`;
+      // Child Repayments curve (Purple)
+      let rD1 = `M ${getX(0)} ${getY(simWithContrib.cumulativeRepaidHistory[0])}`;
+      for (let i = 1; i <= totalYears; i++) rD1 += ` L ${getX(i)} ${getY(simWithContrib.cumulativeRepaidHistory[i])}`;
+      svg1 += `<path d="${rD1}" fill="none" stroke="#7c3aed" stroke-width="2" stroke-dasharray="4,3" />`;
 
-      // Active Compounding ISA Growth (Bold Solid Green)
-      let iD = `M ${getX(0)} ${getY(isaGrowth[0])}`;
-      for (let i = 1; i <= totalYears; i++) iD += ` L ${getX(i)} ${getY(isaGrowth[i])}`;
-      svg += `<path d="${iD}" fill="none" stroke="#059669" stroke-width="2.5" stroke-linecap="round" />`;
+      // Forgone ISA Growth (Emerald Dashed)
+      let iD1 = `M ${getX(0)} ${getY(isaGrowth[0])}`;
+      for (let i = 1; i <= totalYears; i++) iD1 += ` L ${getX(i)} ${getY(isaGrowth[i])}`;
+      svg1 += `<path d="${iD1}" fill="none" stroke="#10b981" stroke-width="1.8" stroke-dasharray="3,3" opacity="0.75" />`;
 
-      const lastIsa = isaGrowth[totalYears];
-      svg += `<circle cx="${getX(totalYears)}" cy="${getY(lastIsa)}" r="3.5" fill="#059669" />`;
-      svg += `<text x="${getX(totalYears) - 4}" y="${getY(lastIsa) - 6}" text-anchor="end" font-size="8" fill="#047857" font-weight="black">Actual ISA: £${Math.round(lastIsa/1000)}k</text>`;
+      // Discrete points for every year on Option 1
+      for (let i = 0; i <= totalYears; i++) {
+        const xPt = getX(i);
+        svg1 += `<circle cx="${xPt}" cy="${getY(simWithContrib.balanceHistory[i])}" r="2.6" fill="#2563eb" stroke="#ffffff" stroke-width="1" />`;
+        svg1 += `<circle cx="${xPt}" cy="${getY(simWithContrib.cumulativeRepaidHistory[i])}" r="2.4" fill="#7c3aed" stroke="#ffffff" stroke-width="1" />`;
+        svg1 += `<circle cx="${xPt}" cy="${getY(isaGrowth[i])}" r="2.2" fill="#10b981" opacity="0.6" />`;
+      }
 
-      svg += `</svg>`;
-      return svg;
+      // Actual ISA = £0 line
+      svg1 += `<line x1="${padL}" y1="${getY(0)}" x2="${w - padR}" y2="${getY(0)}" stroke="#dc2626" stroke-width="1.5" />`;
+
+      // Dynamic guidelines & tooltip on Option 1
+      svg1 += `
+        <line id="opt1Crosshair" x1="0" y1="${padT}" x2="0" y2="${padT + plotH}" stroke="#64748b" stroke-width="1.2" stroke-dasharray="3,3" opacity="0" pointer-events="none" />
+        <circle id="opt1ActiveBalDot" cx="0" cy="0" r="5" fill="#2563eb" stroke="#ffffff" stroke-width="2" opacity="0" pointer-events="none" />
+        <circle id="opt1ActiveRepayDot" cx="0" cy="0" r="4.5" fill="#7c3aed" stroke="#ffffff" stroke-width="2" opacity="0" pointer-events="none" />
+        <circle id="opt1ActiveIsaDot" cx="0" cy="0" r="4.5" fill="#10b981" stroke="#ffffff" stroke-width="2" opacity="0" pointer-events="none" />
+
+        <g id="opt1TooltipGroup" opacity="0" pointer-events="none" filter="url(#opt1TipShadow)">
+          <rect width="165" height="80" rx="6" ry="6" fill="#0f172a" fill-opacity="0.94" stroke="#334155" stroke-width="1" />
+          <text id="opt1TipTitle" x="10" y="16" fill="#ffffff" font-size="10" font-weight="bold">Year 1 • Age 22</text>
+          <text id="opt1TipBal" x="10" y="32" fill="#60a5fa" font-size="9" font-weight="bold">Reduced Balance: £27k</text>
+          <text id="opt1TipRepay" x="10" y="48" fill="#c084fc" font-size="9" font-weight="bold">Child Repaid: £1.8k</text>
+          <text id="opt1TipIsa" x="10" y="64" fill="#f87171" font-size="9" font-weight="bold">Actual ISA: £0 (Lost)</text>
+        </g>
+
+        <rect id="opt1Overlay" x="${padL}" y="${padT}" width="${plotW}" height="${plotH}" fill="transparent" style="cursor: crosshair; touch-action: none;" />
+      `;
+      svg1 += `</svg>`;
+      opt1Container.innerHTML = svg1;
+
+      // -------------------------------------------------------------
+      // CHART 2: OPTION 2 (KEEP CASH IN ISA)
+      // -------------------------------------------------------------
+      let svg2 = `<svg id="opt2Svg" viewBox="0 0 ${w} ${h}" class="w-full h-auto min-w-[280px] select-none" style="font-family: inherit;">`;
+      svg2 += `
+        <defs>
+          <filter id="opt2TipShadow" x="-10%" y="-10%" width="130%" height="130%">
+            <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-opacity="0.3"/>
+          </filter>
+        </defs>
+      `;
+      for (let i = 0; i <= 3; i++) {
+        const val = (maxY / 3) * i;
+        const yPos = getY(val);
+        svg2 += `<line x1="${padL}" y1="${yPos}" x2="${w - padR}" y2="${yPos}" stroke="#e2e8f0" stroke-dasharray="${i === 0 ? '0' : '3,3'}" />`;
+        svg2 += `<text x="${padL - 6}" y="${yPos + 3}" text-anchor="end" font-size="9" fill="#94a3b8">£${Math.round(val/1000)}k</text>`;
+      }
+      svg2 += `<text x="${getX(0)}" y="${h - 8}" text-anchor="start" font-size="9" fill="#64748b">Age ${careerStartAge}</text>`;
+      svg2 += `<text x="${getX(totalYears)}" y="${h - 8}" text-anchor="end" font-size="9" fill="#64748b">Age ${careerStartAge + totalYears}</text>`;
+
+      // Standard Loan curve (Red Dashed)
+      let bD2 = `M ${getX(0)} ${getY(simNoContrib.balanceHistory[0])}`;
+      for (let i = 1; i <= totalYears; i++) bD2 += ` L ${getX(i)} ${getY(simNoContrib.balanceHistory[i])}`;
+      svg2 += `<path d="${bD2}" fill="none" stroke="#ef4444" stroke-width="1.8" stroke-dasharray="3,3" />`;
+
+      // Child Repayments curve (Amber Dashed)
+      let rD2 = `M ${getX(0)} ${getY(simNoContrib.cumulativeRepaidHistory[0])}`;
+      for (let i = 1; i <= totalYears; i++) rD2 += ` L ${getX(i)} ${getY(simNoContrib.cumulativeRepaidHistory[i])}`;
+      svg2 += `<path d="${rD2}" fill="none" stroke="#f59e0b" stroke-width="1.8" stroke-dasharray="4,3" />`;
+
+      // Active Compounding ISA Growth (Solid Green)
+      let iD2 = `M ${getX(0)} ${getY(isaGrowth[0])}`;
+      for (let i = 1; i <= totalYears; i++) iD2 += ` L ${getX(i)} ${getY(isaGrowth[i])}`;
+      svg2 += `<path d="${iD2}" fill="none" stroke="#059669" stroke-width="2.5" stroke-linecap="round" />`;
+
+      // Discrete points for every year on Option 2
+      for (let i = 0; i <= totalYears; i++) {
+        const xPt = getX(i);
+        svg2 += `<circle cx="${xPt}" cy="${getY(simNoContrib.balanceHistory[i])}" r="2.5" fill="#ef4444" stroke="#ffffff" stroke-width="1" />`;
+        svg2 += `<circle cx="${xPt}" cy="${getY(simNoContrib.cumulativeRepaidHistory[i])}" r="2.5" fill="#f59e0b" stroke="#ffffff" stroke-width="1" />`;
+        svg2 += `<circle cx="${xPt}" cy="${getY(isaGrowth[i])}" r="2.8" fill="#059669" stroke="#ffffff" stroke-width="1.2" />`;
+      }
+
+      // Dynamic guidelines & tooltip on Option 2
+      svg2 += `
+        <line id="opt2Crosshair" x1="0" y1="${padT}" x2="0" y2="${padT + plotH}" stroke="#64748b" stroke-width="1.2" stroke-dasharray="3,3" opacity="0" pointer-events="none" />
+        <circle id="opt2ActiveBalDot" cx="0" cy="0" r="5" fill="#ef4444" stroke="#ffffff" stroke-width="2" opacity="0" pointer-events="none" />
+        <circle id="opt2ActiveRepayDot" cx="0" cy="0" r="4.5" fill="#f59e0b" stroke="#ffffff" stroke-width="2" opacity="0" pointer-events="none" />
+        <circle id="opt2ActiveIsaDot" cx="0" cy="0" r="5.5" fill="#059669" stroke="#ffffff" stroke-width="2" opacity="0" pointer-events="none" />
+
+        <g id="opt2TooltipGroup" opacity="0" pointer-events="none" filter="url(#opt2TipShadow)">
+          <rect width="165" height="80" rx="6" ry="6" fill="#0f172a" fill-opacity="0.94" stroke="#334155" stroke-width="1" />
+          <text id="opt2TipTitle" x="10" y="16" fill="#ffffff" font-size="10" font-weight="bold">Year 1 • Age 22</text>
+          <text id="opt2TipBal" x="10" y="32" fill="#fca5a5" font-size="9" font-weight="bold">Standard Debt: £55k</text>
+          <text id="opt2TipRepay" x="10" y="48" fill="#fbbf24" font-size="9" font-weight="bold">Child Repaid: £1.8k</text>
+          <text id="opt2TipIsa" x="10" y="64" fill="#34d399" font-size="9" font-weight="bold">Active ISA: £28.8k</text>
+        </g>
+
+        <rect id="opt2Overlay" x="${padL}" y="${padT}" width="${plotW}" height="${plotH}" fill="transparent" style="cursor: crosshair; touch-action: none;" />
+      `;
+      svg2 += `</svg>`;
+      opt2Container.innerHTML = svg2;
+
+      // Synchronize hover & drag listeners across BOTH charts
+      function handleDualPointer(clientX, targetOverlay) {
+        const rect = targetOverlay.getBoundingClientRect();
+        const relX = clientX - rect.left;
+        const ratio = Math.max(0, Math.min(1, relX / rect.width));
+        const yearIdx = Math.round(ratio * totalYears);
+        updateParentDualYearInspection(yearIdx, simWithContrib, simNoContrib, isaGrowth, totalYears, careerStartAge, padL, plotW, padT, plotH, maxY, w, padR, h, padB);
+      }
+
+      const overlay1 = document.getElementById('opt1Overlay');
+      if (overlay1) {
+        overlay1.addEventListener('mousemove', e => handleDualPointer(e.clientX, overlay1));
+        overlay1.addEventListener('touchmove', e => {
+          if (e.touches && e.touches[0]) handleDualPointer(e.touches[0].clientX, overlay1);
+        }, { passive: true });
+        overlay1.addEventListener('touchstart', e => {
+          if (e.touches && e.touches[0]) handleDualPointer(e.touches[0].clientX, overlay1);
+        }, { passive: true });
+      }
+
+      const overlay2 = document.getElementById('opt2Overlay');
+      if (overlay2) {
+        overlay2.addEventListener('mousemove', e => handleDualPointer(e.clientX, overlay2));
+        overlay2.addEventListener('touchmove', e => {
+          if (e.touches && e.touches[0]) handleDualPointer(e.touches[0].clientX, overlay2);
+        }, { passive: true });
+        overlay2.addEventListener('touchstart', e => {
+          if (e.touches && e.touches[0]) handleDualPointer(e.touches[0].clientX, overlay2);
+        }, { passive: true });
+      }
+
+      updateParentDualYearInspection(1, simWithContrib, simNoContrib, isaGrowth, totalYears, careerStartAge, padL, plotW, padT, plotH, maxY, w, padR, h, padB);
+    }
+
+    function updateParentDualYearInspection(yearIndex, simWithContrib, simNoContrib, isaGrowth, totalYears, careerStartAge, padL, plotW, padT, plotH, maxY, w, padR, h, padB) {
+      if (!simWithContrib || !simNoContrib) return;
+      const rowWith = simWithContrib.yearlyBreakdown[yearIndex] || simWithContrib.yearlyBreakdown[0];
+      const rowNo = simNoContrib.yearlyBreakdown[yearIndex] || simNoContrib.yearlyBreakdown[0];
+      const curIsa = isaGrowth[yearIndex] || isaGrowth[0];
+      if (!rowWith || !rowNo) return;
+
+      const gradYear = state.startYear + state.duration;
+      const isGraduated = gradYear <= CURRENT_YEAR;
+      const repaymentStartYear = isGraduated ? state.workStartYear : (gradYear + 1);
+      const calYear = repaymentStartYear + rowNo.yearIndex;
+      const age = careerStartAge + rowNo.yearIndex;
+
+      const xPos = padL + (rowNo.yearIndex / totalYears) * plotW;
+      const yBalWith = padT + plotH - (Math.min(maxY, rowWith.balance) / maxY) * plotH;
+      const yRepayWith = padT + plotH - (Math.min(maxY, rowWith.cumulativeRepaid) / maxY) * plotH;
+      const yBalNo = padT + plotH - (Math.min(maxY, rowNo.balance) / maxY) * plotH;
+      const yRepayNo = padT + plotH - (Math.min(maxY, rowNo.cumulativeRepaid) / maxY) * plotH;
+      const yIsa = padT + plotH - (Math.min(maxY, curIsa) / maxY) * plotH;
+
+      // Update Chart 1 markers
+      const c1 = document.getElementById('opt1Crosshair');
+      const bDot1 = document.getElementById('opt1ActiveBalDot');
+      const rDot1 = document.getElementById('opt1ActiveRepayDot');
+      const iDot1 = document.getElementById('opt1ActiveIsaDot');
+      const tip1 = document.getElementById('opt1TooltipGroup');
+
+      if (c1) { c1.setAttribute('x1', xPos); c1.setAttribute('x2', xPos); c1.setAttribute('opacity', '1'); }
+      if (bDot1) { bDot1.setAttribute('cx', xPos); bDot1.setAttribute('cy', yBalWith); bDot1.setAttribute('opacity', '1'); }
+      if (rDot1) { rDot1.setAttribute('cx', xPos); rDot1.setAttribute('cy', yRepayWith); rDot1.setAttribute('opacity', '1'); }
+      if (iDot1) { iDot1.setAttribute('cx', xPos); iDot1.setAttribute('cy', yIsa); iDot1.setAttribute('opacity', '1'); }
+
+      if (tip1) {
+        tip1.setAttribute('opacity', '1');
+        const tipW = 165;
+        let tipX = (xPos + tipW + 10 > w - padR) ? (xPos - tipW - 8) : (xPos + 8);
+        tip1.setAttribute('transform', `translate(${tipX}, ${Math.max(padT, yBalWith - 40)})`);
+        const tTitle = document.getElementById('opt1TipTitle');
+        const tBal = document.getElementById('opt1TipBal');
+        const tRepay = document.getElementById('opt1TipRepay');
+        const tIsa = document.getElementById('opt1TipIsa');
+        if (tTitle) tTitle.textContent = `${rowWith.yearIndex === 0 ? 'Start' : 'Year ' + rowWith.yearIndex} • Age ${age} (${calYear})`;
+        if (tBal) tBal.textContent = `Reduced Debt: £${rowWith.balance.toLocaleString()}`;
+        if (tRepay) tRepay.textContent = `Child Repaid: £${rowWith.cumulativeRepaid.toLocaleString()}`;
+        if (tIsa) tIsa.textContent = `Actual ISA Pot: £0`;
+      }
+
+      // Update Chart 2 markers
+      const c2 = document.getElementById('opt2Crosshair');
+      const bDot2 = document.getElementById('opt2ActiveBalDot');
+      const rDot2 = document.getElementById('opt2ActiveRepayDot');
+      const iDot2 = document.getElementById('opt2ActiveIsaDot');
+      const tip2 = document.getElementById('opt2TooltipGroup');
+
+      if (c2) { c2.setAttribute('x1', xPos); c2.setAttribute('x2', xPos); c2.setAttribute('opacity', '1'); }
+      if (bDot2) { bDot2.setAttribute('cx', xPos); bDot2.setAttribute('cy', yBalNo); bDot2.setAttribute('opacity', '1'); }
+      if (rDot2) { rDot2.setAttribute('cx', xPos); rDot2.setAttribute('cy', yRepayNo); rDot2.setAttribute('opacity', '1'); }
+      if (iDot2) { iDot2.setAttribute('cx', xPos); iDot2.setAttribute('cy', yIsa); iDot2.setAttribute('opacity', '1'); }
+
+      if (tip2) {
+        tip2.setAttribute('opacity', '1');
+        const tipW = 165;
+        let tipX = (xPos + tipW + 10 > w - padR) ? (xPos - tipW - 8) : (xPos + 8);
+        tip2.setAttribute('transform', `translate(${tipX}, ${Math.max(padT, yIsa - 40)})`);
+        const tTitle = document.getElementById('opt2TipTitle');
+        const tBal = document.getElementById('opt2TipBal');
+        const tRepay = document.getElementById('opt2TipRepay');
+        const tIsa = document.getElementById('opt2TipIsa');
+        if (tTitle) tTitle.textContent = `${rowNo.yearIndex === 0 ? 'Start' : 'Year ' + rowNo.yearIndex} • Age ${age} (${calYear})`;
+        if (tBal) tBal.textContent = `Standard Debt: £${rowNo.balance.toLocaleString()}`;
+        if (tRepay) tRepay.textContent = `Child Repaid: £${rowNo.cumulativeRepaid.toLocaleString()}`;
+        if (tIsa) tIsa.textContent = `Compounding ISA: £${curIsa.toLocaleString()}`;
+      }
+
+      // Update Top Comparative Inspector Card
+      const inspector = document.getElementById('parentDualHoverInspector');
+      if (inspector) {
+        const netAdvantage = curIsa - (rowNo.cumulativeRepaid - rowWith.cumulativeRepaid);
+        inspector.innerHTML = `
+          <div class="flex flex-wrap items-center justify-between gap-2.5 w-full bg-slate-900 text-white rounded-lg p-2.5 shadow-xs">
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 rounded text-[11px] font-black bg-emerald-500 text-slate-950">
+                ${rowNo.yearIndex === 0 ? 'Graduation' : 'Year ' + rowNo.yearIndex}
+              </span>
+              <span class="text-xs font-black text-slate-100">Child Age ${age} &bull; ${calYear}</span>
+            </div>
+            <div class="flex flex-wrap items-center gap-3 sm:gap-6 text-xs">
+              <div>
+                <span class="text-[10px] text-rose-300 uppercase font-bold block">Option 1 Debt Balance</span>
+                <strong class="text-white font-black">£${rowWith.balance.toLocaleString()}</strong>
+              </div>
+              <div>
+                <span class="text-[10px] text-amber-300 uppercase font-bold block">Option 2 Debt Balance</span>
+                <strong class="text-white font-black">£${rowNo.balance.toLocaleString()}</strong>
+              </div>
+              <div>
+                <span class="text-[10px] text-emerald-300 uppercase font-bold block">Option 2 Compounding ISA</span>
+                <strong class="text-emerald-400 font-black">£${curIsa.toLocaleString()}</strong>
+              </div>
+              <div class="bg-emerald-950/80 border border-emerald-500/50 px-2 py-1 rounded">
+                <span class="text-[10px] text-emerald-300 uppercase font-bold block">Net Family Wealth Gain</span>
+                <strong class="text-emerald-300 font-black">+£${netAdvantage.toLocaleString()} Ahead</strong>
+              </div>
+            </div>
+          </div>
+        `;
+      }
     }
 
     // Initial setup
