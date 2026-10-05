@@ -1613,9 +1613,10 @@
       }];
 
       for (let y = 1; y <= totalYears; y++) {
-        if (balance <= 0) {
+        if (balance <= 0.01) {
+          balance = 0;
           balanceHistory.push(0);
-          cumulativeRepaidHistory.push(totalPaid);
+          cumulativeRepaidHistory.push(Math.round(totalPaid));
           if (clearedYearIndex === null) clearedYearIndex = y - 1;
           yearlyBreakdown.push({
             yearIndex: y,
@@ -1626,7 +1627,7 @@
             interestAccrued: 0,
             interestRate: interestRate,
             balance: 0,
-            cumulativeRepaid: totalPaid,
+            cumulativeRepaid: Math.round(totalPaid),
             status: 'Fully Cleared / Debt-Free'
           });
           curSalary = curSalary * growthMul;
@@ -1635,15 +1636,18 @@
 
         // Repayment = 9% of income over threshold
         const excess = Math.max(0, curSalary - threshold);
-        const annualRepayment = Math.min(balance, excess * 0.09);
+        const scheduledRepayment = excess * 0.09;
 
-        // Apply interest
+        // Apply interest, then cap repayment to total owed (balance + interest)
         const interestAccrued = balance * intMul;
-        balance = balance + interestAccrued - annualRepayment;
+        const balanceWithInterest = balance + interestAccrued;
+        const annualRepayment = Math.min(balanceWithInterest, scheduledRepayment);
+
+        balance = balanceWithInterest - annualRepayment;
         totalPaid += annualRepayment;
 
         let status = 'Active Repayment';
-        if (balance <= 0) {
+        if (balance <= 0.01) {
           balance = 0;
           if (clearedYearIndex === null) clearedYearIndex = y;
           status = 'Fully Cleared / Debt-Free';
@@ -1801,7 +1805,7 @@
       const childActualSavings = Math.max(0, studentSim.totalPaid - parentReducedSim.totalPaid);
 
       // Update Parent Decision Box
-      updateParentDecisionCard(childActualSavings, wipeoutAge, remainingYears, studentSim.clearedYearIndex !== null);
+      updateParentDecisionCard(childActualSavings, wipeoutAge, remainingYears, studentSim, parentReducedSim, careerStartAge);
 
       // Render Student Chart
       renderStudentNativeSvgChart(studentSim, remainingYears, careerStartAge);
@@ -1810,14 +1814,15 @@
       renderDynamicParentSection(studentSim, parentReducedSim, remainingYears, childActualSavings, wipeoutAge, careerStartAge);
     }
 
-    function updateParentDecisionCard(childSavings, wipeoutAge, remainingYears, childClearsEarly) {
+    function updateParentDecisionCard(childSavings, wipeoutAge, remainingYears, simNoContrib, simWithContrib, careerStartAge) {
+      careerStartAge = careerStartAge || state.currentAge;
       const card = document.getElementById('parentDecisionCard');
       const icon = document.getElementById('decisionIcon');
       const headline = document.getElementById('decisionHeadline');
       const badge = document.getElementById('decisionBadge');
       const contentWrapper = document.getElementById('decisionContentWrapper');
 
-      const isBadIdea = (childSavings <= 0 || !childClearsEarly);
+      const isBadIdea = (childSavings <= 100);
       const yearsToWipeout = Math.max(1, wipeoutAge - state.currentAge);
       const isaFutureVal = Math.round(state.parentContribution * Math.pow(1 + state.investmentRate / 100, yearsToWipeout));
 
@@ -1867,24 +1872,34 @@
               <ul class="text-[11px] text-rose-900/90 space-y-1 list-disc list-inside leading-relaxed pl-1">
                 <li><strong>£0 monthly payslip difference:</strong> Repayments are fixed at 9% of earnings above the statutory threshold. Paying upfront does not reduce their monthly deduction by a single penny.</li>
                 <li><strong>Money lost to HMRC:</strong> Because the unpaid debt cancels at Age ${wipeoutAge}, paying £${state.parentContribution.toLocaleString()} upfront simply gives away your money to the Treasury for debt that would have vanished for free.</li>
-                <li><strong>Far better alternative (ISA):</strong> If you keep that £${state.parentContribution.toLocaleString()} and invest it in an ISA at ${state.investmentRate}%, it compounds into <strong class="text-rose-950 font-black">£${isaFutureVal.toLocaleString()}</strong> by Age ${wipeoutAge} — giving them a life-changing first-home deposit.</li>
+                <li><strong>Far better alternative (Investment Account / ISA):</strong> If you keep that £${state.parentContribution.toLocaleString()} and invest it in an investment account in your child's name at ${state.investmentRate}%, it compounds into <strong class="text-rose-950 font-black">£${isaFutureVal.toLocaleString()}</strong> by Age ${wipeoutAge} — giving them a life-changing first-home deposit.</li>
               </ul>
             </div>
           </div>
         `;
       } else {
-        // CASE 3: FINANCIAL BENEFIT (High earner clearing loan early before write-off)
+        // CASE 3: FINANCIAL BENEFIT (Projected earnings clear reduced loan early, saving child out-of-pocket money)
+        const clearedAgeWith = simWithContrib.clearedYearIndex !== null ? (careerStartAge + simWithContrib.clearedYearIndex) : wipeoutAge;
+        const yearsEarlier = simNoContrib.clearedYearIndex !== null 
+          ? (simNoContrib.clearedYearIndex - simWithContrib.clearedYearIndex)
+          : (remainingYears - (simWithContrib.clearedYearIndex || 0));
+
         card.className = 'rounded-xl p-5 border shadow-sm space-y-3 bg-emerald-50 border-emerald-200';
         icon.innerText = '✅';
-        headline.innerText = 'Financial Benefit: Saves Interest for High Earner';
+        headline.innerText = `Financial Benefit: Saves £${childSavings.toLocaleString()} in Compound Interest`;
         headline.className = 'text-base sm:text-lg font-black text-emerald-950';
         badge.innerText = 'Saves Compound Interest';
         badge.className = 'px-3 py-1 rounded-full text-xs font-black bg-emerald-200 text-emerald-900 border border-emerald-300 self-start sm:self-auto';
 
+        let familyNotice = '';
+        if (state.parentContribution > childSavings) {
+          familyNotice = `<li class="text-amber-900"><strong>Family perspective note:</strong> Your child saves £${childSavings.toLocaleString()} personally, but your upfront payment was £${state.parentContribution.toLocaleString()}. Because some debt would have been written off for free without contribution, compare this saving against the Net Investment growth in Table 2 before deciding.</li>`;
+        }
+
         contentWrapper.innerHTML = `
           <div class="bg-white/90 p-4 rounded-lg border border-emerald-200 space-y-2.5">
             <p class="text-xs sm:text-sm font-bold text-emerald-950 leading-snug">
-              Contributing £${state.parentContribution.toLocaleString()} upfront provides a <span class="underline decoration-emerald-500 decoration-2 font-black">clear financial benefit</span> because your child's high projected earnings will fully clear the loan before statutory write-off, saving approximately <strong class="text-emerald-800 font-black">£${childSavings.toLocaleString()} in compound interest</strong>.
+              Contributing £${state.parentContribution.toLocaleString()} upfront provides a <span class="underline decoration-emerald-500 decoration-2 font-black">clear financial benefit</span> because your child's earnings fully clear the loan early, saving approximately <strong class="text-emerald-800 font-black">£${childSavings.toLocaleString()} in compound interest &amp; career repayments</strong>.
             </p>
             
             <div class="text-xs text-emerald-900 space-y-1.5 pt-1 border-t border-emerald-100">
@@ -1893,9 +1908,9 @@
                 <span>Why paying upfront is beneficial for this career path:</span>
               </div>
               <ul class="text-[11px] text-emerald-900/90 space-y-1 list-disc list-inside leading-relaxed pl-1">
-                <li><strong>Saves £${childSavings.toLocaleString()} in interest:</strong> Eliminates high compounding interest (${state.rpi}%+) that would otherwise build up on the tuition fees.</li>
-                <li><strong>Debt-free years earlier:</strong> Your child clears their balance ahead of time, ending the 9% graduate tax deductions sooner.</li>
-                <li><strong>Important consideration:</strong> Money paid upfront is permanently locked with SLC/HMRC and cannot be used for an emergency reserve or house deposit if career plans change.</li>
+                <li><strong>Saves £${childSavings.toLocaleString()} in repayments:</strong> Your child pays £${simWithContrib.totalPaid.toLocaleString()} instead of £${simNoContrib.totalPaid.toLocaleString()}, avoiding substantial compound interest.</li>
+                <li><strong>Debt-free at Age ${clearedAgeWith}:</strong> Your child clears their balance early (${simWithContrib.clearedYearIndex} years after starting work), ending 9% graduate salary deductions ${yearsEarlier > 0 ? yearsEarlier + ' years earlier' : 'early'}.</li>
+                ${familyNotice}
               </ul>
             </div>
           </div>
@@ -2289,7 +2304,7 @@
       const contrib = state.parentContribution;
 
       const childSavings = latestParentChildSavings;
-      const isBadIdea = (childSavings <= 0 || noContribSim.clearedYearIndex === null);
+      const isBadIdea = (childSavings <= 100);
 
       let csv = "\uFEFF"; // UTF-8 BOM for Microsoft Excel
       csv += "DUTTA UK UNIVERSITY STUDENT LOAN CALCULATOR - PARENTAL UPFRONT CONTRIBUTION ANALYSIS\n";
@@ -2308,8 +2323,8 @@
       // SECTION 1: TABLE 1 - UNIVERSITY LOAN & REPAYMENT IMPACT
       csv += "TABLE 1: UNIVERSITY LOAN & REPAYMENT COMPARISON\n";
       csv += "Scenario,Total Starting Loan,Parent Contribution,Total Amount Child Repays,No. of Years to Repay,Debt Cancelled by Gov,Child Out-of-Pocket Savings\n";
-      csv += `"With Parent Contribution","£${fullDebtAmount.toLocaleString()}","£${contrib.toLocaleString()}","£${withContribSim.totalPaid.toLocaleString()}","${withContribSim.clearedYearIndex !== null ? withContribSim.clearedYearIndex + ' Yrs (Cleared early)' : writeOffYears + ' Yrs (Written off)'}","£${withContribSim.endingBalance.toLocaleString()}","${childSavings > 0 ? '£' + childSavings.toLocaleString() + ' Saved' : '£0 (No Saving)'}"\n`;
-      csv += `"No Parent Contribution","£${fullDebtAmount.toLocaleString()}","£0","£${noContribSim.totalPaid.toLocaleString()}","${noContribSim.clearedYearIndex !== null ? noContribSim.clearedYearIndex + ' Yrs' : writeOffYears + ' Yrs (Written off)'}","£${noContribSim.endingBalance.toLocaleString()}","Baseline"\n\n`;
+      csv += `"With Parent Contribution","£${fullDebtAmount.toLocaleString()}","£${contrib.toLocaleString()}","£${withContribSim.totalPaid.toLocaleString()}","${withContribSim.clearedYearIndex !== null ? withContribSim.clearedYearIndex + ' Yrs (Cleared early at Age ' + (careerStartAge + withContribSim.clearedYearIndex) + ')' : writeOffYears + ' Yrs (Written off at Age ' + wipeoutAge + ')'}","${withContribSim.clearedYearIndex !== null ? '£0 (Cleared in full)' : '£' + withContribSim.endingBalance.toLocaleString() + ' (Cancelled for free)'}","${childSavings > 100 ? '£' + childSavings.toLocaleString() + ' Saved' : '£0 (No Saving)'}"\n`;
+      csv += `"No Parent Contribution","£${fullDebtAmount.toLocaleString()}","£0","£${noContribSim.totalPaid.toLocaleString()}","${noContribSim.clearedYearIndex !== null ? noContribSim.clearedYearIndex + ' Yrs (Cleared at Age ' + (careerStartAge + noContribSim.clearedYearIndex) + ')' : writeOffYears + ' Yrs (Written off at Age ' + wipeoutAge + ')'}","${noContribSim.clearedYearIndex !== null ? '£0 (Cleared in full)' : '£' + noContribSim.endingBalance.toLocaleString() + ' (Cancelled for free)'}","Baseline"\n\n`;
 
       // SECTION 2: TABLE 2 - NET INVESTMENT GROWTH IN CHILD'S NAME (AFTER CGT)
       csv += "TABLE 2: NET INVESTMENT GROWTH IN CHILD'S NAME (AFTER UK CAPITAL GAINS TAX)\n";
@@ -2502,8 +2517,8 @@
                     <td class="p-3 font-bold">£${simWithContrib.totalPaid.toLocaleString()}</td>
                     <td class="p-3 text-slate-700">${termWithText}</td>
                     <td class="p-3 font-bold text-slate-600">${cancelWithText}</td>
-                    <td class="p-3 text-right font-black ${childSavings > 0 ? 'text-emerald-700' : 'text-rose-600'}">
-                      ${childSavings > 0 ? '£' + childSavings.toLocaleString() + ' Saved' : '£0 (No Saving)'}
+                    <td class="p-3 text-right font-black ${childSavings > 100 ? 'text-emerald-700' : 'text-rose-600'}">
+                      ${childSavings > 100 ? '£' + childSavings.toLocaleString() + ' Saved' : '£0 (No Saving)'}
                     </td>
                   </tr>
                   <tr class="hover:bg-slate-50/80 transition bg-slate-50/40">
@@ -2519,13 +2534,23 @@
             </div>
 
             <!-- Table 1 Takeaway Banner -->
+            ${childSavings <= 100 ? `
             <div class="bg-blue-50/80 border border-blue-200/80 rounded-xl p-3 text-xs text-blue-950 flex items-start gap-2.5">
               <span class="text-base flex-shrink-0">💡</span>
               <div class="leading-relaxed">
                 <strong>Why your child repays £${simNoContrib.totalPaid.toLocaleString()} in both scenarios:</strong>
-                UK student loans are not commercial debt. Monthly deductions are strictly fixed at <strong>9% of earnings above the statutory threshold</strong>. Reducing the starting debt by £${contrib.toLocaleString()} upfront does <em>not</em> lower their monthly payslip deduction by a single penny, and any debt remaining at term end is cancelled 100% tax-free by the government.
+                UK student loans are not commercial debt. Monthly deductions are strictly fixed at <strong>9% of earnings above the statutory threshold</strong>. Reducing the starting debt by £${contrib.toLocaleString()} upfront does <em>not</em> lower their monthly payslip deduction by a single penny, and any debt remaining at term end is cancelled 100% tax-free by the government at Age ${wipeoutAge}.
               </div>
             </div>
+            ` : `
+            <div class="bg-emerald-50/80 border border-emerald-200/80 rounded-xl p-3 text-xs text-emerald-950 flex items-start gap-2.5">
+              <span class="text-base flex-shrink-0">💡</span>
+              <div class="leading-relaxed">
+                <strong>Why your child saves £${childSavings.toLocaleString()} in career repayments:</strong>
+                Because of their projected earnings growth, contributing £${contrib.toLocaleString()} upfront allows the loan to be <strong>fully cleared ${simNoContrib.clearedYearIndex !== null ? (simNoContrib.clearedYearIndex - simWithContrib.clearedYearIndex) + ' years earlier (at Age ' + (careerStartAge + simWithContrib.clearedYearIndex) + ')' : 'early at Age ' + (careerStartAge + simWithContrib.clearedYearIndex)}</strong>. This stops the 9% graduate salary deduction earlier and eliminates £${childSavings.toLocaleString()} in compounding interest that would otherwise be paid.
+              </div>
+            </div>
+            `}
           </div>
 
           <!-- ================================================================= -->
