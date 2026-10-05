@@ -2236,6 +2236,52 @@
     let latestParentWipeoutAge = 54;
     let latestParentChildSavings = 0;
 
+    // ====================================================================
+    // DYNAMIC CAPITAL GAINS TAX (CGT) & NET INVESTMENT ENGINE
+    // ====================================================================
+    function calculateNetAfterCgt(principal, rate, years, startingSalary, salaryGrowth) {
+      if (!principal || principal <= 0) return 0;
+      const gross = principal * Math.pow(1 + rate, years);
+      const totalGain = Math.max(0, gross - principal);
+      
+      // UK Annual CGT Exemption (£3,000 personal allowance per individual)
+      const taxableGain = Math.max(0, totalGain - 3000);
+      if (taxableGain <= 0) {
+        return Math.round(gross);
+      }
+
+      // Child's projected salary at milestone year
+      const salaryAtYear = startingSalary * Math.pow(1 + salaryGrowth / 100, years);
+      
+      // Basic rate ceiling in UK is £50,270
+      const basicRateThreshold = 50270;
+      const headroomInBasicRate = Math.max(0, basicRateThreshold - salaryAtYear);
+
+      let cgt = 0;
+      if (headroomInBasicRate > 0) {
+        const gainAtBasic = Math.min(taxableGain, headroomInBasicRate);
+        const gainAtHigher = Math.max(0, taxableGain - gainAtBasic);
+        // UK CGT on non-property investments: 18% basic rate, 24% higher rate (current statutory rules)
+        cgt = (gainAtBasic * 0.18) + (gainAtHigher * 0.24);
+      } else {
+        // Entire gain taxed at higher rate (24%)
+        cgt = taxableGain * 0.24;
+      }
+
+      const net = Math.max(0, gross - cgt);
+      return Math.round(net);
+    }
+
+    // ====================================================================
+    // PARENT UPFRONT CONTRIBUTION SIMULATION & EXCEL EXPORT ENGINE
+    // ====================================================================
+    let latestParentSimNoContrib = null;
+    let latestParentSimWithContrib = null;
+    let latestParentTotalYears = 30;
+    let latestParentCareerStartAge = 24;
+    let latestParentWipeoutAge = 54;
+    let latestParentChildSavings = 0;
+
     function downloadParentComparisonExcelCsv() {
       if (!latestParentSimNoContrib || !latestParentSimWithContrib) return;
 
@@ -2252,10 +2298,8 @@
       const noContribSim = latestParentSimNoContrib;
       const withContribSim = latestParentSimWithContrib;
       const contrib = state.parentContribution;
-      const rate = state.investmentRate / 100;
 
       const childSavings = latestParentChildSavings;
-      const isaFutureVal = Math.round(contrib * Math.pow(1 + rate, writeOffYears));
       const isBadIdea = (childSavings <= 0 || noContribSim.clearedYearIndex === null);
 
       let csv = "\uFEFF"; // UTF-8 BOM for Microsoft Excel
@@ -2269,25 +2313,54 @@
       csv += `Parent Upfront Contribution Amount,"£${contrib.toLocaleString()}"\n`;
       csv += `Child Starting Annual Salary,"£${state.salary.toLocaleString()}"\n`;
       csv += `Annual Salary Wage Growth Rate,${state.salaryGrowth}%\n`;
-      csv += `Alternative ISA Investment Return Rate,${state.investmentRate}%\n`;
       csv += `Child Lifetime Repayment Savings from Contribution,"£${childSavings.toLocaleString()}"\n`;
-      csv += `Compounding Value of Upfront Money if Invested in ISA,"£${isaFutureVal.toLocaleString()}"\n`;
-      csv += `Financial Observation,"${isBadIdea ? 'No Benefit - Paying upfront saves £0 in repayments because remaining debt cancels automatically; family forgives compounding ISA nest egg' : 'Financial Benefit - High graduate earnings clear loan early before write-off, saving interest'}"\n\n`;
+      csv += `Financial Observation,"${isBadIdea ? 'No Benefit - Paying upfront saves £0 in repayments because remaining debt cancels automatically; family forgives compounding investment nest egg' : 'Financial Benefit - High graduate earnings clear loan early before write-off, saving interest'}"\n\n`;
 
-      csv += "Career Year,Calendar Year,Child Age,Projected Gross Salary,Option 1 [Upfront] - Ending Balance,Option 1 [Upfront] - Annual Repayment,Option 1 [Upfront] - Cumulative Repaid,Option 1 [Upfront] - ISA Fund Value,Option 2 [ISA] - Ending Balance,Option 2 [ISA] - Annual Repayment,Option 2 [ISA] - Cumulative Repaid,Option 2 [ISA] - Compounding ISA Fund Value,Net Family Wealth Advantage (Option 2 ISA vs Option 1 Upfront),Milestone Note\n";
+      // SECTION 1: TABLE 1 - UNIVERSITY LOAN & REPAYMENT IMPACT
+      csv += "TABLE 1: UNIVERSITY LOAN & REPAYMENT COMPARISON\n";
+      csv += "Scenario,Total Starting Loan,Parent Contribution,Total Amount Child Repays,No. of Years to Repay,Debt Cancelled by Gov,Child Out-of-Pocket Savings\n";
+      csv += `"With Parent Contribution","£${fullDebtAmount.toLocaleString()}","£${contrib.toLocaleString()}","£${withContribSim.totalPaid.toLocaleString()}","${withContribSim.clearedYearIndex !== null ? withContribSim.clearedYearIndex + ' Yrs (Cleared early)' : writeOffYears + ' Yrs (Written off)'}","£${withContribSim.endingBalance.toLocaleString()}","${childSavings > 0 ? '£' + childSavings.toLocaleString() + ' Saved' : '£0 (No Saving)'}"\n`;
+      csv += `"No Parent Contribution","£${fullDebtAmount.toLocaleString()}","£0","£${noContribSim.totalPaid.toLocaleString()}","${noContribSim.clearedYearIndex !== null ? noContribSim.clearedYearIndex + ' Yrs' : writeOffYears + ' Yrs (Written off)'}","£${noContribSim.endingBalance.toLocaleString()}","Baseline"\n\n`;
+
+      // SECTION 2: TABLE 2 - NET INVESTMENT GROWTH IN CHILD'S NAME (AFTER CGT)
+      csv += "TABLE 2: NET INVESTMENT GROWTH IN CHILD'S NAME (AFTER UK CAPITAL GAINS TAX)\n";
+      csv += "Parent Contribution,Investment Horizon,Net Value at 3% (After CGT),Net Value at 4% (After CGT),Net Value at 5% (After CGT),Child's Tax Band at that Milestone\n";
+      
+      const cgt10_3 = calculateNetAfterCgt(contrib, 0.03, 10, state.salary, state.salaryGrowth);
+      const cgt10_4 = calculateNetAfterCgt(contrib, 0.04, 10, state.salary, state.salaryGrowth);
+      const cgt10_5 = calculateNetAfterCgt(contrib, 0.05, 10, state.salary, state.salaryGrowth);
+      const sal10 = state.salary * Math.pow(1 + state.salaryGrowth / 100, 10);
+      const band10 = sal10 < 50270 ? `Basic Rate (18% CGT) - Salary £${Math.round(sal10).toLocaleString()}` : `Higher Rate (24% CGT) - Salary £${Math.round(sal10).toLocaleString()}`;
+      csv += `"£${contrib.toLocaleString()}","In 10 Years (Age ${careerStartAge + 10})","£${cgt10_3.toLocaleString()}","£${cgt10_4.toLocaleString()}","£${cgt10_5.toLocaleString()}","${band10}"\n`;
+
+      const cgt20_3 = calculateNetAfterCgt(contrib, 0.03, 20, state.salary, state.salaryGrowth);
+      const cgt20_4 = calculateNetAfterCgt(contrib, 0.04, 20, state.salary, state.salaryGrowth);
+      const cgt20_5 = calculateNetAfterCgt(contrib, 0.05, 20, state.salary, state.salaryGrowth);
+      const sal20 = state.salary * Math.pow(1 + state.salaryGrowth / 100, 20);
+      const band20 = sal20 < 50270 ? `Basic Rate (18% CGT) - Salary £${Math.round(sal20).toLocaleString()}` : `Higher Rate (24% CGT) - Salary £${Math.round(sal20).toLocaleString()}`;
+      csv += `"£${contrib.toLocaleString()}","In 20 Years - House Deposit (Age ${careerStartAge + 20})","£${cgt20_3.toLocaleString()}","£${cgt20_4.toLocaleString()}","£${cgt20_5.toLocaleString()}","${band20}"\n`;
+
+      const cgtEnd_3 = calculateNetAfterCgt(contrib, 0.03, writeOffYears, state.salary, state.salaryGrowth);
+      const cgtEnd_4 = calculateNetAfterCgt(contrib, 0.04, writeOffYears, state.salary, state.salaryGrowth);
+      const cgtEnd_5 = calculateNetAfterCgt(contrib, 0.05, writeOffYears, state.salary, state.salaryGrowth);
+      const salEnd = state.salary * Math.pow(1 + state.salaryGrowth / 100, writeOffYears);
+      const bandEnd = salEnd < 50270 ? `Basic Rate (18% CGT) - Salary £${Math.round(salEnd).toLocaleString()}` : `Higher Rate (24% CGT) - Salary £${Math.round(salEnd).toLocaleString()}`;
+      csv += `"£${contrib.toLocaleString()}","At End of Loan Term (${writeOffYears} Yrs - Age ${wipeoutAge})","£${cgtEnd_3.toLocaleString()}","£${cgtEnd_4.toLocaleString()}","£${cgtEnd_5.toLocaleString()}","${bandEnd}"\n\n`;
+
+      // SECTION 3: YEAR-BY-YEAR AUDIT TABLE
+      csv += "YEAR-BY-YEAR CAREER AUDIT SCHEDULE\n";
+      csv += "Career Year,Calendar Year,Child Age,Gross Salary,Option 1 [Upfront] - Ending Balance,Option 1 [Upfront] - Annual Repayment,Option 1 [Upfront] - Cumulative Repaid,Option 2 [No Contrib] - Ending Balance,Option 2 [No Contrib] - Annual Repayment,Option 2 [No Contrib] - Cumulative Repaid,Child Investment Account Net Value (4% post-CGT),Milestone Note\n";
 
       for (let y = 0; y <= writeOffYears; y++) {
         const rowNo = noContribSim.yearlyBreakdown[y] || noContribSim.yearlyBreakdown[0];
         const rowWith = withContribSim.yearlyBreakdown[y] || withContribSim.yearlyBreakdown[0];
         const calYear = repaymentStartYear + y;
         const age = careerStartAge + y;
-        const curIsa = Math.round(contrib * Math.pow(1 + rate, y));
-        const childPaidDiff = rowNo.cumulativeRepaid - rowWith.cumulativeRepaid;
-        const netAdvantage = curIsa - childPaidDiff;
+        const netCgtVal = calculateNetAfterCgt(contrib, 0.04, y, state.salary, state.salaryGrowth);
 
         let note = "";
         if (y === 0) note = "Course Graduation";
-        else if (rowWith.balance === 0 && rowNo.balance > 0) note = "Option 1 Cleared Early; Option 2 Continues Standard 9% Deductions";
+        else if (rowWith.balance === 0 && rowNo.balance > 0) note = "Option 1 Cleared Early; Option 2 Continues 9% Deductions";
         else if (rowNo.balance === 0) note = "Option 2 Fully Cleared";
         else if (y === writeOffYears) note = "Statutory Write-Off by UK Government";
 
@@ -2299,12 +2372,10 @@
           `"£${rowWith.balance.toLocaleString()}"`,
           `"£${rowWith.annualRepayment.toLocaleString()}"`,
           `"£${rowWith.cumulativeRepaid.toLocaleString()}"`,
-          `"£0"`,
           `"£${rowNo.balance.toLocaleString()}"`,
           `"£${rowNo.annualRepayment.toLocaleString()}"`,
           `"£${rowNo.cumulativeRepaid.toLocaleString()}"`,
-          `"£${curIsa.toLocaleString()}"`,
-          `"£${netAdvantage.toLocaleString()}"`,
+          `"£${netCgtVal.toLocaleString()}"`,
           `"${note}"`
         ].join(",");
         csv += line + "\n";
@@ -2314,705 +2385,261 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `Parent_Contribution_Analysis_${planName.replace(/\s+/g, '_')}_Salary_${state.salary}_Contrib_${contrib}.csv`;
+      a.download = `Parent_Contribution_Decision_Tables_${planName.replace(/\s+/g, '_')}_Salary_${state.salary}_Contrib_${contrib}.csv`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     }
 
-    // Dynamic Parent Section: 1 full chart if £0, 2 side-by-side interactive charts if > £0
+    // ====================================================================
+    // RENDER PARENT DECISION TABLES (REPLACING CONFUSING LINE CHARTS)
+    // ====================================================================
     function renderDynamicParentSection(simNoContrib, simWithContrib, totalYears, childSavings, wipeoutAge, careerStartAge) {
       careerStartAge = careerStartAge || state.currentAge;
       const wrapper = document.getElementById('parentChartsDynamicWrapper');
       if (!wrapper) return;
 
-      const rate = state.investmentRate / 100;
-      const isaGrowth = [];
-      for (let y = 0; y <= totalYears; y++) {
-        isaGrowth.push(Math.round(state.parentContribution * Math.pow(1 + rate, y)));
-      }
-      const finalIsaVal = isaGrowth[totalYears];
-
-      // Cache state for inspection and Excel download
+      // Cache state for Excel download
       latestParentSimNoContrib = simNoContrib;
       latestParentSimWithContrib = simWithContrib;
-      latestParentIsaGrowth = isaGrowth;
       latestParentTotalYears = totalYears;
       latestParentCareerStartAge = careerStartAge;
       latestParentWipeoutAge = wipeoutAge;
       latestParentChildSavings = childSavings;
 
-      // ==================================================================
-      // CASE A: ZERO PARENT CONTRIBUTION -> SHOW 1 FULL-WIDTH INTERACTIVE CHART
-      // ==================================================================
-      if (state.parentContribution === 0) {
-        wrapper.innerHTML = `
-          <div class="bg-slate-50 p-4 sm:p-5 rounded-xl border border-slate-200 space-y-3">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-              <div>
-                <div class="flex items-center gap-2">
-                  <span class="text-base">📊</span>
-                  <h4 class="text-xs sm:text-sm font-extrabold text-slate-900">
-                    Standard Scenario: 100% Student Loan Borrowing (Zero Contribution)
-                  </h4>
-                </div>
-                <p class="text-[11px] text-slate-500">
-                  Because upfront contribution is £0, your child borrows 100% and makes income-contingent repayments.
-                </p>
-              </div>
+      // Year / Term text formatting
+      const termWithText = (simWithContrib.clearedYearIndex !== null)
+        ? `${simWithContrib.clearedYearIndex} Yrs (Cleared early at Age ${careerStartAge + simWithContrib.clearedYearIndex})`
+        : `${totalYears} Yrs (until write-off at Age ${wipeoutAge})`;
 
-              <div class="flex flex-wrap items-center gap-3">
-                <button onclick="downloadParentComparisonExcelCsv()" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white rounded-lg text-xs font-bold shadow-xs transition cursor-pointer" title="Download Parent Excel schedule (.csv)">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                  <span>Download Excel (.csv)</span>
-                </button>
-              </div>
-            </div>
+      const termNoText = (simNoContrib.clearedYearIndex !== null)
+        ? `${simNoContrib.clearedYearIndex} Yrs (Cleared at Age ${careerStartAge + simNoContrib.clearedYearIndex})`
+        : `${totalYears} Yrs (until write-off at Age ${wipeoutAge})`;
 
-            <!-- Live Data Hover Inspector Strip -->
-            <div id="parentSingleInspector" class="bg-white p-2.5 rounded-lg border border-slate-200 text-xs transition-all shadow-xs">
-              <div class="flex items-center justify-between gap-2 text-slate-600 text-[11px]">
-                <div class="flex items-center gap-2">
-                  <span class="text-sm">👆</span>
-                  <span class="font-bold text-slate-700">Interactive Inspector:</span>
-                  <span>Hover or scroll over the graph points below to inspect any year's projected balance &amp; repayments.</span>
-                </div>
-                <span class="text-[10px] text-blue-600 font-bold bg-blue-50 px-2 py-0.5 rounded border border-blue-200 hidden sm:inline">1 Point Per Year</span>
-              </div>
-            </div>
+      const cancelWithText = (simWithContrib.clearedYearIndex !== null)
+        ? `£0 (Cleared in full)`
+        : `£${simWithContrib.endingBalance.toLocaleString()} (Cancelled for free)`;
 
-            <div id="parentSingleChartWrapper" class="w-full bg-white p-3 rounded-lg border border-slate-200 overflow-x-auto relative">
-              <!-- Rendered via createSvgSingleLoanChart -->
-            </div>
+      const cancelNoText = (simNoContrib.clearedYearIndex !== null)
+        ? `£0 (Cleared in full)`
+        : `£${simNoContrib.endingBalance.toLocaleString()} (Cancelled for free)`;
 
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[11px] text-slate-600 bg-white p-2.5 rounded-lg border border-slate-200">
-              <div class="flex items-center gap-6">
-                <span class="inline-flex items-center gap-1.5"><span class="w-3 h-1 bg-blue-600 rounded"></span> <strong>Outstanding Loan Balance</strong></span>
-                <span class="inline-flex items-center gap-1.5"><span class="w-3 h-1 bg-amber-500 rounded border border-dashed border-amber-600"></span> <strong>Cumulative Repayments Paid</strong></span>
-              </div>
-              <button onclick="downloadParentComparisonExcelCsv()" class="text-emerald-700 hover:text-emerald-800 font-bold underline flex items-center gap-1 cursor-pointer">
-                <span>📊 Export Schedule to Excel (.csv)</span>
-              </button>
-            </div>
-          </div>
-        `;
+      // Dynamic Net Investment Growth calculations (strictly after CGT)
+      const contrib = state.parentContribution;
+      const cgt10_3 = calculateNetAfterCgt(contrib, 0.03, 10, state.salary, state.salaryGrowth);
+      const cgt10_4 = calculateNetAfterCgt(contrib, 0.04, 10, state.salary, state.salaryGrowth);
+      const cgt10_5 = calculateNetAfterCgt(contrib, 0.05, 10, state.salary, state.salaryGrowth);
+      const sal10 = state.salary * Math.pow(1 + state.salaryGrowth / 100, 10);
+      const band10Text = sal10 < 50270
+        ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800">Basic Rate (18% CGT)</span>`
+        : `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800">Higher Rate (24% CGT)</span>`;
 
-        renderParentSingleInteractiveChart(simNoContrib, totalYears, careerStartAge);
-        return;
-      }
+      const cgt20_3 = calculateNetAfterCgt(contrib, 0.03, 20, state.salary, state.salaryGrowth);
+      const cgt20_4 = calculateNetAfterCgt(contrib, 0.04, 20, state.salary, state.salaryGrowth);
+      const cgt20_5 = calculateNetAfterCgt(contrib, 0.05, 20, state.salary, state.salaryGrowth);
+      const sal20 = state.salary * Math.pow(1 + state.salaryGrowth / 100, 20);
+      const band20Text = sal20 < 50270
+        ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800">Basic Rate (18% CGT)</span>`
+        : `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800">Higher Rate (24% CGT)</span>`;
 
-      // ==================================================================
-      // CASE B: CONTRIBUTING > £0 -> SHOW 2 SEPARATE INTERACTIVE SCENARIO CHARTS
-      // ==================================================================
+      const cgtEnd_3 = calculateNetAfterCgt(contrib, 0.03, totalYears, state.salary, state.salaryGrowth);
+      const cgtEnd_4 = calculateNetAfterCgt(contrib, 0.04, totalYears, state.salary, state.salaryGrowth);
+      const cgtEnd_5 = calculateNetAfterCgt(contrib, 0.05, totalYears, state.salary, state.salaryGrowth);
+      const salEnd = state.salary * Math.pow(1 + state.salaryGrowth / 100, totalYears);
+      const bandEndText = salEnd < 50270
+        ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800">Basic Rate (18% CGT)</span>`
+        : `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800">Higher Rate (24% CGT)</span>`;
+
+      // Render the two clear tables
       wrapper.innerHTML = `
-        <div class="space-y-3">
+        <div class="space-y-5">
           
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <!-- Section Header with Excel Download Action -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
             <div>
               <div class="flex items-center gap-2">
-                <span class="text-base">⚖️</span>
-                <h4 class="text-xs sm:text-sm font-extrabold text-slate-900">
-                  Compare The Two Financial Paths Side-by-Side:
+                <span class="text-base">📋</span>
+                <h4 class="text-sm sm:text-base font-black text-slate-900">
+                  Parent Decision Tables: University Upfront vs Child Investment Account
                 </h4>
               </div>
-              <p class="text-[11px] text-slate-500">
-                Chart 1 shows paying fees to university &bull; Chart 2 shows keeping the money in a ${state.investmentRate}% ISA instead.
+              <p class="text-xs text-slate-500 mt-0.5">
+                Clear numbers showing whether paying fees directly saves money, versus investing in your child's name (net of UK Capital Gains Tax).
               </p>
             </div>
 
-            <div class="flex flex-wrap items-center gap-2 self-start sm:self-auto">
-              <div class="flex items-center gap-1.5 bg-white p-1 rounded-lg border border-slate-200 text-xs font-semibold">
-                <span class="text-[10px] text-slate-500 px-1">ISA Growth:</span>
-                <button onclick="setInvestmentRate(3)" class="rate-btn ${state.investmentRate === 3 ? 'active' : ''} px-2 py-0.5 rounded text-[11px] cursor-pointer">3%</button>
-                <button onclick="setInvestmentRate(4)" class="rate-btn ${state.investmentRate === 4 ? 'active' : ''} px-2 py-0.5 rounded text-[11px] cursor-pointer">4%</button>
-                <button onclick="setInvestmentRate(5)" class="rate-btn ${state.investmentRate === 5 ? 'active' : ''} px-2 py-0.5 rounded text-[11px] cursor-pointer">5%</button>
+            <button onclick="downloadParentComparisonExcelCsv()" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer self-start sm:self-auto" title="Download Decision Matrix & Audit to Excel">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+              <span>Download Excel (.csv)</span>
+            </button>
+          </div>
+
+          <!-- ================================================================= -->
+          <!-- TABLE 1: UNIVERSITY LOAN & REPAYMENT IMPACT                      -->
+          <!-- ================================================================= -->
+          <div class="bg-slate-50 p-4 sm:p-5 rounded-2xl border border-slate-200 space-y-3">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-0.5 rounded text-[11px] font-black bg-blue-100 text-blue-800 uppercase tracking-wide">Table 1</span>
+                  <h5 class="text-xs sm:text-sm font-black text-slate-900">
+                    University Loan &amp; Career Repayment Comparison
+                  </h5>
+                </div>
+                <p class="text-[11px] text-slate-500">
+                  How parental upfront contribution affects total starting debt and your child's actual out-of-pocket career repayments.
+                </p>
               </div>
-              <button onclick="downloadParentComparisonExcelCsv()" class="inline-flex items-center gap-1 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white rounded-lg text-xs font-bold shadow-xs transition cursor-pointer" title="Download full parent comparison audit">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                <span>Download Excel (.csv)</span>
+            </div>
+
+            <!-- Responsive Table 1 Grid -->
+            <div class="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-xs">
+              <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr class="bg-amber-100/90 text-amber-950 font-black border-b border-amber-200 text-[11px] uppercase tracking-wider">
+                    <th class="p-3">Total Loan</th>
+                    <th class="p-3">Contribution by Parent</th>
+                    <th class="p-3">Total Amount Child Repays</th>
+                    <th class="p-3">No. of Years to Repay</th>
+                    <th class="p-3">Debt Cancelled by Gov (at Term End)</th>
+                    <th class="p-3 text-right">Child Out-of-Pocket Savings</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 font-medium text-slate-800">
+                  <tr class="hover:bg-slate-50/80 transition">
+                    <td class="p-3 font-black text-slate-900">£${fullDebtAmount.toLocaleString()}</td>
+                    <td class="p-3 font-bold text-rose-700">£${contrib.toLocaleString()}</td>
+                    <td class="p-3 font-bold">£${simWithContrib.totalPaid.toLocaleString()}</td>
+                    <td class="p-3 text-slate-700">${termWithText}</td>
+                    <td class="p-3 font-bold text-slate-600">${cancelWithText}</td>
+                    <td class="p-3 text-right font-black ${childSavings > 0 ? 'text-emerald-700' : 'text-rose-600'}">
+                      ${childSavings > 0 ? '£' + childSavings.toLocaleString() + ' Saved' : '£0 (No Saving)'}
+                    </td>
+                  </tr>
+                  <tr class="hover:bg-slate-50/80 transition bg-slate-50/40">
+                    <td class="p-3 font-black text-slate-900">£${fullDebtAmount.toLocaleString()}</td>
+                    <td class="p-3 font-bold text-slate-600">No Contribution (£0)</td>
+                    <td class="p-3 font-bold">£${simNoContrib.totalPaid.toLocaleString()}</td>
+                    <td class="p-3 text-slate-700">${termNoText}</td>
+                    <td class="p-3 font-bold text-slate-600">${cancelNoText}</td>
+                    <td class="p-3 text-right font-black text-slate-500">Baseline</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Table 1 Takeaway Banner -->
+            <div class="bg-blue-50/80 border border-blue-200/80 rounded-xl p-3 text-xs text-blue-950 flex items-start gap-2.5">
+              <span class="text-base flex-shrink-0">💡</span>
+              <div class="leading-relaxed">
+                <strong>Why your child repays £${simNoContrib.totalPaid.toLocaleString()} in both scenarios:</strong>
+                UK student loans are not commercial debt. Monthly deductions are strictly fixed at <strong>9% of earnings above the statutory threshold</strong>. Reducing the starting debt by £${contrib.toLocaleString()} upfront does <em>not</em> lower their monthly payslip deduction by a single penny, and any debt remaining at term end is cancelled 100% tax-free by the government.
+              </div>
+            </div>
+          </div>
+
+          <!-- ================================================================= -->
+          <!-- TABLE 2: NET INVESTMENT GROWTH IN CHILD'S NAME (AFTER CGT)       -->
+          <!-- ================================================================= -->
+          <div class="bg-slate-50 p-4 sm:p-5 rounded-2xl border border-slate-200 space-y-3">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-0.5 rounded text-[11px] font-black bg-emerald-100 text-emerald-800 uppercase tracking-wide">Table 2</span>
+                  <h5 class="text-xs sm:text-sm font-black text-slate-900">
+                    Net Investment Growth in Child's Name (After Capital Gains Tax - CGT)
+                  </h5>
+                </div>
+                <p class="text-[11px] text-slate-500">
+                  If you invest the £${contrib.toLocaleString()} in an investment account in your child's name instead, dynamically accounting for CGT and their projected salary tax bracket.
+                </p>
+              </div>
+            </div>
+
+            <!-- Responsive Table 2 Grid -->
+            <div class="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-xs">
+              <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr class="bg-emerald-100/90 text-emerald-950 font-black border-b border-emerald-200 text-[11px] uppercase tracking-wider">
+                    <th class="p-3">Contribution</th>
+                    <th class="p-3">Investment Horizon</th>
+                    <th class="p-3 text-emerald-800 font-bold">Growth at 3% (Net After CGT)</th>
+                    <th class="p-3 text-emerald-950 font-black bg-emerald-200/50">Growth at 4% (Net After CGT)</th>
+                    <th class="p-3 text-emerald-800 font-bold">Growth at 5% (Net After CGT)</th>
+                    <th class="p-3 text-right">Child's Tax Band at that Milestone</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 font-medium text-slate-800">
+                  <tr class="hover:bg-slate-50/80 transition">
+                    <td class="p-3 font-bold text-slate-900">£${contrib.toLocaleString()}</td>
+                    <td class="p-3 font-bold text-slate-800">In 10 Years <span class="text-[10px] text-slate-500 block font-normal">Child Age ${careerStartAge + 10}</span></td>
+                    <td class="p-3 font-bold text-emerald-700">£${cgt10_3.toLocaleString()}</td>
+                    <td class="p-3 font-black text-emerald-900 bg-emerald-50/60">£${cgt10_4.toLocaleString()}</td>
+                    <td class="p-3 font-bold text-emerald-700">£${cgt10_5.toLocaleString()}</td>
+                    <td class="p-3 text-right text-[11px] text-slate-600">${band10Text}</td>
+                  </tr>
+                  <tr class="hover:bg-slate-50/80 transition bg-emerald-50/30">
+                    <td class="p-3 font-bold text-slate-900">£${contrib.toLocaleString()}</td>
+                    <td class="p-3 font-black text-slate-900">In 20 Years <span class="text-[10px] font-bold text-emerald-700 block">First-Home Deposit 🏠 (Child Age ${careerStartAge + 20})</span></td>
+                    <td class="p-3 font-bold text-emerald-700">£${cgt20_3.toLocaleString()}</td>
+                    <td class="p-3 font-black text-emerald-950 bg-emerald-100/70 text-sm">£${cgt20_4.toLocaleString()}</td>
+                    <td class="p-3 font-bold text-emerald-700">£${cgt20_5.toLocaleString()}</td>
+                    <td class="p-3 text-right text-[11px] text-slate-600">${band20Text}</td>
+                  </tr>
+                  <tr class="hover:bg-slate-50/80 transition">
+                    <td class="p-3 font-bold text-slate-900">£${contrib.toLocaleString()}</td>
+                    <td class="p-3 font-bold text-slate-800">At End of Loan Term <span class="text-[10px] text-slate-500 block font-normal">${totalYears} Yrs (Child Age ${wipeoutAge})</span></td>
+                    <td class="p-3 font-bold text-emerald-700">£${cgtEnd_3.toLocaleString()}</td>
+                    <td class="p-3 font-black text-emerald-900 bg-emerald-50/60">£${cgtEnd_4.toLocaleString()}</td>
+                    <td class="p-3 font-bold text-emerald-700">£${cgtEnd_5.toLocaleString()}</td>
+                    <td class="p-3 text-right text-[11px] text-slate-600">${bandEndText}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Table 2 CGT Methodology Strip -->
+            <div class="bg-emerald-50/80 border border-emerald-200/80 rounded-xl p-3 text-xs text-emerald-950 flex items-start gap-2.5">
+              <span class="text-base flex-shrink-0">🛡️</span>
+              <div class="leading-relaxed">
+                <strong>UK Capital Gains Tax (CGT) Accounting:</strong>
+                All figures in Table 2 are strictly <strong>net of UK Capital Gains Tax</strong>. The calculation utilizes your child's statutory personal £3,000 annual CGT allowance and dynamically applies basic rate (18%) or higher rate (24%) CGT based on their projected salary at each milestone.
+              </div>
+            </div>
+          </div>
+
+          <!-- ================================================================= -->
+          <!-- BOTTOM-LINE DECISION SUMMARY CARD                                 -->
+          <!-- ================================================================= -->
+          <div class="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white rounded-2xl p-4 sm:p-5 shadow-sm space-y-2">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-2">
+              <div class="flex items-center gap-2">
+                <span class="text-lg">⚖️</span>
+                <span class="text-xs font-black uppercase tracking-wider text-blue-200">The Bottom-Line Comparison</span>
+              </div>
+              <button onclick="downloadParentComparisonExcelCsv()" class="text-xs font-bold text-emerald-300 hover:text-emerald-200 underline self-start sm:self-auto cursor-pointer">
+                <span>📊 Export Full Decision Matrix to Excel (.csv)</span>
               </button>
             </div>
-          </div>
-
-          <!-- Synchronized Live Comparison Hover Inspector Strip -->
-          <div id="parentDualHoverInspector" class="bg-white p-2.5 rounded-lg border border-slate-200 text-xs transition-all shadow-xs">
-            <div class="flex items-center justify-between gap-2 text-slate-600 text-[11px]">
-              <div class="flex items-center gap-2">
-                <span class="text-sm">👆</span>
-                <span class="font-bold text-slate-700">Interactive Year Inspector:</span>
-                <span>Hover or drag over either chart below to compare Year-by-Year loan balances vs Compounding ISA fund.</span>
-              </div>
-              <span class="text-[10px] text-blue-600 font-bold bg-blue-50 px-2 py-0.5 rounded border border-blue-200 hidden sm:inline">1 Point Per Year On Both Charts</span>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-
-            <!-- CHART 1: OPTION 1 - PAY UPFRONT TO UNIVERSITY -->
-            <div class="bg-rose-50/60 p-4 rounded-xl border border-rose-200 space-y-3 flex flex-col justify-between">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1 text-center sm:text-left">
               <div>
-                <div class="flex items-center justify-between">
-                  <span class="px-2 py-0.5 rounded text-[10px] font-black bg-rose-200 text-rose-900 uppercase">Option 1</span>
-                  <span class="text-[11px] font-bold text-rose-700">£${state.parentContribution.toLocaleString()} Paid to HMRC</span>
-                </div>
-                <h5 class="text-sm font-black text-slate-900 mt-1">Pay University Fees Upfront</h5>
-                <p class="text-[11px] text-slate-500">Reduced loan debt, but £0 money remaining in an investment pot.</p>
+                <span class="text-[10px] uppercase font-bold text-slate-300 block">Child Payslip Savings (Upfront)</span>
+                <strong class="text-base font-black ${childSavings > 0 ? 'text-emerald-300' : 'text-rose-300'}">£${childSavings.toLocaleString()}</strong>
               </div>
-
-              <div id="opt1ChartWrapper" class="w-full bg-white p-2.5 rounded-lg border border-rose-100 overflow-x-auto relative">
-                <!-- Injected via createSvgOption1Chart -->
-              </div>
-
-              <!-- Option 1 Legend -->
-              <div class="flex flex-wrap items-center justify-center gap-3 text-[10px] text-slate-600 bg-white p-2 rounded-lg border border-rose-100">
-                <span class="inline-flex items-center gap-1"><span class="w-2.5 h-1 bg-blue-600 rounded"></span> <strong>Reduced Loan</strong></span>
-                <span class="inline-flex items-center gap-1"><span class="w-2.5 h-1 bg-purple-600 rounded border border-dashed border-purple-700"></span> <strong>Child Repayments</strong></span>
-                <span class="inline-flex items-center gap-1"><span class="w-2.5 h-1 bg-emerald-400 rounded border border-dashed border-emerald-500"></span> <strong>Forgone ISA Growth</strong></span>
-              </div>
-
-              <div class="space-y-1.5 bg-white/80 p-3 rounded-lg border border-rose-200 text-[11px] text-rose-900">
-                <div class="flex justify-between"><span>Cash Given to University:</span> <strong>-£${state.parentContribution.toLocaleString()}</strong></div>
-                <div class="flex justify-between"><span>Child Monthly Deduction:</span> <strong>Identical 9%</strong></div>
-                <div class="flex justify-between text-slate-400"><span>Final ISA House Deposit:</span> <strong class="text-rose-600">£0 (Zero)</strong></div>
-              </div>
-            </div>
-
-            <!-- CHART 2: OPTION 2 - KEEP CASH IN ISA -->
-            <div class="bg-emerald-50/60 p-4 rounded-xl border border-emerald-200 space-y-3 flex flex-col justify-between">
               <div>
-                <div class="flex items-center justify-between">
-                  <span class="px-2 py-0.5 rounded text-[10px] font-black bg-emerald-200 text-emerald-900 uppercase">Option 2 (Recommended)</span>
-                  <span class="text-[11px] font-bold text-emerald-700">£${state.parentContribution.toLocaleString()} Invested in ISA</span>
-                </div>
-                <h5 class="text-sm font-black text-slate-900 mt-1">Take Loan + Invest Cash at ${state.investmentRate}%</h5>
-                <p class="text-[11px] text-slate-500">Standard student loan (wiped at Age ${wipeoutAge}) &plus; Compounding ISA nest egg.</p>
+                <span class="text-[10px] uppercase font-bold text-slate-300 block">Net Child Wealth in 20 Yrs (at 4% post-CGT)</span>
+                <strong class="text-base font-black text-emerald-300">£${cgt20_4.toLocaleString()}</strong>
               </div>
-
-              <div id="opt2ChartWrapper" class="w-full bg-white p-2.5 rounded-lg border border-emerald-100 overflow-x-auto relative">
-                <!-- Injected via createSvgOption2Chart -->
-              </div>
-
-              <!-- Option 2 Legend -->
-              <div class="flex flex-wrap items-center justify-center gap-3 text-[10px] text-slate-600 bg-white p-2 rounded-lg border border-emerald-100">
-                <span class="inline-flex items-center gap-1"><span class="w-2.5 h-1 bg-rose-500 rounded border border-dashed border-rose-600"></span> <strong>Standard Loan</strong></span>
-                <span class="inline-flex items-center gap-1"><span class="w-2.5 h-1 bg-amber-500 rounded border border-dashed border-amber-600"></span> <strong>Child Repayments</strong></span>
-                <span class="inline-flex items-center gap-1"><span class="w-2.5 h-1 bg-emerald-600 rounded"></span> <strong>Active ISA Growth</strong></span>
-              </div>
-
-              <div class="space-y-1.5 bg-white/80 p-3 rounded-lg border border-emerald-200 text-[11px] text-emerald-900">
-                <div class="flex justify-between"><span>Retained in Family Wealth:</span> <strong class="text-emerald-700">£${state.parentContribution.toLocaleString()}</strong></div>
-                <div class="flex justify-between"><span>Loan Wiped Clean by Gov:</span> <strong>100% at Age ${wipeoutAge}</strong></div>
-                <div class="flex justify-between text-emerald-950 font-bold"><span>Final ISA House Deposit:</span> <strong class="text-emerald-700 font-black">£${finalIsaVal.toLocaleString()}</strong></div>
+              <div class="bg-white/10 p-2 rounded-xl text-center">
+                <span class="text-[10px] uppercase font-bold text-emerald-200 block">Net Family Wealth Advantage</span>
+                <strong class="text-base font-black text-white">+£${Math.max(0, cgt20_4 - childSavings).toLocaleString()} Ahead</strong>
               </div>
             </div>
-
-          </div>
-
-          <!-- Plain-English Verdict Strip -->
-          <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 text-[11px] text-blue-900 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div class="flex items-start gap-2">
-              <span class="text-sm flex-shrink-0">💡</span>
-              <div>
-                <strong>Why Option 2 (ISA) Wins:</strong> 
-                Under Option 1, paying £${state.parentContribution.toLocaleString()} upfront does not give your child lower monthly deductions, and leaves them with £0 house deposit. Under Option 2, the loan debt cancels anyway at Age ${wipeoutAge}, and your cash compounds into a <strong>£${finalIsaVal.toLocaleString()}</strong> house deposit!
-              </div>
-            </div>
-            <button onclick="downloadParentComparisonExcelCsv()" class="text-emerald-700 hover:text-emerald-800 font-bold underline whitespace-nowrap self-start sm:self-auto cursor-pointer">
-              <span>📊 Export Full Comparison (.csv)</span>
-            </button>
           </div>
 
         </div>
       `;
-
-      renderParentDualInteractiveCharts(simWithContrib, simNoContrib, isaGrowth, totalYears, careerStartAge);
-    }
-
-    // ==================================================================
-    // PARENT CASE A: SINGLE FULL-WIDTH INTERACTIVE SVG (FOR £0 CONTRIB)
-    // ==================================================================
-    function renderParentSingleInteractiveChart(sim, totalYears, careerStartAge) {
-      careerStartAge = careerStartAge || state.currentAge;
-      const container = document.getElementById('parentSingleChartWrapper');
-      if (!container) return;
-
-      const w = 740, h = 240, padL = 55, padR = 25, padT = 20, padB = 30;
-      const plotW = w - padL - padR, plotH = h - padT - padB;
-      const maxVal = Math.max(...sim.balanceHistory, ...sim.cumulativeRepaidHistory, 40000);
-      const maxY = Math.ceil(maxVal / 10000) * 10000;
-
-      const getX = i => padL + (i / totalYears) * plotW;
-      const getY = val => padT + plotH - (Math.min(maxY, val) / maxY) * plotH;
-
-      let svg = `<svg id="parentSingleSvg" viewBox="0 0 ${w} ${h}" class="w-full h-auto min-w-[550px] select-none" style="font-family: inherit;">`;
-      svg += `
-        <defs>
-          <linearGradient id="parentBlueGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#2563eb" stop-opacity="0.22" />
-            <stop offset="100%" stop-color="#2563eb" stop-opacity="0.01" />
-          </linearGradient>
-          <filter id="parentTipShadow" x="-10%" y="-10%" width="130%" height="130%">
-            <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.35"/>
-          </filter>
-        </defs>
-      `;
-
-      // Y-axis grid & labels
-      for (let i = 0; i <= 4; i++) {
-        const val = (maxY / 4) * i;
-        const yPos = getY(val);
-        svg += `<line x1="${padL}" y1="${yPos}" x2="${w - padR}" y2="${yPos}" stroke="#e2e8f0" stroke-dasharray="${i === 0 ? '0' : '4,4'}" stroke-width="1" />`;
-        svg += `<text x="${padL - 8}" y="${yPos + 4}" text-anchor="end" font-size="10" fill="#64748b" font-weight="600">£${Math.round(val/1000)}k</text>`;
-      }
-
-      // X-axis age ticks
-      const xStep = Math.max(1, Math.round(totalYears / 6));
-      for (let i = 0; i <= totalYears; i += xStep) {
-        const xPos = getX(i);
-        const age = careerStartAge + i;
-        svg += `<line x1="${xPos}" y1="${padT}" x2="${xPos}" y2="${padT + plotH}" stroke="#f1f5f9" stroke-width="1" />`;
-        svg += `<text x="${xPos}" y="${h - 10}" text-anchor="middle" font-size="10" fill="#64748b" font-weight="600">Age ${age}</text>`;
-      }
-      svg += `<text x="${getX(totalYears)}" y="${h - 10}" text-anchor="middle" font-size="10" fill="#1e293b" font-weight="bold">Age ${careerStartAge + totalYears}</text>`;
-
-      // Area fill
-      let areaD = `M ${getX(0)} ${getY(sim.balanceHistory[0])}`;
-      for (let i = 1; i <= totalYears; i++) areaD += ` L ${getX(i)} ${getY(sim.balanceHistory[i])}`;
-      areaD += ` L ${getX(totalYears)} ${getY(0)} L ${getX(0)} ${getY(0)} Z`;
-      svg += `<path d="${areaD}" fill="url(#parentBlueGrad)" />`;
-
-      // Outstanding Balance curve
-      let bD = `M ${getX(0)} ${getY(sim.balanceHistory[0])}`;
-      for (let i = 1; i <= totalYears; i++) bD += ` L ${getX(i)} ${getY(sim.balanceHistory[i])}`;
-      svg += `<path d="${bD}" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round" />`;
-
-      // Cumulative Repayments curve
-      let rD = `M ${getX(0)} ${getY(sim.cumulativeRepaidHistory[0])}`;
-      for (let i = 1; i <= totalYears; i++) rD += ` L ${getX(i)} ${getY(sim.cumulativeRepaidHistory[i])}`;
-      svg += `<path d="${rD}" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-dasharray="5,4" stroke-linecap="round" />`;
-
-      // Discrete points for EVERY SINGLE YEAR
-      for (let i = 0; i <= totalYears; i++) {
-        const xPt = getX(i);
-        svg += `<circle cx="${xPt}" cy="${getY(sim.balanceHistory[i])}" r="3" fill="#2563eb" stroke="#ffffff" stroke-width="1.2" />`;
-        svg += `<circle cx="${xPt}" cy="${getY(sim.cumulativeRepaidHistory[i])}" r="2.8" fill="#f59e0b" stroke="#ffffff" stroke-width="1.2" />`;
-      }
-
-      // Static labels
-      svg += `<text x="${getX(0) + 8}" y="${getY(sim.balanceHistory[0]) - 8}" font-size="10" font-weight="bold" fill="#1e40af">£${Math.round(sim.balanceHistory[0]).toLocaleString()}</text>`;
-      const lastRepaid = sim.cumulativeRepaidHistory[totalYears];
-      svg += `<text x="${getX(totalYears) - 6}" y="${getY(lastRepaid) - 8}" text-anchor="end" font-size="10" font-weight="bold" fill="#b45309">Repaid: £${Math.round(lastRepaid).toLocaleString()}</text>`;
-
-      // Interactive guidelines & floating tooltip
-      svg += `
-        <line id="parentSingleCrosshair" x1="0" y1="${padT}" x2="0" y2="${padT + plotH}" stroke="#64748b" stroke-width="1.5" stroke-dasharray="3,3" opacity="0" pointer-events="none" />
-        <circle id="parentSingleActiveBalDot" cx="0" cy="0" r="6" fill="#2563eb" stroke="#ffffff" stroke-width="2.5" opacity="0" pointer-events="none" />
-        <circle id="parentSingleActiveRepayDot" cx="0" cy="0" r="5.5" fill="#f59e0b" stroke="#ffffff" stroke-width="2.5" opacity="0" pointer-events="none" />
-
-        <g id="parentSingleTooltipGroup" opacity="0" pointer-events="none" filter="url(#parentTipShadow)">
-          <rect width="190" height="96" rx="8" ry="8" fill="#0f172a" fill-opacity="0.94" stroke="#334155" stroke-width="1" />
-          <text id="parentSingleTipTitle" x="12" y="18" fill="#ffffff" font-size="11" font-weight="bold">Year 1 • Age 22</text>
-          <text id="parentSingleTipSalary" x="12" y="35" fill="#93c5fd" font-size="10">Salary: £45,000</text>
-          <text id="parentSingleTipBal" x="12" y="52" fill="#60a5fa" font-size="10" font-weight="bold">Loan Balance: £55,359</text>
-          <text id="parentSingleTipRepay" x="12" y="69" fill="#fbbf24" font-size="10" font-weight="bold">Cumulative Repaid: £1,800</text>
-          <text id="parentSingleTipDeduct" x="12" y="85" fill="#cbd5e1" font-size="9.5">Repayment: £150/mo</text>
-        </g>
-
-        <rect id="parentSingleOverlay" x="${padL}" y="${padT}" width="${plotW}" height="${plotH}" fill="transparent" style="cursor: crosshair; touch-action: none;" />
-      `;
-
-      svg += `</svg>`;
-      container.innerHTML = svg;
-
-      const overlay = document.getElementById('parentSingleOverlay');
-      if (overlay) {
-        function handlePointer(clientX) {
-          const rect = overlay.getBoundingClientRect();
-          const relX = clientX - rect.left;
-          const ratio = Math.max(0, Math.min(1, relX / rect.width));
-          const yearIdx = Math.round(ratio * totalYears);
-          updateParentSingleYearInspection(yearIdx, sim, totalYears, careerStartAge, padL, plotW, padT, plotH, maxY, w, padR, h, padB);
-        }
-
-        overlay.addEventListener('mousemove', e => handlePointer(e.clientX));
-        overlay.addEventListener('touchmove', e => {
-          if (e.touches && e.touches[0]) handlePointer(e.touches[0].clientX);
-        }, { passive: true });
-        overlay.addEventListener('touchstart', e => {
-          if (e.touches && e.touches[0]) handlePointer(e.touches[0].clientX);
-        }, { passive: true });
-      }
-
-      updateParentSingleYearInspection(1, sim, totalYears, careerStartAge, padL, plotW, padT, plotH, maxY, w, padR, h, padB);
-    }
-
-    function updateParentSingleYearInspection(yearIndex, sim, totalYears, careerStartAge, padL, plotW, padT, plotH, maxY, w, padR, h, padB) {
-      if (!sim || !sim.yearlyBreakdown) return;
-      const row = sim.yearlyBreakdown[yearIndex] || sim.yearlyBreakdown[0];
-      if (!row) return;
-
-      const gradYear = state.startYear + state.duration;
-      const isGraduated = gradYear <= CURRENT_YEAR;
-      const repaymentStartYear = isGraduated ? state.workStartYear : (gradYear + 1);
-      const calYear = repaymentStartYear + row.yearIndex;
-      const age = careerStartAge + row.yearIndex;
-
-      const xPos = padL + (row.yearIndex / totalYears) * plotW;
-      const yBalPos = padT + plotH - (Math.min(maxY, row.balance) / maxY) * plotH;
-      const yRepayPos = padT + plotH - (Math.min(maxY, row.cumulativeRepaid) / maxY) * plotH;
-
-      const crosshair = document.getElementById('parentSingleCrosshair');
-      const balDot = document.getElementById('parentSingleActiveBalDot');
-      const repayDot = document.getElementById('parentSingleActiveRepayDot');
-      const tipGroup = document.getElementById('parentSingleTooltipGroup');
-
-      if (crosshair) {
-        crosshair.setAttribute('x1', xPos);
-        crosshair.setAttribute('x2', xPos);
-        crosshair.setAttribute('opacity', '1');
-      }
-      if (balDot) {
-        balDot.setAttribute('cx', xPos);
-        balDot.setAttribute('cy', yBalPos);
-        balDot.setAttribute('opacity', '1');
-      }
-      if (repayDot) {
-        repayDot.setAttribute('cx', xPos);
-        repayDot.setAttribute('cy', yRepayPos);
-        repayDot.setAttribute('opacity', '1');
-      }
-
-      if (tipGroup) {
-        tipGroup.setAttribute('opacity', '1');
-        const tipWidth = 190;
-        const tipHeight = 96;
-        let tipX = (xPos + tipWidth + 12 > w - padR) ? (xPos - tipWidth - 10) : (xPos + 10);
-        let tipY = Math.max(padT + 4, Math.min(h - padB - tipHeight - 4, yBalPos - 45));
-        tipGroup.setAttribute('transform', `translate(${tipX}, ${tipY})`);
-
-        const tTitle = document.getElementById('parentSingleTipTitle');
-        const tSalary = document.getElementById('parentSingleTipSalary');
-        const tBal = document.getElementById('parentSingleTipBal');
-        const tRepay = document.getElementById('parentSingleTipRepay');
-        const tDeduct = document.getElementById('parentSingleTipDeduct');
-
-        if (tTitle) tTitle.textContent = `${row.yearIndex === 0 ? 'Start' : 'Year ' + row.yearIndex} • Age ${age} (${calYear})`;
-        if (tSalary) tSalary.textContent = `Salary: £${row.salary.toLocaleString()}`;
-        if (tBal) tBal.textContent = `Balance: £${row.balance.toLocaleString()}`;
-        if (tRepay) tRepay.textContent = `Repaid: £${row.cumulativeRepaid.toLocaleString()}`;
-        if (tDeduct) tDeduct.textContent = row.yearIndex === 0 ? `Starting Debt` : `Deduction: £${row.monthlyRepayment.toLocaleString()}/mo`;
-      }
-
-      const inspector = document.getElementById('parentSingleInspector');
-      if (inspector) {
-        inspector.innerHTML = `
-          <div class="flex flex-wrap items-center justify-between gap-2.5 w-full bg-blue-50/80 border border-blue-200 rounded-lg p-2.5">
-            <div class="flex items-center gap-2">
-              <span class="px-2 py-0.5 rounded text-[11px] font-black bg-blue-600 text-white">
-                ${row.yearIndex === 0 ? 'Starting Debt' : 'Career Year ' + row.yearIndex}
-              </span>
-              <span class="text-xs font-black text-slate-800">Age ${age} &bull; ${calYear}</span>
-              <span class="text-[10px] text-slate-600 font-bold bg-white px-1.5 py-0.5 rounded border border-slate-200">${row.status}</span>
-            </div>
-            <div class="flex flex-wrap items-center gap-3 sm:gap-5 text-xs">
-              <div><span class="text-[10px] text-slate-500 uppercase font-bold block">Gross Salary</span><strong class="text-slate-900 font-black">£${row.salary.toLocaleString()}</strong></div>
-              <div><span class="text-[10px] text-blue-600 uppercase font-bold block">Loan Balance</span><strong class="text-blue-700 font-black">£${row.balance.toLocaleString()}</strong></div>
-              <div><span class="text-[10px] text-amber-600 uppercase font-bold block">Cumulative Repaid</span><strong class="text-amber-700 font-black">£${row.cumulativeRepaid.toLocaleString()}</strong></div>
-              <div><span class="text-[10px] text-slate-500 uppercase font-bold block">Deduction</span><strong class="text-slate-800 font-black">£${row.annualRepayment.toLocaleString()} <span class="text-[10px] text-slate-500 font-normal">(£${row.monthlyRepayment}/mo)</span></strong></div>
-            </div>
-          </div>
-        `;
-      }
-    }
-
-    // ==================================================================
-    // PARENT CASE B: DUAL INTERACTIVE SVGS (OPTION 1 VS OPTION 2)
-    // ==================================================================
-    function renderParentDualInteractiveCharts(simWithContrib, simNoContrib, isaGrowth, totalYears, careerStartAge) {
-      careerStartAge = careerStartAge || state.currentAge;
-      const opt1Container = document.getElementById('opt1ChartWrapper');
-      const opt2Container = document.getElementById('opt2ChartWrapper');
-      if (!opt1Container || !opt2Container) return;
-
-      const w = 360, h = 210, padL = 45, padR = 15, padT = 18, padB = 26;
-      const plotW = w - padL - padR, plotH = h - padT - padB;
-      const maxVal = Math.max(...simNoContrib.balanceHistory, ...isaGrowth, 45000);
-      const maxY = Math.ceil(maxVal / 15000) * 15000;
-
-      const getX = i => padL + (i / totalYears) * plotW;
-      const getY = val => padT + plotH - (Math.min(maxY, val) / maxY) * plotH;
-
-      // -------------------------------------------------------------
-      // CHART 1: OPTION 1 (PAY UPFRONT)
-      // -------------------------------------------------------------
-      let svg1 = `<svg id="opt1Svg" viewBox="0 0 ${w} ${h}" class="w-full h-auto min-w-[280px] select-none" style="font-family: inherit;">`;
-      svg1 += `
-        <defs>
-          <filter id="opt1TipShadow" x="-10%" y="-10%" width="130%" height="130%">
-            <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-opacity="0.3"/>
-          </filter>
-        </defs>
-      `;
-      for (let i = 0; i <= 3; i++) {
-        const val = (maxY / 3) * i;
-        const yPos = getY(val);
-        svg1 += `<line x1="${padL}" y1="${yPos}" x2="${w - padR}" y2="${yPos}" stroke="#e2e8f0" stroke-dasharray="${i === 0 ? '0' : '3,3'}" />`;
-        svg1 += `<text x="${padL - 6}" y="${yPos + 3}" text-anchor="end" font-size="9" fill="#94a3b8">£${Math.round(val/1000)}k</text>`;
-      }
-      svg1 += `<text x="${getX(0)}" y="${h - 8}" text-anchor="start" font-size="9" fill="#64748b">Age ${careerStartAge}</text>`;
-      svg1 += `<text x="${getX(totalYears)}" y="${h - 8}" text-anchor="end" font-size="9" fill="#64748b">Age ${careerStartAge + totalYears}</text>`;
-
-      // Reduced loan curve (Blue)
-      let bD1 = `M ${getX(0)} ${getY(simWithContrib.balanceHistory[0])}`;
-      for (let i = 1; i <= totalYears; i++) bD1 += ` L ${getX(i)} ${getY(simWithContrib.balanceHistory[i])}`;
-      svg1 += `<path d="${bD1}" fill="none" stroke="#2563eb" stroke-width="2" />`;
-
-      // Child Repayments curve (Purple)
-      let rD1 = `M ${getX(0)} ${getY(simWithContrib.cumulativeRepaidHistory[0])}`;
-      for (let i = 1; i <= totalYears; i++) rD1 += ` L ${getX(i)} ${getY(simWithContrib.cumulativeRepaidHistory[i])}`;
-      svg1 += `<path d="${rD1}" fill="none" stroke="#7c3aed" stroke-width="2" stroke-dasharray="4,3" />`;
-
-      // Forgone ISA Growth (Emerald Dashed)
-      let iD1 = `M ${getX(0)} ${getY(isaGrowth[0])}`;
-      for (let i = 1; i <= totalYears; i++) iD1 += ` L ${getX(i)} ${getY(isaGrowth[i])}`;
-      svg1 += `<path d="${iD1}" fill="none" stroke="#10b981" stroke-width="1.8" stroke-dasharray="3,3" opacity="0.75" />`;
-
-      // Discrete points for every year on Option 1
-      for (let i = 0; i <= totalYears; i++) {
-        const xPt = getX(i);
-        svg1 += `<circle cx="${xPt}" cy="${getY(simWithContrib.balanceHistory[i])}" r="2.6" fill="#2563eb" stroke="#ffffff" stroke-width="1" />`;
-        svg1 += `<circle cx="${xPt}" cy="${getY(simWithContrib.cumulativeRepaidHistory[i])}" r="2.4" fill="#7c3aed" stroke="#ffffff" stroke-width="1" />`;
-        svg1 += `<circle cx="${xPt}" cy="${getY(isaGrowth[i])}" r="2.2" fill="#10b981" opacity="0.6" />`;
-      }
-
-      // Actual ISA = £0 line
-      svg1 += `<line x1="${padL}" y1="${getY(0)}" x2="${w - padR}" y2="${getY(0)}" stroke="#dc2626" stroke-width="1.5" />`;
-
-      // Dynamic guidelines & tooltip on Option 1
-      svg1 += `
-        <line id="opt1Crosshair" x1="0" y1="${padT}" x2="0" y2="${padT + plotH}" stroke="#64748b" stroke-width="1.2" stroke-dasharray="3,3" opacity="0" pointer-events="none" />
-        <circle id="opt1ActiveBalDot" cx="0" cy="0" r="5" fill="#2563eb" stroke="#ffffff" stroke-width="2" opacity="0" pointer-events="none" />
-        <circle id="opt1ActiveRepayDot" cx="0" cy="0" r="4.5" fill="#7c3aed" stroke="#ffffff" stroke-width="2" opacity="0" pointer-events="none" />
-        <circle id="opt1ActiveIsaDot" cx="0" cy="0" r="4.5" fill="#10b981" stroke="#ffffff" stroke-width="2" opacity="0" pointer-events="none" />
-
-        <g id="opt1TooltipGroup" opacity="0" pointer-events="none" filter="url(#opt1TipShadow)">
-          <rect width="165" height="80" rx="6" ry="6" fill="#0f172a" fill-opacity="0.94" stroke="#334155" stroke-width="1" />
-          <text id="opt1TipTitle" x="10" y="16" fill="#ffffff" font-size="10" font-weight="bold">Year 1 • Age 22</text>
-          <text id="opt1TipBal" x="10" y="32" fill="#60a5fa" font-size="9" font-weight="bold">Reduced Balance: £27k</text>
-          <text id="opt1TipRepay" x="10" y="48" fill="#c084fc" font-size="9" font-weight="bold">Child Repaid: £1.8k</text>
-          <text id="opt1TipIsa" x="10" y="64" fill="#f87171" font-size="9" font-weight="bold">Actual ISA: £0 (Lost)</text>
-        </g>
-
-        <rect id="opt1Overlay" x="${padL}" y="${padT}" width="${plotW}" height="${plotH}" fill="transparent" style="cursor: crosshair; touch-action: none;" />
-      `;
-      svg1 += `</svg>`;
-      opt1Container.innerHTML = svg1;
-
-      // -------------------------------------------------------------
-      // CHART 2: OPTION 2 (KEEP CASH IN ISA)
-      // -------------------------------------------------------------
-      let svg2 = `<svg id="opt2Svg" viewBox="0 0 ${w} ${h}" class="w-full h-auto min-w-[280px] select-none" style="font-family: inherit;">`;
-      svg2 += `
-        <defs>
-          <filter id="opt2TipShadow" x="-10%" y="-10%" width="130%" height="130%">
-            <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-opacity="0.3"/>
-          </filter>
-        </defs>
-      `;
-      for (let i = 0; i <= 3; i++) {
-        const val = (maxY / 3) * i;
-        const yPos = getY(val);
-        svg2 += `<line x1="${padL}" y1="${yPos}" x2="${w - padR}" y2="${yPos}" stroke="#e2e8f0" stroke-dasharray="${i === 0 ? '0' : '3,3'}" />`;
-        svg2 += `<text x="${padL - 6}" y="${yPos + 3}" text-anchor="end" font-size="9" fill="#94a3b8">£${Math.round(val/1000)}k</text>`;
-      }
-      svg2 += `<text x="${getX(0)}" y="${h - 8}" text-anchor="start" font-size="9" fill="#64748b">Age ${careerStartAge}</text>`;
-      svg2 += `<text x="${getX(totalYears)}" y="${h - 8}" text-anchor="end" font-size="9" fill="#64748b">Age ${careerStartAge + totalYears}</text>`;
-
-      // Standard Loan curve (Red Dashed)
-      let bD2 = `M ${getX(0)} ${getY(simNoContrib.balanceHistory[0])}`;
-      for (let i = 1; i <= totalYears; i++) bD2 += ` L ${getX(i)} ${getY(simNoContrib.balanceHistory[i])}`;
-      svg2 += `<path d="${bD2}" fill="none" stroke="#ef4444" stroke-width="1.8" stroke-dasharray="3,3" />`;
-
-      // Child Repayments curve (Amber Dashed)
-      let rD2 = `M ${getX(0)} ${getY(simNoContrib.cumulativeRepaidHistory[0])}`;
-      for (let i = 1; i <= totalYears; i++) rD2 += ` L ${getX(i)} ${getY(simNoContrib.cumulativeRepaidHistory[i])}`;
-      svg2 += `<path d="${rD2}" fill="none" stroke="#f59e0b" stroke-width="1.8" stroke-dasharray="4,3" />`;
-
-      // Active Compounding ISA Growth (Solid Green)
-      let iD2 = `M ${getX(0)} ${getY(isaGrowth[0])}`;
-      for (let i = 1; i <= totalYears; i++) iD2 += ` L ${getX(i)} ${getY(isaGrowth[i])}`;
-      svg2 += `<path d="${iD2}" fill="none" stroke="#059669" stroke-width="2.5" stroke-linecap="round" />`;
-
-      // Discrete points for every year on Option 2
-      for (let i = 0; i <= totalYears; i++) {
-        const xPt = getX(i);
-        svg2 += `<circle cx="${xPt}" cy="${getY(simNoContrib.balanceHistory[i])}" r="2.5" fill="#ef4444" stroke="#ffffff" stroke-width="1" />`;
-        svg2 += `<circle cx="${xPt}" cy="${getY(simNoContrib.cumulativeRepaidHistory[i])}" r="2.5" fill="#f59e0b" stroke="#ffffff" stroke-width="1" />`;
-        svg2 += `<circle cx="${xPt}" cy="${getY(isaGrowth[i])}" r="2.8" fill="#059669" stroke="#ffffff" stroke-width="1.2" />`;
-      }
-
-      // Dynamic guidelines & tooltip on Option 2
-      svg2 += `
-        <line id="opt2Crosshair" x1="0" y1="${padT}" x2="0" y2="${padT + plotH}" stroke="#64748b" stroke-width="1.2" stroke-dasharray="3,3" opacity="0" pointer-events="none" />
-        <circle id="opt2ActiveBalDot" cx="0" cy="0" r="5" fill="#ef4444" stroke="#ffffff" stroke-width="2" opacity="0" pointer-events="none" />
-        <circle id="opt2ActiveRepayDot" cx="0" cy="0" r="4.5" fill="#f59e0b" stroke="#ffffff" stroke-width="2" opacity="0" pointer-events="none" />
-        <circle id="opt2ActiveIsaDot" cx="0" cy="0" r="5.5" fill="#059669" stroke="#ffffff" stroke-width="2" opacity="0" pointer-events="none" />
-
-        <g id="opt2TooltipGroup" opacity="0" pointer-events="none" filter="url(#opt2TipShadow)">
-          <rect width="165" height="80" rx="6" ry="6" fill="#0f172a" fill-opacity="0.94" stroke="#334155" stroke-width="1" />
-          <text id="opt2TipTitle" x="10" y="16" fill="#ffffff" font-size="10" font-weight="bold">Year 1 • Age 22</text>
-          <text id="opt2TipBal" x="10" y="32" fill="#fca5a5" font-size="9" font-weight="bold">Standard Debt: £55k</text>
-          <text id="opt2TipRepay" x="10" y="48" fill="#fbbf24" font-size="9" font-weight="bold">Child Repaid: £1.8k</text>
-          <text id="opt2TipIsa" x="10" y="64" fill="#34d399" font-size="9" font-weight="bold">Active ISA: £28.8k</text>
-        </g>
-
-        <rect id="opt2Overlay" x="${padL}" y="${padT}" width="${plotW}" height="${plotH}" fill="transparent" style="cursor: crosshair; touch-action: none;" />
-      `;
-      svg2 += `</svg>`;
-      opt2Container.innerHTML = svg2;
-
-      // Synchronize hover & drag listeners across BOTH charts
-      function handleDualPointer(clientX, targetOverlay) {
-        const rect = targetOverlay.getBoundingClientRect();
-        const relX = clientX - rect.left;
-        const ratio = Math.max(0, Math.min(1, relX / rect.width));
-        const yearIdx = Math.round(ratio * totalYears);
-        updateParentDualYearInspection(yearIdx, simWithContrib, simNoContrib, isaGrowth, totalYears, careerStartAge, padL, plotW, padT, plotH, maxY, w, padR, h, padB);
-      }
-
-      const overlay1 = document.getElementById('opt1Overlay');
-      if (overlay1) {
-        overlay1.addEventListener('mousemove', e => handleDualPointer(e.clientX, overlay1));
-        overlay1.addEventListener('touchmove', e => {
-          if (e.touches && e.touches[0]) handleDualPointer(e.touches[0].clientX, overlay1);
-        }, { passive: true });
-        overlay1.addEventListener('touchstart', e => {
-          if (e.touches && e.touches[0]) handleDualPointer(e.touches[0].clientX, overlay1);
-        }, { passive: true });
-      }
-
-      const overlay2 = document.getElementById('opt2Overlay');
-      if (overlay2) {
-        overlay2.addEventListener('mousemove', e => handleDualPointer(e.clientX, overlay2));
-        overlay2.addEventListener('touchmove', e => {
-          if (e.touches && e.touches[0]) handleDualPointer(e.touches[0].clientX, overlay2);
-        }, { passive: true });
-        overlay2.addEventListener('touchstart', e => {
-          if (e.touches && e.touches[0]) handleDualPointer(e.touches[0].clientX, overlay2);
-        }, { passive: true });
-      }
-
-      updateParentDualYearInspection(1, simWithContrib, simNoContrib, isaGrowth, totalYears, careerStartAge, padL, plotW, padT, plotH, maxY, w, padR, h, padB);
-    }
-
-    function updateParentDualYearInspection(yearIndex, simWithContrib, simNoContrib, isaGrowth, totalYears, careerStartAge, padL, plotW, padT, plotH, maxY, w, padR, h, padB) {
-      if (!simWithContrib || !simNoContrib) return;
-      const rowWith = simWithContrib.yearlyBreakdown[yearIndex] || simWithContrib.yearlyBreakdown[0];
-      const rowNo = simNoContrib.yearlyBreakdown[yearIndex] || simNoContrib.yearlyBreakdown[0];
-      const curIsa = isaGrowth[yearIndex] || isaGrowth[0];
-      if (!rowWith || !rowNo) return;
-
-      const gradYear = state.startYear + state.duration;
-      const isGraduated = gradYear <= CURRENT_YEAR;
-      const repaymentStartYear = isGraduated ? state.workStartYear : (gradYear + 1);
-      const calYear = repaymentStartYear + rowNo.yearIndex;
-      const age = careerStartAge + rowNo.yearIndex;
-
-      const xPos = padL + (rowNo.yearIndex / totalYears) * plotW;
-      const yBalWith = padT + plotH - (Math.min(maxY, rowWith.balance) / maxY) * plotH;
-      const yRepayWith = padT + plotH - (Math.min(maxY, rowWith.cumulativeRepaid) / maxY) * plotH;
-      const yBalNo = padT + plotH - (Math.min(maxY, rowNo.balance) / maxY) * plotH;
-      const yRepayNo = padT + plotH - (Math.min(maxY, rowNo.cumulativeRepaid) / maxY) * plotH;
-      const yIsa = padT + plotH - (Math.min(maxY, curIsa) / maxY) * plotH;
-
-      // Update Chart 1 markers
-      const c1 = document.getElementById('opt1Crosshair');
-      const bDot1 = document.getElementById('opt1ActiveBalDot');
-      const rDot1 = document.getElementById('opt1ActiveRepayDot');
-      const iDot1 = document.getElementById('opt1ActiveIsaDot');
-      const tip1 = document.getElementById('opt1TooltipGroup');
-
-      if (c1) { c1.setAttribute('x1', xPos); c1.setAttribute('x2', xPos); c1.setAttribute('opacity', '1'); }
-      if (bDot1) { bDot1.setAttribute('cx', xPos); bDot1.setAttribute('cy', yBalWith); bDot1.setAttribute('opacity', '1'); }
-      if (rDot1) { rDot1.setAttribute('cx', xPos); rDot1.setAttribute('cy', yRepayWith); rDot1.setAttribute('opacity', '1'); }
-      if (iDot1) { iDot1.setAttribute('cx', xPos); iDot1.setAttribute('cy', yIsa); iDot1.setAttribute('opacity', '1'); }
-
-      if (tip1) {
-        tip1.setAttribute('opacity', '1');
-        const tipW = 165;
-        let tipX = (xPos + tipW + 10 > w - padR) ? (xPos - tipW - 8) : (xPos + 8);
-        tip1.setAttribute('transform', `translate(${tipX}, ${Math.max(padT, yBalWith - 40)})`);
-        const tTitle = document.getElementById('opt1TipTitle');
-        const tBal = document.getElementById('opt1TipBal');
-        const tRepay = document.getElementById('opt1TipRepay');
-        const tIsa = document.getElementById('opt1TipIsa');
-        if (tTitle) tTitle.textContent = `${rowWith.yearIndex === 0 ? 'Start' : 'Year ' + rowWith.yearIndex} • Age ${age} (${calYear})`;
-        if (tBal) tBal.textContent = `Reduced Debt: £${rowWith.balance.toLocaleString()}`;
-        if (tRepay) tRepay.textContent = `Child Repaid: £${rowWith.cumulativeRepaid.toLocaleString()}`;
-        if (tIsa) tIsa.textContent = `Actual ISA Pot: £0`;
-      }
-
-      // Update Chart 2 markers
-      const c2 = document.getElementById('opt2Crosshair');
-      const bDot2 = document.getElementById('opt2ActiveBalDot');
-      const rDot2 = document.getElementById('opt2ActiveRepayDot');
-      const iDot2 = document.getElementById('opt2ActiveIsaDot');
-      const tip2 = document.getElementById('opt2TooltipGroup');
-
-      if (c2) { c2.setAttribute('x1', xPos); c2.setAttribute('x2', xPos); c2.setAttribute('opacity', '1'); }
-      if (bDot2) { bDot2.setAttribute('cx', xPos); bDot2.setAttribute('cy', yBalNo); bDot2.setAttribute('opacity', '1'); }
-      if (rDot2) { rDot2.setAttribute('cx', xPos); rDot2.setAttribute('cy', yRepayNo); rDot2.setAttribute('opacity', '1'); }
-      if (iDot2) { iDot2.setAttribute('cx', xPos); iDot2.setAttribute('cy', yIsa); iDot2.setAttribute('opacity', '1'); }
-
-      if (tip2) {
-        tip2.setAttribute('opacity', '1');
-        const tipW = 165;
-        let tipX = (xPos + tipW + 10 > w - padR) ? (xPos - tipW - 8) : (xPos + 8);
-        tip2.setAttribute('transform', `translate(${tipX}, ${Math.max(padT, yIsa - 40)})`);
-        const tTitle = document.getElementById('opt2TipTitle');
-        const tBal = document.getElementById('opt2TipBal');
-        const tRepay = document.getElementById('opt2TipRepay');
-        const tIsa = document.getElementById('opt2TipIsa');
-        if (tTitle) tTitle.textContent = `${rowNo.yearIndex === 0 ? 'Start' : 'Year ' + rowNo.yearIndex} • Age ${age} (${calYear})`;
-        if (tBal) tBal.textContent = `Standard Debt: £${rowNo.balance.toLocaleString()}`;
-        if (tRepay) tRepay.textContent = `Child Repaid: £${rowNo.cumulativeRepaid.toLocaleString()}`;
-        if (tIsa) tIsa.textContent = `Compounding ISA: £${curIsa.toLocaleString()}`;
-      }
-
-      // Update Top Comparative Inspector Card
-      const inspector = document.getElementById('parentDualHoverInspector');
-      if (inspector) {
-        const netAdvantage = curIsa - (rowNo.cumulativeRepaid - rowWith.cumulativeRepaid);
-        inspector.innerHTML = `
-          <div class="flex flex-wrap items-center justify-between gap-2.5 w-full bg-slate-900 text-white rounded-lg p-2.5 shadow-xs">
-            <div class="flex items-center gap-2">
-              <span class="px-2 py-0.5 rounded text-[11px] font-black bg-emerald-500 text-slate-950">
-                ${rowNo.yearIndex === 0 ? 'Graduation' : 'Year ' + rowNo.yearIndex}
-              </span>
-              <span class="text-xs font-black text-slate-100">Child Age ${age} &bull; ${calYear}</span>
-            </div>
-            <div class="flex flex-wrap items-center gap-3 sm:gap-6 text-xs">
-              <div>
-                <span class="text-[10px] text-rose-300 uppercase font-bold block">Option 1 Debt Balance</span>
-                <strong class="text-white font-black">£${rowWith.balance.toLocaleString()}</strong>
-              </div>
-              <div>
-                <span class="text-[10px] text-amber-300 uppercase font-bold block">Option 2 Debt Balance</span>
-                <strong class="text-white font-black">£${rowNo.balance.toLocaleString()}</strong>
-              </div>
-              <div>
-                <span class="text-[10px] text-emerald-300 uppercase font-bold block">Option 2 Compounding ISA</span>
-                <strong class="text-emerald-400 font-black">£${curIsa.toLocaleString()}</strong>
-              </div>
-              <div class="bg-emerald-950/80 border border-emerald-500/50 px-2 py-1 rounded">
-                <span class="text-[10px] text-emerald-300 uppercase font-bold block">Net Family Wealth Gain</span>
-                <strong class="text-emerald-300 font-black">+£${netAdvantage.toLocaleString()} Ahead</strong>
-              </div>
-            </div>
-          </div>
-        `;
-      }
     }
 
     // Initial setup
