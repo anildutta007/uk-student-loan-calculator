@@ -653,24 +653,47 @@
 
           <!-- Student Career Graph (Native SVG Vector Engine) -->
           <div class="bg-slate-50 p-4 sm:p-5 rounded-xl border border-slate-200 space-y-3">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
               <div class="flex items-center gap-2">
                 <span class="text-base">📈</span>
                 <h4 class="text-xs sm:text-sm font-extrabold text-slate-900">Career Repayment &amp; Loan Balance Trajectory</h4>
               </div>
-              <div class="flex items-center gap-3 text-[11px] font-semibold">
-                <span class="inline-flex items-center gap-1.5 text-blue-600"><span class="w-3 h-1 bg-blue-600 rounded"></span> Remaining Balance</span>
-                <span class="inline-flex items-center gap-1.5 text-amber-600"><span class="w-3 h-1 bg-amber-500 rounded border border-dashed border-amber-600"></span> Cumulative Repaid</span>
+              <div class="flex flex-wrap items-center gap-3">
+                <div class="flex items-center gap-3 text-[11px] font-semibold">
+                  <span class="inline-flex items-center gap-1.5 text-blue-600"><span class="w-3 h-1 bg-blue-600 rounded"></span> Remaining Balance</span>
+                  <span class="inline-flex items-center gap-1.5 text-amber-600"><span class="w-3 h-1 bg-amber-500 rounded border border-dashed border-amber-600"></span> Cumulative Repaid</span>
+                </div>
+                <button onclick="downloadAmortizationExcelCsv()" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white rounded-lg text-xs font-bold shadow-xs transition cursor-pointer" title="Download Excel schedule (.csv)">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                  <span>Download Excel (.csv)</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Live Data Hover Inspector Strip -->
+            <div id="chartHoverInspector" class="bg-white p-2.5 rounded-lg border border-slate-200 text-xs transition-all shadow-xs">
+              <div class="flex items-center justify-between gap-2 text-slate-600 text-[11px]">
+                <div class="flex items-center gap-2">
+                  <span class="text-sm">👆</span>
+                  <span class="font-bold text-slate-700">Interactive Inspector:</span>
+                  <span>Hover or scroll over the graph points below to inspect any year's projected salary, balance &amp; repayments.</span>
+                </div>
+                <span class="text-[10px] text-blue-600 font-bold bg-blue-50 px-2 py-0.5 rounded border border-blue-200 hidden sm:inline">1 Point Per Year</span>
               </div>
             </div>
             
-            <div id="studentChartWrapper" class="w-full bg-white p-3 rounded-lg border border-slate-200 overflow-x-auto">
+            <div id="studentChartWrapper" class="w-full bg-white p-3 rounded-lg border border-slate-200 overflow-x-auto relative">
               <!-- Native SVG injected here -->
             </div>
             
-            <p class="text-[11px] text-slate-500 text-center">
-              Tracking your debt amortization over <span class="chartTermText font-bold">27</span> years from starting balance to statutory write-off.
-            </p>
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[11px] text-slate-500">
+              <p>
+                Tracking your debt amortization over <span class="chartTermText font-bold">27</span> years from starting balance to statutory write-off.
+              </p>
+              <button onclick="downloadAmortizationExcelCsv()" class="text-emerald-700 hover:text-emerald-800 font-bold underline flex items-center gap-1 self-start sm:self-auto cursor-pointer">
+                <span>📊 Export Full Career Audit to Excel (.csv)</span>
+              </button>
+            </div>
           </div>
 
         </div>
@@ -887,6 +910,7 @@
     let tuitionOnlyAmount = 27750;
     let fullDebtAmount = 55359;
     let currentTipAmount = 1;
+    let latestStudentSim = null;
 
     // Tip Modal Controller
     function openTipModal() {
@@ -1276,12 +1300,37 @@
 
       const balanceHistory = [startingBalance];
       const cumulativeRepaidHistory = [0];
+      const yearlyBreakdown = [{
+        yearIndex: 0,
+        salary: Math.round(salary),
+        threshold: threshold,
+        annualRepayment: 0,
+        monthlyRepayment: 0,
+        interestAccrued: 0,
+        interestRate: interestRate,
+        balance: Math.round(startingBalance),
+        cumulativeRepaid: 0,
+        status: 'Starting Graduate Debt'
+      }];
 
       for (let y = 1; y <= totalYears; y++) {
         if (balance <= 0) {
           balanceHistory.push(0);
           cumulativeRepaidHistory.push(totalPaid);
           if (clearedYearIndex === null) clearedYearIndex = y - 1;
+          yearlyBreakdown.push({
+            yearIndex: y,
+            salary: Math.round(curSalary),
+            threshold: threshold,
+            annualRepayment: 0,
+            monthlyRepayment: 0,
+            interestAccrued: 0,
+            interestRate: interestRate,
+            balance: 0,
+            cumulativeRepaid: totalPaid,
+            status: 'Fully Cleared / Debt-Free'
+          });
+          curSalary = curSalary * growthMul;
           continue;
         }
 
@@ -1294,13 +1343,29 @@
         balance = balance + interestAccrued - annualRepayment;
         totalPaid += annualRepayment;
 
+        let status = 'Active Repayment';
         if (balance <= 0) {
           balance = 0;
           if (clearedYearIndex === null) clearedYearIndex = y;
+          status = 'Fully Cleared / Debt-Free';
+        } else if (y === totalYears) {
+          status = 'Statutorily Written Off / Cancelled';
         }
 
         balanceHistory.push(Math.round(balance));
         cumulativeRepaidHistory.push(Math.round(totalPaid));
+        yearlyBreakdown.push({
+          yearIndex: y,
+          salary: Math.round(curSalary),
+          threshold: threshold,
+          annualRepayment: Math.round(annualRepayment),
+          monthlyRepayment: Math.round(annualRepayment / 12),
+          interestAccrued: Math.round(interestAccrued),
+          interestRate: interestRate,
+          balance: Math.round(balance),
+          cumulativeRepaid: Math.round(totalPaid),
+          status: status
+        });
 
         // Increment salary for next year
         curSalary = curSalary * growthMul;
@@ -1309,6 +1374,7 @@
       return {
         balanceHistory,
         cumulativeRepaidHistory,
+        yearlyBreakdown,
         totalPaid: Math.round(totalPaid),
         endingBalance: Math.round(balance),
         clearedYearIndex
@@ -1414,6 +1480,7 @@
       // Trajectory 1: NO Parent Contribution (Baseline)
       const baseDebt = fullDebtAmount;
       const studentSim = runAmortizationTrajectory(baseDebt, state.salary, state.salaryGrowth, effectiveInterest, threshold, remainingYears);
+      latestStudentSim = studentSim;
 
       const studentSummary = document.getElementById('studentSummaryText');
       document.getElementById('dispTotalRepaid').innerText = '£' + studentSim.totalPaid.toLocaleString();
@@ -1570,7 +1637,7 @@
         return padT + plotH - (Math.min(maxY, val) / maxY) * plotH;
       }
 
-      let svg = `<svg viewBox="0 0 ${w} ${h}" class="w-full h-auto min-w-[550px]" style="font-family: inherit;">`;
+      let svg = `<svg id="studentSvgChart" viewBox="0 0 ${w} ${h}" class="w-full h-auto min-w-[550px] select-none" style="font-family: inherit;">`;
       
       svg += `
         <defs>
@@ -1578,6 +1645,9 @@
             <stop offset="0%" stop-color="#2563eb" stop-opacity="0.22" />
             <stop offset="100%" stop-color="#2563eb" stop-opacity="0.01" />
           </linearGradient>
+          <filter id="tipShadow" x="-10%" y="-10%" width="130%" height="130%">
+            <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.35"/>
+          </filter>
         </defs>
       `;
 
@@ -1624,16 +1694,236 @@
       }
       svg += `<path d="${repayPathD}" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-dasharray="5,4" stroke-linecap="round" />`;
 
-      // Milestones
-      svg += `<circle cx="${getX(0)}" cy="${getY(sim.balanceHistory[0])}" r="4" fill="#2563eb" stroke="#ffffff" stroke-width="2" />`;
-      svg += `<text x="${getX(0) + 8}" y="${getY(sim.balanceHistory[0]) - 8}" font-size="10" font-weight="bold" fill="#1e40af">£${Math.round(sim.balanceHistory[0]).toLocaleString()}</text>`;
+      // Points for every year (One point for each year on both curves)
+      for (let i = 0; i <= totalYears; i++) {
+        const xPt = getX(i);
+        const yBalPt = getY(sim.balanceHistory[i]);
+        const yRepayPt = getY(sim.cumulativeRepaidHistory[i]);
+        svg += `<circle cx="${xPt}" cy="${yBalPt}" r="3" fill="#2563eb" stroke="#ffffff" stroke-width="1.2" class="chart-pt-bal" />`;
+        svg += `<circle cx="${xPt}" cy="${yRepayPt}" r="2.8" fill="#f59e0b" stroke="#ffffff" stroke-width="1.2" class="chart-pt-repay" />`;
+      }
 
+      // Static milestone text labels
+      svg += `<text x="${getX(0) + 8}" y="${getY(sim.balanceHistory[0]) - 8}" font-size="10" font-weight="bold" fill="#1e40af">£${Math.round(sim.balanceHistory[0]).toLocaleString()}</text>`;
       const lastRepaid = sim.cumulativeRepaidHistory[totalYears];
-      svg += `<circle cx="${getX(totalYears)}" cy="${getY(lastRepaid)}" r="4" fill="#f59e0b" stroke="#ffffff" stroke-width="2" />`;
       svg += `<text x="${getX(totalYears) - 6}" y="${getY(lastRepaid) - 8}" text-anchor="end" font-size="10" font-weight="bold" fill="#b45309">Repaid: £${Math.round(lastRepaid).toLocaleString()}</text>`;
+
+      // Interactive Scrubber elements
+      svg += `
+        <!-- Vertical guide line -->
+        <line id="svgCrosshair" x1="0" y1="${padT}" x2="0" y2="${padT + plotH}" stroke="#64748b" stroke-width="1.5" stroke-dasharray="3,3" opacity="0" pointer-events="none" />
+        
+        <!-- Active highlighted circles -->
+        <circle id="svgActiveBalDot" cx="0" cy="0" r="6" fill="#2563eb" stroke="#ffffff" stroke-width="2.5" opacity="0" pointer-events="none" />
+        <circle id="svgActiveRepayDot" cx="0" cy="0" r="5.5" fill="#f59e0b" stroke="#ffffff" stroke-width="2.5" opacity="0" pointer-events="none" />
+
+        <!-- Floating SVG Tooltip Group -->
+        <g id="svgTooltipGroup" opacity="0" pointer-events="none" filter="url(#tipShadow)">
+          <rect id="svgTipRect" width="190" height="96" rx="8" ry="8" fill="#0f172a" fill-opacity="0.94" stroke="#334155" stroke-width="1" />
+          <text id="svgTipTitle" x="12" y="18" fill="#ffffff" font-size="11" font-weight="bold">Year 1 • Age 22</text>
+          <text id="svgTipSalary" x="12" y="35" fill="#93c5fd" font-size="10">Salary: £45,000</text>
+          <text id="svgTipBal" x="12" y="52" fill="#60a5fa" font-size="10" font-weight="bold">Loan Balance: £55,359</text>
+          <text id="svgTipRepay" x="12" y="69" fill="#fbbf24" font-size="10" font-weight="bold">Cumulative Repaid: £1,800</text>
+          <text id="svgTipDeduct" x="12" y="85" fill="#cbd5e1" font-size="9.5">Repayment: £150/mo</text>
+        </g>
+
+        <!-- Transparent Overlay that captures pointer moves smoothly -->
+        <rect id="svgInteractiveOverlay" x="${padL}" y="${padT}" width="${plotW}" height="${plotH}" fill="transparent" style="cursor: crosshair; touch-action: none;" />
+      `;
 
       svg += `</svg>`;
       container.innerHTML = svg;
+
+      // Event listener for hover and touch scrubbing
+      const overlay = document.getElementById('svgInteractiveOverlay');
+      if (overlay) {
+        function handlePointer(clientX) {
+          const rect = overlay.getBoundingClientRect();
+          const relX = clientX - rect.left;
+          const ratio = Math.max(0, Math.min(1, relX / rect.width));
+          const yearIdx = Math.round(ratio * totalYears);
+          updateChartYearInspection(yearIdx, sim, totalYears, careerStartAge, padL, plotW, padT, plotH, maxY, w, padR, h, padB);
+        }
+
+        overlay.addEventListener('mousemove', e => handlePointer(e.clientX));
+        overlay.addEventListener('touchmove', e => {
+          if (e.touches && e.touches[0]) {
+            handlePointer(e.touches[0].clientX);
+          }
+        }, { passive: true });
+        overlay.addEventListener('touchstart', e => {
+          if (e.touches && e.touches[0]) {
+            handlePointer(e.touches[0].clientX);
+          }
+        }, { passive: true });
+      }
+
+      // Default inspector display to Year 1 (or Year 0)
+      updateChartYearInspection(1, sim, totalYears, careerStartAge, padL, plotW, padT, plotH, maxY, w, padR, h, padB);
+    }
+
+    function updateChartYearInspection(yearIndex, sim, totalYears, careerStartAge, padL, plotW, padT, plotH, maxY, w, padR, h, padB) {
+      if (!sim || !sim.yearlyBreakdown) return;
+      const row = sim.yearlyBreakdown[yearIndex] || sim.yearlyBreakdown[0];
+      if (!row) return;
+
+      const gradYear = state.startYear + state.duration;
+      const isGraduated = gradYear <= CURRENT_YEAR;
+      const repaymentStartYear = isGraduated ? state.workStartYear : (gradYear + 1);
+      const calYear = repaymentStartYear + row.yearIndex;
+      const age = careerStartAge + row.yearIndex;
+
+      const xPos = padL + (row.yearIndex / totalYears) * plotW;
+      const yBalPos = padT + plotH - (Math.min(maxY, row.balance) / maxY) * plotH;
+      const yRepayPos = padT + plotH - (Math.min(maxY, row.cumulativeRepaid) / maxY) * plotH;
+
+      const crosshair = document.getElementById('svgCrosshair');
+      const balDot = document.getElementById('svgActiveBalDot');
+      const repayDot = document.getElementById('svgActiveRepayDot');
+      const tipGroup = document.getElementById('svgTooltipGroup');
+
+      if (crosshair) {
+        crosshair.setAttribute('x1', xPos);
+        crosshair.setAttribute('x2', xPos);
+        crosshair.setAttribute('opacity', '1');
+      }
+      if (balDot) {
+        balDot.setAttribute('cx', xPos);
+        balDot.setAttribute('cy', yBalPos);
+        balDot.setAttribute('opacity', '1');
+      }
+      if (repayDot) {
+        repayDot.setAttribute('cx', xPos);
+        repayDot.setAttribute('cy', yRepayPos);
+        repayDot.setAttribute('opacity', '1');
+      }
+
+      if (tipGroup) {
+        tipGroup.setAttribute('opacity', '1');
+        const tipWidth = 190;
+        const tipHeight = 96;
+        let tipX = (xPos + tipWidth + 12 > w - padR) ? (xPos - tipWidth - 10) : (xPos + 10);
+        let tipY = Math.max(padT + 4, Math.min(h - padB - tipHeight - 4, yBalPos - 45));
+        tipGroup.setAttribute('transform', `translate(${tipX}, ${tipY})`);
+
+        const tTitle = document.getElementById('svgTipTitle');
+        const tSalary = document.getElementById('svgTipSalary');
+        const tBal = document.getElementById('svgTipBal');
+        const tRepay = document.getElementById('svgTipRepay');
+        const tDeduct = document.getElementById('svgTipDeduct');
+
+        if (tTitle) tTitle.textContent = `${row.yearIndex === 0 ? 'Start' : 'Year ' + row.yearIndex} • Age ${age} (${calYear})`;
+        if (tSalary) tSalary.textContent = `Salary: £${row.salary.toLocaleString()}`;
+        if (tBal) tBal.textContent = `Balance: £${row.balance.toLocaleString()}`;
+        if (tRepay) tRepay.textContent = `Repaid: £${row.cumulativeRepaid.toLocaleString()}`;
+        if (tDeduct) tDeduct.textContent = row.yearIndex === 0 ? `Starting Debt` : `Deduction: £${row.monthlyRepayment.toLocaleString()}/mo`;
+      }
+
+      const inspector = document.getElementById('chartHoverInspector');
+      if (inspector) {
+        inspector.innerHTML = `
+          <div class="flex flex-wrap items-center justify-between gap-2.5 w-full bg-blue-50/80 border border-blue-200 rounded-lg p-2.5">
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 rounded text-[11px] font-black bg-blue-600 text-white">
+                ${row.yearIndex === 0 ? 'Starting Graduate Debt' : 'Career Year ' + row.yearIndex}
+              </span>
+              <span class="text-xs font-black text-slate-800">
+                Age ${age} &bull; ${calYear}
+              </span>
+              <span class="text-[10px] text-slate-600 font-bold bg-white px-1.5 py-0.5 rounded border border-slate-200">
+                ${row.status}
+              </span>
+            </div>
+            <div class="flex flex-wrap items-center gap-3 sm:gap-5 text-xs">
+              <div>
+                <span class="text-[10px] text-slate-500 uppercase font-bold block">Annual Salary</span>
+                <strong class="text-slate-900 font-black">£${row.salary.toLocaleString()}</strong>
+              </div>
+              <div>
+                <span class="text-[10px] text-blue-600 uppercase font-bold block">Remaining Balance</span>
+                <strong class="text-blue-700 font-black">£${row.balance.toLocaleString()}</strong>
+              </div>
+              <div>
+                <span class="text-[10px] text-amber-600 uppercase font-bold block">Total Repaid</span>
+                <strong class="text-amber-700 font-black">£${row.cumulativeRepaid.toLocaleString()}</strong>
+              </div>
+              <div>
+                <span class="text-[10px] text-slate-500 uppercase font-bold block">Annual Deduction</span>
+                <strong class="text-slate-800 font-black">£${row.annualRepayment.toLocaleString()} <span class="text-[10px] text-slate-500 font-normal">(£${row.monthlyRepayment}/mo)</span></strong>
+              </div>
+              <div>
+                <span class="text-[10px] text-slate-500 uppercase font-bold block">Interest Accrued</span>
+                <strong class="text-slate-700 font-bold">+£${row.interestAccrued.toLocaleString()}</strong>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    function downloadAmortizationExcelCsv() {
+      if (!latestStudentSim || !latestStudentSim.yearlyBreakdown) return;
+
+      const isPlan5 = (state.homeCountry === 'england' && state.startYear >= 2023);
+      const planName = isPlan5 ? "Plan 5" : "Plan 2";
+      const writeOffYears = isPlan5 ? 40 : 30;
+      const gradYear = state.startYear + state.duration;
+      const isGraduated = gradYear <= CURRENT_YEAR;
+      const repaymentStartYear = isGraduated ? state.workStartYear : (gradYear + 1);
+      const careerStartAge = isGraduated 
+        ? state.currentAge 
+        : (state.currentAge + Math.max(0, repaymentStartYear - CURRENT_YEAR));
+      const wipeoutYear = repaymentStartYear + writeOffYears;
+
+      let csv = "\uFEFF"; // UTF-8 BOM so Microsoft Excel renders £ symbols cleanly
+      csv += "DUTTA UK UNIVERSITY STUDENT LOAN CALCULATOR - CAREER REPAYMENT & AMORTIZATION SCHEDULE\n";
+      csv += `Student Loan Plan,${planName} (${writeOffYears}-Year Statutory Term)\n`;
+      csv += `Course Start Year,${state.startYear}\n`;
+      csv += `Course Duration,${state.duration} Years\n`;
+      csv += `Country of Origin,${state.homeCountry === 'england' ? 'England' : 'Wales'}\n`;
+      csv += `Starting Student Age,${state.currentAge}\n`;
+      csv += `Repayment Start Year,${repaymentStartYear} (Age ${careerStartAge})\n`;
+      csv += `Statutory Write-Off Year,${wipeoutYear} (Age ${careerStartAge + writeOffYears})\n`;
+      csv += `Starting Loan Debt,"£${fullDebtAmount.toLocaleString()}"\n`;
+      csv += `Graduate Starting Annual Salary,"£${state.salary.toLocaleString()}"\n`;
+      csv += `Annual Salary Growth Rate,${state.salaryGrowth}%\n`;
+      csv += `RPI Inflation Rate,${state.rpi}%\n`;
+      csv += `Statutory Repayment Threshold,"£${(isPlan5 ? 25000 : 27295).toLocaleString()} / yr"\n`;
+      csv += `Total Amount Repaid Over Career,"£${latestStudentSim.totalPaid.toLocaleString()}"\n`;
+      csv += `Amount Cancelled / Written Off by Gov,"£${latestStudentSim.endingBalance.toLocaleString()}"\n\n`;
+
+      csv += "Career Year,Calendar Year,Student Age,Annual Gross Salary,Monthly Gross Salary,Repayment Threshold,Annual Repayment (9%),Monthly Deduction,Effective Interest Rate,Interest Accrued This Year,Ending Loan Balance,Cumulative Amount Repaid,Loan Status\n";
+
+      latestStudentSim.yearlyBreakdown.forEach(row => {
+        const calYear = repaymentStartYear + row.yearIndex;
+        const age = careerStartAge + row.yearIndex;
+        const line = [
+          row.yearIndex === 0 ? "Year 0 (Graduation)" : "Year " + row.yearIndex,
+          calYear,
+          age,
+          `"£${row.salary.toLocaleString()}"`,
+          `"£${Math.round(row.salary / 12).toLocaleString()}"`,
+          `"£${row.threshold.toLocaleString()}"`,
+          `"£${row.annualRepayment.toLocaleString()}"`,
+          `"£${row.monthlyRepayment.toLocaleString()}"`,
+          `"${row.interestRate.toFixed(1)}%"`,
+          `"£${row.interestAccrued.toLocaleString()}"`,
+          `"£${row.balance.toLocaleString()}"`,
+          `"£${row.cumulativeRepaid.toLocaleString()}"`,
+          `"${row.status}"`
+        ].join(",");
+        csv += line + "\n";
+      });
+
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `UK_Student_Loan_Schedule_${planName.replace(/\s+/g, '_')}_Salary_${state.salary}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     }
 
     // ====================================================================
