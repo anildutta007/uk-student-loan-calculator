@@ -282,19 +282,36 @@
             <p class="text-[10px] text-slate-400">Wales retains Plan 2.</p>
           </div>
 
-          <!-- 4. Current Age -->
-          <div class="space-y-1.5">
+          <!-- 4. Current Age (Highlighted Column + Red Essential Badge + Slider & Steppers) -->
+          <div class="bg-red-50/80 border-2 border-red-400/80 rounded-xl p-2.5 space-y-1.5 shadow-xs ring-2 ring-red-100 flex flex-col justify-between">
             <div class="flex items-center justify-between">
-              <label class="block text-xs font-bold uppercase tracking-wide text-blue-700">
+              <label class="block text-xs font-black uppercase tracking-wide text-red-950">
                 Your Current Age
               </label>
-              <span class="text-[9px] font-bold text-blue-600 bg-blue-100 px-1.5 py-0.2 rounded">essential</span>
+              <span class="text-[9px] font-black uppercase tracking-wider text-white bg-red-600 px-2 py-0.5 rounded-full shadow-xs">essential</span>
             </div>
-            <div class="relative">
-              <input type="number" id="currentAge" value="24" min="16" max="75" oninput="recalculateResults()" class="w-full bg-slate-50 border border-blue-300 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 focus:ring-2 focus:ring-blue-500 focus:outline-none">
-              <span class="absolute right-3 top-2 text-xs text-slate-400 font-bold">yrs</span>
+            
+            <!-- Quick Stepper (- / +) with Number Input -->
+            <div class="flex items-center gap-1.5">
+              <button type="button" onclick="changeAgeBy(-1)" class="w-8 h-8 rounded-lg bg-white border border-red-300 text-red-700 hover:bg-red-100 active:scale-95 font-black text-base flex items-center justify-center cursor-pointer shadow-xs select-none transition" title="Decrease age">&minus;</button>
+              <div class="relative flex-1">
+                <input type="number" id="currentAge" value="24" min="16" max="75" oninput="handleAgeInput(this.value)" class="w-full bg-white border-2 border-red-300 rounded-lg px-2 py-1 text-center text-sm font-black text-slate-900 focus:ring-2 focus:ring-red-500 focus:outline-none">
+                <span class="absolute right-2 top-1.5 text-[10px] text-slate-400 font-bold">yrs</span>
+              </div>
+              <button type="button" onclick="changeAgeBy(1)" class="w-8 h-8 rounded-lg bg-white border border-red-300 text-red-700 hover:bg-red-100 active:scale-95 font-black text-base flex items-center justify-center cursor-pointer shadow-xs select-none transition" title="Increase age">&#43;</button>
             </div>
-            <p class="text-[10px] text-slate-400">Used for statutory write-off calculation.</p>
+
+            <!-- Interactive Age Slider -->
+            <div class="space-y-0.5 pt-0.5">
+              <input type="range" id="ageSlider" min="16" max="75" step="1" value="24" oninput="handleAgeSlider(this.value)" class="w-full h-1.5 bg-red-200 accent-red-600 rounded-lg cursor-pointer">
+              <div class="flex justify-between text-[9px] text-red-800 font-semibold px-0.5">
+                <span>16 yrs</span>
+                <span id="dispCurrentAgeSlider" class="font-extrabold text-red-950">Age 24</span>
+                <span>75 yrs</span>
+              </div>
+            </div>
+
+            <p class="text-[10px] text-red-800/80 font-medium leading-tight">Essential for statutory write-off &amp; lifetime projection.</p>
           </div>
 
         </div>
@@ -967,6 +984,42 @@
       recalculateAll();
     }
 
+    function handleAgeInput(val) {
+      let age = parseInt(val);
+      if (isNaN(age)) return;
+      if (age < 16) age = 16;
+      if (age > 80) age = 80;
+      state.currentAge = age;
+      const slider = document.getElementById('ageSlider');
+      if (slider) slider.value = age;
+      const disp = document.getElementById('dispCurrentAgeSlider');
+      if (disp) disp.innerText = `Age ${age}`;
+      recalculateResults();
+    }
+
+    function handleAgeSlider(val) {
+      const age = parseInt(val) || 18;
+      state.currentAge = age;
+      const input = document.getElementById('currentAge');
+      if (input) input.value = age;
+      const disp = document.getElementById('dispCurrentAgeSlider');
+      if (disp) disp.innerText = `Age ${age}`;
+      recalculateResults();
+    }
+
+    function changeAgeBy(delta) {
+      const input = document.getElementById('currentAge');
+      let cur = parseInt(input ? input.value : state.currentAge) || 24;
+      cur = Math.max(16, Math.min(80, cur + delta));
+      state.currentAge = cur;
+      if (input) input.value = cur;
+      const slider = document.getElementById('ageSlider');
+      if (slider) slider.value = cur;
+      const disp = document.getElementById('dispCurrentAgeSlider');
+      if (disp) disp.innerText = `Age ${cur}`;
+      recalculateResults();
+    }
+
     function handleSalaryGrowthChange(val) {
       state.salaryGrowth = parseFloat(val);
       document.getElementById('dispSalaryGrowthVal').innerText = state.salaryGrowth.toFixed(1);
@@ -1140,6 +1193,10 @@
       state.duration = parseInt(document.getElementById('courseDuration').value);
       state.homeCountry = document.getElementById('homeCountry').value;
       state.currentAge = Math.max(16, parseInt(document.getElementById('currentAge').value) || 24);
+      const ageSlider = document.getElementById('ageSlider');
+      if (ageSlider) ageSlider.value = state.currentAge;
+      const dispAgeSlider = document.getElementById('dispCurrentAgeSlider');
+      if (dispAgeSlider) dispAgeSlider.innerText = `Age ${state.currentAge}`;
       state.workStartYear = parseInt(document.getElementById('workStartYear').value) || (state.startYear + state.duration);
 
       const rates = HISTORICAL_DATA[state.startYear] || HISTORICAL_DATA[2024];
@@ -1259,6 +1316,19 @@
     }
 
     function recalculateResults() {
+      // Synchronize currentAge from input if present
+      const ageInput = document.getElementById('currentAge');
+      if (ageInput && ageInput.value) {
+        const parsedAge = parseInt(ageInput.value);
+        if (!isNaN(parsedAge) && parsedAge >= 16) {
+          state.currentAge = parsedAge;
+          const ageSlider = document.getElementById('ageSlider');
+          if (ageSlider && parseInt(ageSlider.value) !== parsedAge) ageSlider.value = parsedAge;
+          const dispAgeSlider = document.getElementById('dispCurrentAgeSlider');
+          if (dispAgeSlider) dispAgeSlider.innerText = `Age ${parsedAge}`;
+        }
+      }
+
       // Synchronize text labels
       document.querySelectorAll('.ruleSalaryText').forEach(el => {
         el.innerText = state.salary.toLocaleString();
