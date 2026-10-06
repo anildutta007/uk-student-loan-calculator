@@ -567,21 +567,26 @@
       <!-- STEP 3: RESULTS PERSPECTIVES (STUDENT PAYSLIP VS PARENT ADVISOR) -->
       <section class="space-y-4">
         
-        <!-- Tab Navigation Switcher (3 Perspective Views) -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 p-1.5 bg-slate-200/80 rounded-2xl">
-          <button onclick="switchPerspective('student')" id="tab-student" class="perspective-tab active py-2.5 px-3 rounded-xl text-center font-bold text-xs sm:text-sm transition cursor-pointer flex items-center justify-center gap-2">
+        <!-- Tab Navigation Switcher (4 Views) -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 p-1.5 bg-slate-200/80 rounded-2xl">
+          <button onclick="switchPerspective('student')" id="tab-student" class="perspective-tab active py-2.5 px-2 rounded-xl text-center font-bold text-xs sm:text-sm transition cursor-pointer flex items-center justify-center gap-1.5">
             <span>🎓</span>
             <span>Student Repayment</span>
           </button>
           
-          <button onclick="switchPerspective('parent')" id="tab-parent" class="perspective-tab bg-white text-slate-700 border border-slate-200 py-2.5 px-3 rounded-xl text-center font-bold text-xs sm:text-sm transition cursor-pointer flex items-center justify-center gap-2 hover:bg-slate-50">
+          <button onclick="switchPerspective('parent')" id="tab-parent" class="perspective-tab bg-white text-slate-700 border border-slate-200 py-2.5 px-2 rounded-xl text-center font-bold text-xs sm:text-sm transition cursor-pointer flex items-center justify-center gap-1.5 hover:bg-slate-50">
             <span>👨‍👩‍👦</span>
-            <span>I am a Parent (Contribution)</span>
+            <span>Parent Contribution</span>
           </button>
 
-          <button onclick="switchPerspective('info')" id="tab-info" class="perspective-tab bg-white text-slate-700 border border-slate-200 py-2.5 px-3 rounded-xl text-center font-bold text-xs sm:text-sm transition cursor-pointer flex items-center justify-center gap-2 hover:bg-slate-50">
+          <button onclick="switchPerspective('cgt-guide')" id="tab-cgt" class="perspective-tab bg-white text-slate-700 border border-slate-200 py-2.5 px-2 rounded-xl text-center font-bold text-xs sm:text-sm transition cursor-pointer flex items-center justify-center gap-1.5 hover:bg-slate-50">
+            <span>🛡️</span>
+            <span>CGT &amp; ISA Guide</span>
+          </button>
+
+          <button onclick="switchPerspective('info')" id="tab-info" class="perspective-tab bg-white text-slate-700 border border-slate-200 py-2.5 px-2 rounded-xl text-center font-bold text-xs sm:text-sm transition cursor-pointer flex items-center justify-center gap-1.5 hover:bg-slate-50">
             <span>ℹ️</span>
-            <span>Information &amp; Assumptions</span>
+            <span>Assumptions &amp; Rules</span>
           </button>
         </div>
 
@@ -766,6 +771,138 @@
           <!-- DYNAMIC PARENT CHARTS CONTAINER: 1 CHART IF £0, 2 CHARTS IF CONTRIBUTING -->
           <div id="parentChartsDynamicWrapper" class="space-y-4">
             <!-- Dynamically populated: 1 chart if £0 contrib, or 2 side-by-side charts if contributing -->
+          </div>
+
+        </div>
+
+        <!-- PERSPECTIVE D: CGT & ISA CALCULATION GUIDE (BEGINNER-FRIENDLY TAX GUIDE) -->
+        <div id="perspective-cgt" class="bg-white rounded-xl p-5 sm:p-6 border border-slate-200 shadow-sm space-y-6 hidden">
+          
+          <!-- Header Banner with Back Action -->
+          <div class="border-b border-slate-100 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-100 text-emerald-800">Beginner-Friendly Tax Guide</span>
+                <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-slate-100 text-slate-700 border border-slate-200">UK Tax Rules 2026/27</span>
+              </div>
+              <h3 class="text-base sm:text-lg font-black text-slate-900 mt-1">What is Capital Gains Tax (CGT) &amp; The ISA Wrapper?</h3>
+              <p class="text-xs text-slate-500">Demystifying investment taxes with plain-English explanations and step-by-step arithmetic from your actual inputs.</p>
+            </div>
+            <button onclick="switchPerspective('parent')" class="inline-flex items-center gap-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold transition cursor-pointer self-start sm:self-auto border border-slate-300">
+              <span>&larr;</span>
+              <span>Back to Parent Decision Tables</span>
+            </button>
+          </div>
+
+          <!-- Section 1: Plain-English Concepts (No Jargon) -->
+          <div class="space-y-3">
+            <div class="flex items-center gap-2">
+              <span class="text-base">💡</span>
+              <h4 class="text-xs sm:text-sm font-extrabold uppercase tracking-wide text-slate-800">
+                1. Core Concepts: The Tax Shield vs Taxable Account
+              </h4>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <!-- Card 1: What is an ISA Wrapper? -->
+              <div class="bg-emerald-50/70 p-4 rounded-xl border border-emerald-200 space-y-2.5">
+                <div class="flex items-center gap-2 text-emerald-950 font-black text-xs sm:text-sm">
+                  <span>🛡️</span>
+                  <h5>The ISA Wrapper (100% Tax-Free)</h5>
+                </div>
+                <p class="text-xs text-emerald-900 leading-relaxed">
+                  Think of an <strong>ISA (Individual Savings Account)</strong> as a legal "tax-free shield" granted by HMRC.
+                </p>
+                <ul class="text-[11px] text-emerald-900/90 space-y-1.5 list-disc list-inside leading-relaxed">
+                  <li><strong>Zero tax forever:</strong> All share growth, dividends, and interest inside this wrapper are <strong>100% tax-free</strong>.</li>
+                  <li><strong>Withdraw anytime:</strong> When your child withdraws funds for a house deposit or wedding, they owe HMRC <strong>£0 tax</strong>.</li>
+                  <li><strong>Statutory limits:</strong> £20,000/year for adults (18+), or £9,000/year for Junior ISAs (under 18).</li>
+                </ul>
+              </div>
+
+              <!-- Card 2: What is a General Investment Account? -->
+              <div class="bg-blue-50/70 p-4 rounded-xl border border-blue-200 space-y-2.5">
+                <div class="flex items-center gap-2 text-blue-950 font-black text-xs sm:text-sm">
+                  <span>🏦</span>
+                  <h5>General Investment Account (GIA)</h5>
+                </div>
+                <p class="text-xs text-blue-900 leading-relaxed">
+                  A standard investment account opened in your child's name <strong>without</strong> an ISA wrapper.
+                </p>
+                <ul class="text-[11px] text-blue-900/90 space-y-1.5 list-disc list-inside leading-relaxed">
+                  <li><strong>Only profit is taxed:</strong> Capital Gains Tax (CGT) is <em>only</em> paid on the profit (growth) made, never on the original deposit you put in.</li>
+                  <li><strong>£3,000 Annual Exemption:</strong> Every UK resident can make up to <strong>£3,000 profit per tax year completely tax-free</strong>.</li>
+                  <li><strong>Surplus is taxed:</strong> Any profit above £3,000 in a single tax year triggers Capital Gains Tax.</li>
+                </ul>
+              </div>
+
+              <!-- Card 3: Which CGT Rate Applies? -->
+              <div class="bg-amber-50/70 p-4 rounded-xl border border-amber-200 space-y-2.5">
+                <div class="flex items-center gap-2 text-amber-950 font-black text-xs sm:text-sm">
+                  <span>⚖️</span>
+                  <h5>Which Tax Rate Applies? (18% vs 24%)</h5>
+                </div>
+                <p class="text-xs text-amber-900 leading-relaxed">
+                  HMRC links your child's CGT rate directly to their salary in the year the investment is sold:
+                </p>
+                <ul class="text-[11px] text-amber-900/90 space-y-1.5 list-disc list-inside leading-relaxed">
+                  <li><strong>Basic Rate (18% CGT):</strong> Applied if their salary + taxable gain stays below the UK higher-rate threshold (<strong>£50,270</strong>).</li>
+                  <li><strong>Higher Rate (24% CGT):</strong> Applied to any portion where salary + taxable gain exceeds <strong>£50,270</strong>.</li>
+                  <li><strong>Automatic salary tracking:</strong> Our calculator dynamically increases their tax rate as their career salary rises over time!</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 2: Live Dynamic Step-by-Step Calculation Breakdown -->
+          <div class="space-y-3 border-t border-slate-100 pt-5">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+              <div class="flex items-center gap-2">
+                <span class="text-base">🧮</span>
+                <h4 class="text-xs sm:text-sm font-extrabold uppercase tracking-wide text-slate-800">
+                  2. Step-by-Step Math: How Your Numbers in Table 2 Were Calculated
+                </h4>
+              </div>
+              <span class="text-[11px] text-slate-500">Live data reflecting your current Step 1 &amp; Step 2 inputs</span>
+            </div>
+
+            <div id="cgtLiveBreakdownContainer" class="space-y-4">
+              <!-- Dynamically rendered by renderCgtDetailedGuide() -->
+            </div>
+          </div>
+
+          <!-- Section 3: Smart Parent Tax Strategies -->
+          <div class="space-y-3 border-t border-slate-100 pt-5">
+            <div class="flex items-center gap-2">
+              <span class="text-base">🎯</span>
+              <h4 class="text-xs sm:text-sm font-extrabold uppercase tracking-wide text-slate-800">
+                3. Three Practical Tips for Parents
+              </h4>
+            </div>
+
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs text-slate-700 space-y-3">
+              <div class="flex items-start gap-2.5">
+                <span class="px-2 py-0.5 rounded font-black bg-emerald-200 text-emerald-900 text-[10px]">Tip 1</span>
+                <div>
+                  <strong>Always use the ISA wrapper first:</strong>
+                  If your child is under 18, use a Junior ISA (£9,000/year). Once they turn 18, they can invest up to £20,000/year into an Adult Stocks &amp; Shares ISA. This completely eliminates all CGT paperwork and taxes.
+                </div>
+              </div>
+              <div class="flex items-start gap-2.5">
+                <span class="px-2 py-0.5 rounded font-black bg-blue-200 text-blue-900 text-[10px]">Tip 2</span>
+                <div>
+                  <strong>"Bed &amp; ISA" transfer strategy:</strong>
+                  If you have a large lump sum outside an ISA, you can transfer up to £20,000 each tax year from the General Account into the ISA. By selling small portions each year within the £3,000 annual exemption, you pay £0 CGT.
+                </div>
+              </div>
+              <div class="flex items-start gap-2.5">
+                <span class="px-2 py-0.5 rounded font-black bg-amber-200 text-amber-900 text-[10px]">Tip 3</span>
+                <div>
+                  <strong>Weigh against student loan upfront payoff:</strong>
+                  Paying fees directly to the university locks your money away with SLC forever. An investment account or ISA in your child's name keeps the money flexible, growing, and readily available for an emergency reserve or first-home deposit.
+                </div>
+              </div>
+            </div>
           </div>
 
         </div>
@@ -1474,23 +1611,35 @@
       state.perspective = p;
       const studEl = document.getElementById('perspective-student');
       const parEl = document.getElementById('perspective-parent');
+      const cgtEl = document.getElementById('perspective-cgt');
       const infoEl = document.getElementById('perspective-info');
       if (studEl) studEl.classList.toggle('hidden', p !== 'student');
       if (parEl) parEl.classList.toggle('hidden', p !== 'parent');
+      if (cgtEl) cgtEl.classList.toggle('hidden', p !== 'cgt-guide');
       if (infoEl) infoEl.classList.toggle('hidden', p !== 'info');
       
       const tabStud = document.getElementById('tab-student');
       const tabPar = document.getElementById('tab-parent');
+      const tabCgt = document.getElementById('tab-cgt');
       const tabInfo = document.getElementById('tab-info');
 
-      const activeClass = 'perspective-tab active py-2.5 px-3 rounded-xl text-center font-bold text-xs sm:text-sm transition cursor-pointer flex items-center justify-center gap-2';
-      const inactiveClass = 'perspective-tab bg-white text-slate-700 border border-slate-200 py-2.5 px-3 rounded-xl text-center font-bold text-xs sm:text-sm transition cursor-pointer flex items-center justify-center gap-2 hover:bg-slate-50';
+      const activeClass = 'perspective-tab active py-2.5 px-2 rounded-xl text-center font-bold text-xs sm:text-sm transition cursor-pointer flex items-center justify-center gap-1.5';
+      const inactiveClass = 'perspective-tab bg-white text-slate-700 border border-slate-200 py-2.5 px-2 rounded-xl text-center font-bold text-xs sm:text-sm transition cursor-pointer flex items-center justify-center gap-1.5 hover:bg-slate-50';
 
       if (tabStud) tabStud.className = (p === 'student') ? activeClass : inactiveClass;
       if (tabPar) tabPar.className = (p === 'parent') ? activeClass : inactiveClass;
+      if (tabCgt) tabCgt.className = (p === 'cgt-guide') ? activeClass : inactiveClass;
       if (tabInfo) tabInfo.className = (p === 'info') ? activeClass : inactiveClass;
 
       recalculateResults();
+
+      if (p === 'cgt-guide') {
+        const target = document.getElementById('perspective-cgt');
+        if (target) {
+          const topPos = target.getBoundingClientRect().top + window.pageYOffset - 80;
+          window.scrollTo({ top: topPos, behavior: 'smooth' });
+        }
+      }
     }
 
     function syncSalary(val) {
@@ -1812,6 +1961,9 @@
 
       // Render Dynamic Parent Charts (1 Chart if £0, 2 Separate Charts if Contributing)
       renderDynamicParentSection(studentSim, parentReducedSim, remainingYears, childActualSavings, wipeoutAge, careerStartAge);
+
+      // Render Dynamic CGT & ISA Calculation Guide Breakdown
+      renderCgtDetailedGuide(state.parentContribution, remainingYears, wipeoutAge, careerStartAge);
     }
 
     function updateParentDecisionCard(childSavings, wipeoutAge, remainingYears, simNoContrib, simWithContrib, careerStartAge) {
@@ -2277,6 +2429,357 @@
     }
 
     // ====================================================================
+    // CGT & ISA CALCULATION GUIDE ENGINE (DETAILED STEP-BY-STEP MATH)
+    // ====================================================================
+    function getCgtMilestoneMath(pot, rate, years, startingSalary, salaryGrowth) {
+      const gross = pot * Math.pow(1 + rate, years);
+      const totalGain = Math.max(0, gross - pot);
+      const allowance = 3000;
+      const taxableGain = Math.max(0, totalGain - allowance);
+      const salaryAtYear = startingSalary * Math.pow(1 + salaryGrowth / 100, years);
+      const basicRateThreshold = 50270;
+      const headroomInBasicRate = Math.max(0, basicRateThreshold - salaryAtYear);
+
+      let gainAtBasic = 0;
+      let gainAtHigher = 0;
+      let cgt = 0;
+
+      if (taxableGain > 0) {
+        if (headroomInBasicRate > 0) {
+          gainAtBasic = Math.min(taxableGain, headroomInBasicRate);
+          gainAtHigher = Math.max(0, taxableGain - gainAtBasic);
+          cgt = (gainAtBasic * 0.18) + (gainAtHigher * 0.24);
+        } else {
+          gainAtHigher = taxableGain;
+          cgt = taxableGain * 0.24;
+        }
+      }
+
+      const net = Math.max(0, gross - cgt);
+
+      return {
+        pot,
+        rate,
+        years,
+        gross: Math.round(gross),
+        totalGain: Math.round(totalGain),
+        allowance,
+        taxableGain: Math.round(taxableGain),
+        salaryAtYear: Math.round(salaryAtYear),
+        headroomInBasicRate: Math.round(headroomInBasicRate),
+        gainAtBasic: Math.round(gainAtBasic),
+        gainAtHigher: Math.round(gainAtHigher),
+        cgtBasic: Math.round(gainAtBasic * 0.18),
+        cgtHigher: Math.round(gainAtHigher * 0.24),
+        cgtTotal: Math.round(cgt),
+        net: Math.round(net),
+        isaTaxSaving: Math.round(cgt),
+        isHigherRate: salaryAtYear >= basicRateThreshold
+      };
+    }
+
+    function renderCgtDetailedGuide(contrib, remainingYears, wipeoutAge, careerStartAge) {
+      careerStartAge = careerStartAge || state.currentAge;
+      const container = document.getElementById('cgtLiveBreakdownContainer');
+      if (!container) return;
+
+      const isZeroContrib = (contrib <= 0);
+      const activeContrib = isZeroContrib ? 10000 : contrib;
+      const salary = state.salary;
+      const growth = state.salaryGrowth;
+
+      const m10_4 = getCgtMilestoneMath(activeContrib, 0.04, 10, salary, growth);
+      const m20_4 = getCgtMilestoneMath(activeContrib, 0.04, 20, salary, growth);
+      const mEnd_4 = getCgtMilestoneMath(activeContrib, 0.04, remainingYears, salary, growth);
+
+      // Matrix comparisons
+      const m10_3 = getCgtMilestoneMath(activeContrib, 0.03, 10, salary, growth);
+      const m10_5 = getCgtMilestoneMath(activeContrib, 0.05, 10, salary, growth);
+      const m20_3 = getCgtMilestoneMath(activeContrib, 0.03, 20, salary, growth);
+      const m20_5 = getCgtMilestoneMath(activeContrib, 0.05, 20, salary, growth);
+      const mEnd_3 = getCgtMilestoneMath(activeContrib, 0.03, remainingYears, salary, growth);
+      const mEnd_5 = getCgtMilestoneMath(activeContrib, 0.05, remainingYears, salary, growth);
+
+      function renderStepWalkthroughCard(m, title, horizonLabel, badgeColor, icon) {
+        return `
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+            <!-- Milestone Header -->
+            <div class="p-4 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <span class="text-xl">${icon}</span>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider ${badgeColor}">${horizonLabel}</span>
+                    <span class="text-xs font-bold text-slate-500">Child Age ${careerStartAge + m.years}</span>
+                  </div>
+                  <h5 class="text-sm sm:text-base font-black text-slate-900 mt-0.5">${title}</h5>
+                </div>
+              </div>
+              <div class="text-right">
+                <span class="text-[11px] text-slate-500 block">ISA Tax Shield Saving</span>
+                <span class="text-sm sm:text-base font-black text-emerald-700">+£${m.isaTaxSaving.toLocaleString()} Free Cash</span>
+              </div>
+            </div>
+
+            <!-- 6-Step Visual Stepper -->
+            <div class="p-4 sm:p-5 space-y-4 text-xs">
+              
+              <!-- Step 1 & 2 Grid -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1">
+                  <div class="flex items-center justify-between">
+                    <span class="text-[10px] font-black uppercase text-slate-500">Step 1 &bull; Initial Capital Pot</span>
+                    <span class="px-1.5 py-0.5 bg-slate-200 text-slate-700 rounded text-[10px] font-bold">0% Tax</span>
+                  </div>
+                  <div class="text-base font-black text-slate-900">£${m.pot.toLocaleString()}</div>
+                  <p class="text-[11px] text-slate-600">The upfront contribution deposited in your child's name. Initial deposits are capital savings, so HMRC charges <strong>£0 tax</strong>.</p>
+                </div>
+
+                <div class="p-3 rounded-xl bg-emerald-50/60 border border-emerald-200 space-y-1">
+                  <div class="flex items-center justify-between">
+                    <span class="text-[10px] font-black uppercase text-emerald-800">Step 2 &bull; 4% Compound Growth</span>
+                    <span class="px-1.5 py-0.5 bg-emerald-200 text-emerald-950 rounded text-[10px] font-black">ISA Take-Home</span>
+                  </div>
+                  <div class="text-base font-black text-emerald-900">£${m.gross.toLocaleString()}</div>
+                  <p class="text-[11px] text-emerald-900">Formula: £${m.pot.toLocaleString()} &times; (1.04)<sup>${m.years}</sup>. Inside an <strong>ISA wrapper</strong>, this is the 100% tax-free value.</p>
+                </div>
+              </div>
+
+              <!-- Step 3 & 4 Grid -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1">
+                  <div class="flex items-center justify-between">
+                    <span class="text-[10px] font-black uppercase text-slate-500">Step 3 &bull; Total Capital Gain (Profit)</span>
+                    <span class="text-[10px] font-bold text-slate-600">Growth Only</span>
+                  </div>
+                  <div class="text-base font-black text-slate-900">£${m.totalGain.toLocaleString()}</div>
+                  <p class="text-[11px] text-slate-600">Gross Pot (£${m.gross.toLocaleString()}) &minus; Starting Pot (£${m.pot.toLocaleString()}). HMRC only taxes growth, never your original money.</p>
+                </div>
+
+                <div class="p-3 rounded-xl bg-blue-50/60 border border-blue-200 space-y-1">
+                  <div class="flex items-center justify-between">
+                    <span class="text-[10px] font-black uppercase text-blue-800">Step 4 &bull; Deduct £3k Tax-Free Allowance</span>
+                    <span class="px-1.5 py-0.5 bg-blue-200 text-blue-900 rounded text-[10px] font-bold">Annual Allowance</span>
+                  </div>
+                  <div class="text-base font-black text-blue-950">£${m.taxableGain.toLocaleString()} <span class="text-xs font-normal text-blue-800">Taxable</span></div>
+                  <p class="text-[11px] text-blue-900">
+                    ${m.taxableGain === 0 
+                      ? `Total profit (£${m.totalGain.toLocaleString()}) is below the £3,000 statutory allowance. <strong>Taxable gain is £0</strong>!` 
+                      : `Profit (£${m.totalGain.toLocaleString()}) &minus; £3,000 personal allowance = <strong>£${m.taxableGain.toLocaleString()}</strong> subject to CGT.`}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Step 5: Tax Rate Breakdown -->
+              <div class="p-3.5 rounded-xl bg-amber-50/70 border border-amber-200 space-y-2">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                  <span class="text-[10px] font-black uppercase text-amber-900">Step 5 &bull; Check Child's Career Salary &amp; Apply CGT Rates (18% vs 24%)</span>
+                  <span class="text-[10px] font-bold text-amber-800">Threshold: £50,270 Higher Rate</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1 border-t border-amber-200/60 text-xs">
+                  <div>
+                    <span class="text-[10px] text-amber-800 block">Projected Salary (Yr ${m.years})</span>
+                    <strong class="text-slate-900 font-black text-sm">£${m.salaryAtYear.toLocaleString()}</strong>
+                  </div>
+                  <div>
+                    <span class="text-[10px] text-amber-800 block">Tax Band Breakdown</span>
+                    <span class="text-xs font-bold text-slate-800">
+                      ${m.taxableGain === 0 
+                        ? '£0 Gain (Zero tax)' 
+                        : (m.gainAtBasic > 0 && m.gainAtHigher > 0)
+                          ? `£${m.gainAtBasic.toLocaleString()} @ 18% + £${m.gainAtHigher.toLocaleString()} @ 24%`
+                          : (m.gainAtBasic > 0)
+                            ? `£${m.gainAtBasic.toLocaleString()} @ 18% Basic Rate`
+                            : `£${m.gainAtHigher.toLocaleString()} @ 24% Higher Rate`}
+                    </span>
+                  </div>
+                  <div class="sm:text-right">
+                    <span class="text-[10px] text-amber-800 block">Total CGT Owed to HMRC</span>
+                    <strong class="text-rose-700 font-black text-sm">£${m.cgtTotal.toLocaleString()}</strong>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Step 6: Comparison Take-Home Box -->
+              <div class="p-3.5 rounded-xl bg-gradient-to-r from-slate-900 to-indigo-950 text-white space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-black uppercase tracking-wider text-slate-300">Step 6 &bull; Final Take-Home Comparison</span>
+                  <span class="text-[10px] text-emerald-300 font-bold">In Your Child's Pocket</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1 text-center sm:text-left">
+                  <div class="bg-white/10 p-2.5 rounded-lg">
+                    <span class="text-[10px] text-slate-300 uppercase block font-bold">Standard Account (Net CGT)</span>
+                    <strong class="text-base font-black text-white">£${m.net.toLocaleString()}</strong>
+                    <span class="text-[10px] text-slate-300 block">Gross £${m.gross.toLocaleString()} &minus; £${m.cgtTotal.toLocaleString()} tax</span>
+                  </div>
+                  <div class="bg-emerald-500/20 border border-emerald-400/30 p-2.5 rounded-lg">
+                    <span class="text-[10px] text-emerald-200 uppercase block font-black">Tax-Free ISA Wrapper</span>
+                    <strong class="text-base font-black text-emerald-300">£${m.gross.toLocaleString()}</strong>
+                    <span class="text-[10px] text-emerald-200 block">100% Tax-Free (&pound;0 tax to HMRC)</span>
+                  </div>
+                  <div class="bg-white/10 p-2.5 rounded-lg sm:text-right">
+                    <span class="text-[10px] text-emerald-300 uppercase block font-black">ISA Tax Shield Benefit</span>
+                    <strong class="text-base font-black text-emerald-400">+£${m.isaTaxSaving.toLocaleString()}</strong>
+                    <span class="text-[10px] text-slate-300 block">Extra money for their future</span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        `;
+      }
+
+      container.innerHTML = `
+        ${isZeroContrib ? `
+          <div class="bg-amber-50 border border-amber-200 rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-amber-950">
+            <div class="flex items-center gap-2">
+              <span class="text-lg">📌</span>
+              <div>
+                <strong>Notice:</strong> Your Parent Contribution in Step 1 is currently set to <strong>£0</strong>.
+                Below is an illustrative calculation walkthrough using a standard <strong>£10,000 contribution</strong> with your child's salary inputs.
+              </div>
+            </div>
+            <button onclick="syncParentContribution(10000)" class="px-3 py-1.5 bg-amber-200 hover:bg-amber-300 text-amber-950 rounded-lg font-black transition cursor-pointer self-start sm:self-auto whitespace-nowrap">
+              <span>Set Contribution to £10,000 &rarr;</span>
+            </button>
+          </div>
+        ` : `
+          <div class="bg-emerald-50/80 border border-emerald-200 rounded-xl p-3 flex flex-wrap items-center justify-between gap-2 text-xs text-emerald-950">
+            <div class="flex items-center gap-2">
+              <span class="text-base">📊</span>
+              <span><strong>Your Live Inputs:</strong> Parent Pot: <strong>£${activeContrib.toLocaleString()}</strong> | Starting Salary: <strong>£${salary.toLocaleString()}</strong> | Annual Pay Rise: <strong>${growth}%</strong> | Statutory CGT Exemption: <strong>£3,000/yr</strong></span>
+            </div>
+            <button onclick="switchPerspective('parent')" class="text-xs font-bold text-emerald-900 hover:underline cursor-pointer">
+              <span>Back to Decision Tables &rarr;</span>
+            </button>
+          </div>
+        `}
+
+        <!-- FEATURED MILESTONE 1: IN 10 YEARS -->
+        ${renderStepWalkthroughCard(m10_4, "10-Year Horizon: Early Career Foundation", "In 10 Years", "bg-blue-100 text-blue-900", "🌱")}
+
+        <!-- FEATURED MILESTONE 2: IN 20 YEARS (HOME DEPOSIT) -->
+        ${renderStepWalkthroughCard(m20_4, "20-Year Horizon: First-Home Deposit Milestone", "In 20 Years 🏠", "bg-emerald-100 text-emerald-900", "🏡")}
+
+        <!-- FEATURED MILESTONE 3: AT LOAN TERM END -->
+        ${renderStepWalkthroughCard(mEnd_4, `At Loan Term End: Full Horizon (${remainingYears} Years)`, `Loan Write-Off Year`, "bg-purple-100 text-purple-900", "🎓")}
+
+        <!-- SCENARIO COMPARISON MATRIX (3%, 4%, 5%) -->
+        <div class="bg-slate-50 p-4 sm:p-5 rounded-2xl border border-slate-200 space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-base">📊</span>
+              <h5 class="text-xs sm:text-sm font-black text-slate-900">
+                Full Scenario Matrix: Taxable General Account vs ISA Wrapper (3%, 4% &amp; 5% Growth)
+              </h5>
+            </div>
+            <span class="text-[11px] text-slate-500">Based on £${activeContrib.toLocaleString()} pot</span>
+          </div>
+
+          <div class="overflow-x-auto rounded-xl border border-slate-200 bg-white">
+            <table class="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200 text-[11px]">
+                  <th class="p-3">Milestone Horizon</th>
+                  <th class="p-3">Annual Return</th>
+                  <th class="p-3">Gross Pot (ISA Value)</th>
+                  <th class="p-3">Statutory CGT Tax</th>
+                  <th class="p-3">General Account (Net of CGT)</th>
+                  <th class="p-3 text-right">ISA Tax Shield Bonus</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100 text-slate-800">
+                <!-- 10 Years -->
+                <tr class="hover:bg-slate-50">
+                  <td class="p-3 font-bold" rowspan="3">In 10 Years (Age ${careerStartAge + 10})</td>
+                  <td class="p-3">3% p.a.</td>
+                  <td class="p-3 font-semibold text-emerald-800">£${m10_3.gross.toLocaleString()}</td>
+                  <td class="p-3 text-rose-700 font-semibold">£${m10_3.cgtTotal.toLocaleString()}</td>
+                  <td class="p-3 font-bold">£${m10_3.net.toLocaleString()}</td>
+                  <td class="p-3 text-right font-black text-emerald-700">+£${m10_3.isaTaxSaving.toLocaleString()}</td>
+                </tr>
+                <tr class="hover:bg-slate-50 bg-emerald-50/30">
+                  <td class="p-3 font-black text-emerald-950">4% p.a. (Benchmark)</td>
+                  <td class="p-3 font-black text-emerald-950">£${m10_4.gross.toLocaleString()}</td>
+                  <td class="p-3 text-rose-700 font-bold">£${m10_4.cgtTotal.toLocaleString()}</td>
+                  <td class="p-3 font-black text-slate-900">£${m10_4.net.toLocaleString()}</td>
+                  <td class="p-3 text-right font-black text-emerald-700">+£${m10_4.isaTaxSaving.toLocaleString()}</td>
+                </tr>
+                <tr class="hover:bg-slate-50">
+                  <td class="p-3">5% p.a.</td>
+                  <td class="p-3 font-semibold text-emerald-800">£${m10_5.gross.toLocaleString()}</td>
+                  <td class="p-3 text-rose-700 font-semibold">£${m10_5.cgtTotal.toLocaleString()}</td>
+                  <td class="p-3 font-bold">£${m10_5.net.toLocaleString()}</td>
+                  <td class="p-3 text-right font-black text-emerald-700">+£${m10_5.isaTaxSaving.toLocaleString()}</td>
+                </tr>
+
+                <!-- 20 Years -->
+                <tr class="hover:bg-slate-50 border-t-2 border-slate-200">
+                  <td class="p-3 font-bold text-emerald-950" rowspan="3">In 20 Years 🏠 (Age ${careerStartAge + 20})</td>
+                  <td class="p-3">3% p.a.</td>
+                  <td class="p-3 font-semibold text-emerald-800">£${m20_3.gross.toLocaleString()}</td>
+                  <td class="p-3 text-rose-700 font-semibold">£${m20_3.cgtTotal.toLocaleString()}</td>
+                  <td class="p-3 font-bold">£${m20_3.net.toLocaleString()}</td>
+                  <td class="p-3 text-right font-black text-emerald-700">+£${m20_3.isaTaxSaving.toLocaleString()}</td>
+                </tr>
+                <tr class="hover:bg-slate-50 bg-emerald-100/40">
+                  <td class="p-3 font-black text-emerald-950">4% p.a. (Benchmark)</td>
+                  <td class="p-3 font-black text-emerald-950">£${m20_4.gross.toLocaleString()}</td>
+                  <td class="p-3 text-rose-700 font-black">£${m20_4.cgtTotal.toLocaleString()}</td>
+                  <td class="p-3 font-black text-slate-900">£${m20_4.net.toLocaleString()}</td>
+                  <td class="p-3 text-right font-black text-emerald-800">+£${m20_4.isaTaxSaving.toLocaleString()}</td>
+                </tr>
+                <tr class="hover:bg-slate-50">
+                  <td class="p-3">5% p.a.</td>
+                  <td class="p-3 font-semibold text-emerald-800">£${m20_5.gross.toLocaleString()}</td>
+                  <td class="p-3 text-rose-700 font-semibold">£${m20_5.cgtTotal.toLocaleString()}</td>
+                  <td class="p-3 font-bold">£${m20_5.net.toLocaleString()}</td>
+                  <td class="p-3 text-right font-black text-emerald-700">+£${m20_5.isaTaxSaving.toLocaleString()}</td>
+                </tr>
+
+                <!-- Loan Term End -->
+                <tr class="hover:bg-slate-50 border-t-2 border-slate-200">
+                  <td class="p-3 font-bold" rowspan="3">Term End (${remainingYears} Yrs - Age ${wipeoutAge})</td>
+                  <td class="p-3">3% p.a.</td>
+                  <td class="p-3 font-semibold text-emerald-800">£${mEnd_3.gross.toLocaleString()}</td>
+                  <td class="p-3 text-rose-700 font-semibold">£${mEnd_3.cgtTotal.toLocaleString()}</td>
+                  <td class="p-3 font-bold">£${mEnd_3.net.toLocaleString()}</td>
+                  <td class="p-3 text-right font-black text-emerald-700">+£${mEnd_3.isaTaxSaving.toLocaleString()}</td>
+                </tr>
+                <tr class="hover:bg-slate-50 bg-emerald-50/30">
+                  <td class="p-3 font-black text-emerald-950">4% p.a. (Benchmark)</td>
+                  <td class="p-3 font-black text-emerald-950">£${mEnd_4.gross.toLocaleString()}</td>
+                  <td class="p-3 text-rose-700 font-bold">£${mEnd_4.cgtTotal.toLocaleString()}</td>
+                  <td class="p-3 font-black text-slate-900">£${mEnd_4.net.toLocaleString()}</td>
+                  <td class="p-3 text-right font-black text-emerald-700">+£${mEnd_4.isaTaxSaving.toLocaleString()}</td>
+                </tr>
+                <tr class="hover:bg-slate-50">
+                  <td class="p-3">5% p.a.</td>
+                  <td class="p-3 font-semibold text-emerald-800">£${mEnd_5.gross.toLocaleString()}</td>
+                  <td class="p-3 text-rose-700 font-semibold">£${mEnd_5.cgtTotal.toLocaleString()}</td>
+                  <td class="p-3 font-bold">£${mEnd_5.net.toLocaleString()}</td>
+                  <td class="p-3 text-right font-black text-emerald-700">+£${mEnd_5.isaTaxSaving.toLocaleString()}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Navigation Action -->
+        <div class="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div class="text-xs text-slate-500">
+            All calculations adhere strictly to current HMRC 2026/27 rules: £3,000 CGT exemption, 18% basic rate, 24% higher rate above £50,270.
+          </div>
+          <button onclick="switchPerspective('parent')" class="inline-flex items-center gap-1.5 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition cursor-pointer shadow-sm">
+            <span>&larr;</span>
+            <span>Return to Parent Decision Tables</span>
+          </button>
+        </div>
+      `;
+    }
+
+    // ====================================================================
     // PARENT UPFRONT CONTRIBUTION SIMULATION & EXCEL EXPORT ENGINE
     // ====================================================================
     let latestParentSimNoContrib = null;
@@ -2584,7 +3087,7 @@
           <!-- TABLE 2: NET INVESTMENT GROWTH IN CHILD'S NAME (TAXABLE VS ISA)   -->
           <!-- ================================================================= -->
           <div class="bg-slate-50 p-4 sm:p-5 rounded-2xl border border-slate-200 space-y-3">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
                 <div class="flex items-center gap-2">
                   <span class="px-2 py-0.5 rounded text-[11px] font-black bg-emerald-100 text-emerald-800 uppercase tracking-wide">Table 2</span>
@@ -2596,6 +3099,10 @@
                   If you invest the £${contrib.toLocaleString()} in your child's name: comparing a taxable General Investment Account (net of CGT) with a tax-free ISA wrapper.
                 </p>
               </div>
+              <button onclick="switchPerspective('cgt-guide')" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-950 border border-emerald-300 rounded-xl text-xs font-bold transition cursor-pointer self-start sm:self-auto shadow-xs whitespace-nowrap" title="Learn what CGT and ISA Wrappers are and see calculation math">
+                <span>📖</span>
+                <span>What is CGT &amp; ISA? (Calculation Guide) &rarr;</span>
+              </button>
             </div>
 
             <!-- Responsive Table 2 Grid -->
@@ -2697,12 +3204,18 @@
             <!-- Table 2 Tax & ISA Methodology Strip -->
             <div class="bg-emerald-50/80 border border-emerald-200/80 rounded-xl p-3 text-xs text-emerald-950 flex items-start gap-2.5">
               <span class="text-base flex-shrink-0">🛡️</span>
-              <div class="leading-relaxed">
+              <div class="leading-relaxed flex-1">
                 <strong>Tax-Free ISA Wrapper vs General Investment Account (CGT) Accounting:</strong>
                 <ul class="list-disc list-inside mt-1 space-y-0.5 text-[11px] text-emerald-900">
                   <li><strong>ISA wrapper (100% Tax-Free):</strong> If invested within a Junior ISA or Adult Stocks &amp; Shares ISA (£20,000/yr adult allowance or £9,000/yr JISA allowance), all compounding returns are <strong>100% tax-free</strong> with £0 Capital Gains Tax on withdrawal.</li>
                   <li><strong>General Investment Account (post-CGT):</strong> If held in a standard taxable account in your child's name without an ISA wrapper, it utilizes their statutory £3,000 annual CGT allowance, and any surplus gain is taxed dynamically at basic rate (18%) or higher rate (24%) based on their salary at that milestone.</li>
                 </ul>
+                <div class="mt-2.5 pt-2 border-t border-emerald-200/70 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+                  <button onclick="switchPerspective('cgt-guide')" class="text-xs font-black text-emerald-900 hover:text-emerald-950 underline cursor-pointer flex items-center gap-1 self-start">
+                    <span>📖 View Step-by-Step Calculation Breakdown &rarr;</span>
+                  </button>
+                  <span class="text-[11px] text-emerald-800 italic">Shows full arithmetic formula with your live numbers</span>
+                </div>
               </div>
             </div>
           </div>
