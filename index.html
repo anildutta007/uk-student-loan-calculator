@@ -1554,8 +1554,10 @@
     function handleSalaryGrowthChange(val) {
       state.salaryGrowth = parseFloat(val);
       document.getElementById('dispSalaryGrowthVal').innerText = state.salaryGrowth.toFixed(1);
-      document.getElementById('dispGrowthRef').innerText = state.salaryGrowth.toFixed(1) + '%';
-      document.getElementById('dispParentGrowthRef').innerText = state.salaryGrowth.toFixed(1) + '%';
+      const dispGrowth = document.getElementById('dispGrowthRef');
+      if (dispGrowth) dispGrowth.innerText = state.salaryGrowth.toFixed(1) + '%';
+      const dispParentGrowth = document.getElementById('dispParentGrowthRef');
+      if (dispParentGrowth) dispParentGrowth.innerText = state.salaryGrowth.toFixed(1) + '%';
       recalculateResults();
     }
 
@@ -1931,6 +1933,7 @@
       const isPlan5 = (state.homeCountry === 'england' && state.startYear >= 2023);
       const threshold = isPlan5 ? 25000 : 27295;
       const writeOffYears = isPlan5 ? 40 : 30;
+      const planName = isPlan5 ? 'Plan 5' : 'Plan 2';
 
       const capBadge = document.getElementById('dispTermCapBadge');
       if (capBadge) {
