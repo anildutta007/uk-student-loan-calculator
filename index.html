@@ -215,8 +215,98 @@
         </div>
       </header>
 
+      <!-- PERSISTENT LIVE STICKY KPI HUD (ALWAYS VISIBLE REGARDLESS OF ACTIVE TAB) -->
+      <div class="sticky top-2 z-40 bg-white/95 backdrop-blur-md rounded-2xl border border-slate-300/80 shadow-md p-3 px-4 sm:px-6 transition-all">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span class="text-xs font-black uppercase tracking-wider text-slate-500">Live Status:</span>
+            <span id="hudPlanBadge" class="px-2 py-0.5 rounded text-[11px] font-bold bg-blue-100 text-blue-800 border border-blue-200">Plan 2 (30-Yr)</span>
+          </div>
+
+          <!-- KPI Mini Stats Strip -->
+          <div class="flex items-center gap-3 sm:gap-6 flex-wrap text-xs">
+            <div>
+              <span class="text-[10px] uppercase font-bold text-slate-400 block">Total Borrowing</span>
+              <strong id="hudDebt" class="text-xs sm:text-sm font-black text-slate-900">£55,359</strong>
+            </div>
+            <div>
+              <span class="text-[10px] uppercase font-bold text-slate-400 block">Grad Salary</span>
+              <strong id="hudSalary" class="text-xs sm:text-sm font-black text-blue-700">£35,000</strong>
+            </div>
+            <div>
+              <span class="text-[10px] uppercase font-bold text-slate-400 block">Parent Upfront</span>
+              <strong id="hudContrib" class="text-xs sm:text-sm font-black text-slate-800">£0</strong>
+            </div>
+            <div>
+              <span class="text-[10px] uppercase font-bold text-slate-400 block">Total Career Repaid</span>
+              <strong id="hudRepaid" class="text-xs sm:text-sm font-black text-indigo-700">£42,850</strong>
+            </div>
+            <div>
+              <span class="text-[10px] uppercase font-bold text-slate-400 block">Written Off Free</span>
+              <strong id="hudCancelled" class="text-xs sm:text-sm font-black text-emerald-700">£38,910</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MASTER TOP TAB NAVIGATION (STEP 1 > STEP 2 > STUDENT > PARENT > TAX GUIDE > ASSUMPTIONS) -->
+      <div class="bg-white rounded-2xl p-2 border border-slate-200 shadow-xs">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-1.5">
+          
+          <button onclick="switchPerspective('step1')" id="tab-step1" class="perspective-tab active py-2.5 px-2 rounded-xl text-center font-bold text-xs transition cursor-pointer flex flex-col items-center justify-center gap-0.5">
+            <div class="flex items-center gap-1.5">
+              <span>🎓</span>
+              <span>1. Course &amp; Loans</span>
+            </div>
+            <span id="badge-step1" class="text-[10px] px-1.5 py-0.2 rounded bg-white/20 text-white font-bold opacity-90">Debt Setup</span>
+          </button>
+
+          <button onclick="switchPerspective('step2')" id="tab-step2" class="perspective-tab bg-white text-slate-700 border border-slate-200 py-2.5 px-2 rounded-xl text-center font-bold text-xs transition cursor-pointer flex flex-col items-center justify-center gap-0.5 hover:bg-slate-50">
+            <div class="flex items-center gap-1.5">
+              <span>💼</span>
+              <span>2. Career &amp; Parent</span>
+            </div>
+            <span id="badge-step2" class="text-[10px] px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 font-bold">Salary &amp; Pot</span>
+          </button>
+
+          <button onclick="switchPerspective('student')" id="tab-student" class="perspective-tab bg-white text-slate-700 border border-slate-200 py-2.5 px-2 rounded-xl text-center font-bold text-xs transition cursor-pointer flex flex-col items-center justify-center gap-0.5 hover:bg-slate-50">
+            <div class="flex items-center gap-1.5">
+              <span>📊</span>
+              <span>3. Student View</span>
+            </div>
+            <span id="badge-student" class="text-[10px] px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 font-bold">Repayments</span>
+          </button>
+
+          <button onclick="switchPerspective('parent')" id="tab-parent" class="perspective-tab bg-white text-slate-700 border border-slate-200 py-2.5 px-2 rounded-xl text-center font-bold text-xs transition cursor-pointer flex flex-col items-center justify-center gap-0.5 hover:bg-slate-50">
+            <div class="flex items-center gap-1.5">
+              <span>👨‍👩‍👧</span>
+              <span>4. Parent Tables</span>
+            </div>
+            <span id="badge-parent" class="text-[10px] px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 font-bold">Decision Lab</span>
+          </button>
+
+          <button onclick="switchPerspective('cgt-guide')" id="tab-cgt" class="perspective-tab bg-white text-slate-700 border border-slate-200 py-2.5 px-2 rounded-xl text-center font-bold text-xs transition cursor-pointer flex flex-col items-center justify-center gap-0.5 hover:bg-slate-50">
+            <div class="flex items-center gap-1.5">
+              <span>🛡️</span>
+              <span>5. CGT &amp; ISA Guide</span>
+            </div>
+            <span class="text-[10px] px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 font-bold">Tax Explainer</span>
+          </button>
+
+          <button onclick="switchPerspective('info')" id="tab-info" class="perspective-tab bg-white text-slate-700 border border-slate-200 py-2.5 px-2 rounded-xl text-center font-bold text-xs transition cursor-pointer flex flex-col items-center justify-center gap-0.5 hover:bg-slate-50">
+            <div class="flex items-center gap-1.5">
+              <span>ℹ️</span>
+              <span>6. Assumptions</span>
+            </div>
+            <span class="text-[10px] px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 font-bold">Rules &amp; Links</span>
+          </button>
+
+        </div>
+      </div>
+
       <!-- STEP 1: THE UNIVERSITY JOURNEY (DEBT BUILDER) -->
-      <section class="bg-white rounded-xl p-5 sm:p-6 border border-slate-200 shadow-sm space-y-5">
+      <section id="perspective-step1" class="bg-white rounded-xl p-5 sm:p-6 border border-slate-200 shadow-sm space-y-5">
         
         <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-3 gap-2">
           <div>
@@ -465,10 +555,21 @@
           </div>
         </div>
 
+        <!-- Step 1 Bottom Navigation Bar -->
+        <div class="pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div class="text-xs text-slate-500">
+            Total Starting Debt: <strong class="text-slate-900" id="s1SummaryDebtText">£55,359</strong>
+          </div>
+          <button onclick="switchPerspective('step2')" class="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white rounded-xl text-xs font-black shadow-xs transition cursor-pointer self-stretch sm:self-auto justify-center">
+            <span>Next: Step 2 &bull; Graduate Career &amp; Parent Contribution</span>
+            <span>&rarr;</span>
+          </button>
+        </div>
+
       </section>
 
       <!-- STEP 2: CAREER EARNINGS & ECONOMIC PROFILE (SHARED INPUTS FOR BOTH TABS) -->
-      <section class="bg-white rounded-xl p-5 sm:p-6 border border-slate-200 shadow-sm space-y-4">
+      <section id="perspective-step2" class="bg-white rounded-xl p-5 sm:p-6 border border-slate-200 shadow-sm space-y-4 hidden">
         
         <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-3 gap-2">
           <div>
@@ -559,6 +660,22 @@
           <div class="text-[11px] text-blue-900/90 leading-relaxed space-y-1" id="statutoryRulesExplain">
             <p>&bull; <strong>Repayment Threshold:</strong> You only pay <strong>9%</strong> on income earned above <strong>£27,295/year</strong> (£2,274/month). If you earn less, your deduction is £0.</p>
             <p>&bull; <strong>Interest Calculation:</strong> Under Plan 2, interest while studying is RPI + 3% (<strong>7.1%</strong>). After graduation, it scales between RPI (4.1%) up to RPI + 3% (7.1%) depending on income. Under Plan 5, interest is strictly capped at RPI (4.1%).</p>
+        <!-- Step 2 Bottom Navigation Bar -->
+        <div class="pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <button onclick="switchPerspective('step1')" class="inline-flex items-center gap-1.5 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold transition cursor-pointer self-start sm:self-auto border border-slate-200">
+            <span>&larr;</span>
+            <span>Back to Step 1 (Course &amp; Loans)</span>
+          </button>
+
+          <div class="flex items-center gap-2 w-full sm:w-auto">
+            <button onclick="switchPerspective('student')" class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white rounded-xl text-xs font-black shadow-xs transition cursor-pointer">
+              <span>View Student Repayments</span>
+              <span>&rarr;</span>
+            </button>
+            <button onclick="switchPerspective('parent')" class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white rounded-xl text-xs font-black shadow-xs transition cursor-pointer">
+              <span>View Parent Decision Tables</span>
+              <span>&rarr;</span>
+            </button>
           </div>
         </div>
 
@@ -566,41 +683,24 @@
 
       <!-- STEP 3: RESULTS PERSPECTIVES (STUDENT PAYSLIP VS PARENT ADVISOR) -->
       <section class="space-y-4">
-        
-        <!-- Tab Navigation Switcher (4 Views) -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 p-1.5 bg-slate-200/80 rounded-2xl">
-          <button onclick="switchPerspective('student')" id="tab-student" class="perspective-tab active py-2.5 px-2 rounded-xl text-center font-bold text-xs sm:text-sm transition cursor-pointer flex items-center justify-center gap-1.5">
-            <span>🎓</span>
-            <span>Student Repayment</span>
-          </button>
-          
-          <button onclick="switchPerspective('parent')" id="tab-parent" class="perspective-tab bg-white text-slate-700 border border-slate-200 py-2.5 px-2 rounded-xl text-center font-bold text-xs sm:text-sm transition cursor-pointer flex items-center justify-center gap-1.5 hover:bg-slate-50">
-            <span>👨‍👩‍👦</span>
-            <span>Parent Contribution</span>
-          </button>
-
-          <button onclick="switchPerspective('cgt-guide')" id="tab-cgt" class="perspective-tab bg-white text-slate-700 border border-slate-200 py-2.5 px-2 rounded-xl text-center font-bold text-xs sm:text-sm transition cursor-pointer flex items-center justify-center gap-1.5 hover:bg-slate-50">
-            <span>🛡️</span>
-            <span>CGT &amp; ISA Guide</span>
-          </button>
-
-          <button onclick="switchPerspective('info')" id="tab-info" class="perspective-tab bg-white text-slate-700 border border-slate-200 py-2.5 px-2 rounded-xl text-center font-bold text-xs sm:text-sm transition cursor-pointer flex items-center justify-center gap-1.5 hover:bg-slate-50">
-            <span>ℹ️</span>
-            <span>Assumptions &amp; Rules</span>
-          </button>
-        </div>
 
         <!-- PERSPECTIVE A: STUDENT PAYSLIP IMPACT & LIFETIME LOAN TRAJECTORY -->
-        <div id="perspective-student" class="bg-white rounded-xl p-5 sm:p-6 border border-slate-200 shadow-sm space-y-5">
+        <div id="perspective-student" class="bg-white rounded-xl p-5 sm:p-6 border border-slate-200 shadow-sm space-y-5 hidden">
           
-          <div class="border-b border-slate-100 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+          <div class="border-b border-slate-100 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
               <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-blue-100 text-blue-800">Graduate Payslip Breakdown</span>
               <h3 class="text-sm sm:text-base font-black text-slate-900 mt-1">Starting Salary: £<span class="ruleSalaryText">35,000</span> / year</h3>
               <p class="text-xs text-slate-500">How student loan deductions impact your actual monthly take-home pay.</p>
             </div>
-            <div class="text-xs font-bold text-slate-600 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 self-start sm:self-auto">
-              Gross Monthly: <span id="dispMonthlyGross" class="text-slate-900">£2,917</span>
+            <div class="flex items-center gap-2 flex-wrap self-start sm:self-auto">
+              <button onclick="switchPerspective('step2')" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-900 border border-blue-200 rounded-xl text-xs font-bold transition cursor-pointer">
+                <span>&larr;</span>
+                <span>Tweak Career / Loan Inputs</span>
+              </button>
+              <div class="text-xs font-bold text-slate-600 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200">
+                Gross Monthly: <span id="dispMonthlyGross" class="text-slate-900 font-bold">£2,917</span>
+              </div>
             </div>
           </div>
 
@@ -707,7 +807,7 @@
 
         <!-- PERSPECTIVE B: PARENT UPFRONT CONTRIBUTION WITH DECISION & SEPARATE SCENARIO CHARTS -->
         <div id="perspective-parent" class="bg-white rounded-xl p-5 sm:p-6 border border-slate-200 shadow-sm space-y-5 hidden">
-          <div class="border-b border-slate-100 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+          <div class="border-b border-slate-100 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
               <div class="flex items-center gap-2">
                 <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-100 text-amber-800">Personalized Parent Decision Engine</span>
@@ -715,6 +815,10 @@
               <h3 class="text-sm sm:text-base font-black text-slate-900 mt-1">Should you pay your child's university fees upfront?</h3>
               <p class="text-xs text-slate-500">Evaluated using your child's specific starting salary (£<span class="ruleSalaryText">35,000</span>) and <span id="dispParentGrowthRef">3.5%</span> annual career progression.</p>
             </div>
+            <button onclick="switchPerspective('step2')" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-950 border border-emerald-300 rounded-xl text-xs font-bold transition cursor-pointer self-start sm:self-auto">
+              <span>&larr;</span>
+              <span>Adjust Child Career / Inputs</span>
+            </button>
           </div>
 
           <!-- Upfront Contribution Input -->
@@ -1335,7 +1439,7 @@
       isLivingManuallyEdited: false,
       customLivingTotal: null,
       deviceMode: 'desktop',
-      perspective: 'student'
+      perspective: 'step1'
     };
 
     let tuitionOnlyAmount = 27750;
@@ -1609,23 +1713,32 @@
 
     function switchPerspective(p) {
       state.perspective = p;
+      const step1El = document.getElementById('perspective-step1');
+      const step2El = document.getElementById('perspective-step2');
       const studEl = document.getElementById('perspective-student');
       const parEl = document.getElementById('perspective-parent');
       const cgtEl = document.getElementById('perspective-cgt');
       const infoEl = document.getElementById('perspective-info');
+
+      if (step1El) step1El.classList.toggle('hidden', p !== 'step1');
+      if (step2El) step2El.classList.toggle('hidden', p !== 'step2');
       if (studEl) studEl.classList.toggle('hidden', p !== 'student');
       if (parEl) parEl.classList.toggle('hidden', p !== 'parent');
       if (cgtEl) cgtEl.classList.toggle('hidden', p !== 'cgt-guide');
       if (infoEl) infoEl.classList.toggle('hidden', p !== 'info');
       
+      const tabStep1 = document.getElementById('tab-step1');
+      const tabStep2 = document.getElementById('tab-step2');
       const tabStud = document.getElementById('tab-student');
       const tabPar = document.getElementById('tab-parent');
       const tabCgt = document.getElementById('tab-cgt');
       const tabInfo = document.getElementById('tab-info');
 
-      const activeClass = 'perspective-tab active py-2.5 px-2 rounded-xl text-center font-bold text-xs sm:text-sm transition cursor-pointer flex items-center justify-center gap-1.5';
-      const inactiveClass = 'perspective-tab bg-white text-slate-700 border border-slate-200 py-2.5 px-2 rounded-xl text-center font-bold text-xs sm:text-sm transition cursor-pointer flex items-center justify-center gap-1.5 hover:bg-slate-50';
+      const activeClass = 'perspective-tab active py-2.5 px-2 rounded-xl text-center font-bold text-xs transition cursor-pointer flex flex-col items-center justify-center gap-0.5';
+      const inactiveClass = 'perspective-tab bg-white text-slate-700 border border-slate-200 py-2.5 px-2 rounded-xl text-center font-bold text-xs transition cursor-pointer flex flex-col items-center justify-center gap-0.5 hover:bg-slate-50';
 
+      if (tabStep1) tabStep1.className = (p === 'step1') ? activeClass : inactiveClass;
+      if (tabStep2) tabStep2.className = (p === 'step2') ? activeClass : inactiveClass;
       if (tabStud) tabStud.className = (p === 'student') ? activeClass : inactiveClass;
       if (tabPar) tabPar.className = (p === 'parent') ? activeClass : inactiveClass;
       if (tabCgt) tabCgt.className = (p === 'cgt-guide') ? activeClass : inactiveClass;
@@ -1633,13 +1746,7 @@
 
       recalculateResults();
 
-      if (p === 'cgt-guide') {
-        const target = document.getElementById('perspective-cgt');
-        if (target) {
-          const topPos = target.getBoundingClientRect().top + window.pageYOffset - 80;
-          window.scrollTo({ top: topPos, behavior: 'smooth' });
-        }
-      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function syncSalary(val) {
@@ -1964,6 +2071,41 @@
 
       // Render Dynamic CGT & ISA Calculation Guide Breakdown
       renderCgtDetailedGuide(state.parentContribution, remainingYears, wipeoutAge, careerStartAge);
+
+      // Update Sticky Live KPI HUD Ribbon
+      const hudPlan = document.getElementById('hudPlanBadge');
+      if (hudPlan) hudPlan.innerText = `${planName} (${remainingYears}-Yr Term)`;
+      const hudDebtEl = document.getElementById('hudDebt');
+      if (hudDebtEl) hudDebtEl.innerText = `£${fullDebtAmount.toLocaleString()}`;
+      const hudSalaryEl = document.getElementById('hudSalary');
+      if (hudSalaryEl) hudSalaryEl.innerText = `£${state.salary.toLocaleString()}`;
+      const hudContribEl = document.getElementById('hudContrib');
+      if (hudContribEl) hudContribEl.innerText = `£${state.parentContribution.toLocaleString()}`;
+      const hudRepaidEl = document.getElementById('hudRepaid');
+      if (hudRepaidEl) hudRepaidEl.innerText = `£${studentSim.totalPaid.toLocaleString()}`;
+      const hudCancelledEl = document.getElementById('hudCancelled');
+      if (hudCancelledEl) {
+        if (studentSim.clearedYearIndex !== null) {
+          hudCancelledEl.innerText = `£0 (Cleared Age ${careerStartAge + studentSim.clearedYearIndex})`;
+          hudCancelledEl.className = 'text-xs sm:text-sm font-black text-blue-700';
+        } else {
+          hudCancelledEl.innerText = `£${studentSim.endingBalance.toLocaleString()} (Age ${wipeoutAge})`;
+          hudCancelledEl.className = 'text-xs sm:text-sm font-black text-emerald-700';
+        }
+      }
+
+      // Update Tab Badges
+      const b1 = document.getElementById('badge-step1');
+      if (b1) b1.innerText = `£${Math.round(fullDebtAmount / 1000)}k Debt`;
+      const b2 = document.getElementById('badge-step2');
+      if (b2) b2.innerText = `£${Math.round(state.salary / 1000)}k • £${Math.round(state.parentContribution / 1000)}k`;
+      const b3 = document.getElementById('badge-student');
+      if (b3) b3.innerText = `£${Math.round(studentSim.totalPaid / 1000)}k Repaid`;
+      const b4 = document.getElementById('badge-parent');
+      if (b4) b4.innerText = (childActualSavings > 100) ? `Saves £${Math.round(childActualSavings / 1000)}k` : `Decision Lab`;
+
+      const s1SummaryDebt = document.getElementById('s1SummaryDebtText');
+      if (s1SummaryDebt) s1SummaryDebt.innerText = `£${fullDebtAmount.toLocaleString()}`;
     }
 
     function updateParentDecisionCard(childSavings, wipeoutAge, remainingYears, simNoContrib, simWithContrib, careerStartAge) {
@@ -3256,6 +3398,7 @@
 
     // Initial setup
     handleCourseChange();
+    switchPerspective(state.perspective || 'step1');
   </script>
 </body>
 </html>
